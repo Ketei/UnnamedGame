@@ -4,8 +4,39 @@ extends Node
 const grid_size: int = 16
 
 # Possible difficulties for the game.
-enum Difficulty {EASY, NORMAL, HARD}
+enum Difficulty {EASY, NORMAL, HARD, IMPOSSIBLE}
 
+const Arousal_Change_Bottoms : Array = [-100, -75, -50, -25, -5, 5, 15, 25, 40, 60]
+const Arousal_Change_Tops : Array = [-100, -85, -60, -35, -15, 5, 20, 35, 50, 60]
+
+# Applies effects to actor depending on it's lust value. This is designed around player only but can work on NPC
+# provided they have the proper variable enabled.
+# per-level values will be added to the proper variable for each lust level increase/decrease.
+# Numbered values will add the value to the proper variable starting from that value until the
+# next higher value is reached. Ex. Starting from lust 20, it'll add 2 to arousal until reaching arousal 39
+# on reachign 40 it'll start adding 3 until the next number is reached.
+var lust_effects: Dictionary = {
+	"per-level": {
+		"sex-damage-dealt": -0.75,
+		"sex-damage-received": 0.02
+	},
+	"20": {
+		"arousal": 2
+	},
+	"40": {
+		"arousal": 3
+	},
+	"60": {
+		"arousal": 5
+	},
+	"80": {
+		"arousal": 10
+	},
+	"100": {
+		"arousal": 25
+	}
+}
+# ---------------------------
 
 # Relating to terrains
 enum TerrainState {GROUND, AIR, WATER}
@@ -36,3 +67,25 @@ func change_keybind(EventName: String, NewKeybindKeyCode: int):
 		var _new_keybind = InputEventKey.new()
 		_new_keybind.keycode = NewKeybindKeyCode
 		InputMap.action_add_event(EventName, _new_keybind)
+
+
+func add_lust_effect(LustAmount: int, StatChange: String, MathOperation: String, ValueChange: float) -> void:
+	if str(LustAmount) not in lust_effects:
+		lust_effects[str(LustAmount)] = {}
+	
+	if StatChange not in lust_effects[str(LustAmount)]:
+		lust_effects[str(LustAmount)][StatChange] = {}
+	
+	lust_effects[str(LustAmount)][StatChange][MathOperation.to_lower()] = ValueChange
+
+
+func remove_lust_effect(LustAmount: int, StatChange: String, MathOperation: String):
+	if str(LustAmount) in lust_effects:
+		if StatChange in lust_effects[str(LustAmount)]:
+			lust_effects[str(LustAmount)][StatChange].erase(MathOperation.to_lower())
+			
+			if lust_effects[str(LustAmount)][StatChange].is_empty():
+				lust_effects[str(LustAmount)].erase(StatChange)
+			
+			if lust_effects[str(LustAmount)].is_empty():
+				lust_effects.erase(str(LustAmount))
