@@ -69,23 +69,19 @@ func change_keybind(EventName: String, NewKeybindKeyCode: int):
 		InputMap.action_add_event(EventName, _new_keybind)
 
 
-func add_lust_effect(LustAmount: int, StatChange: String, MathOperation: String, ValueChange: float) -> void:
+func add_lust_effect(LustAmount: int, StatChange: String, ValueChange: float) -> void:
 	if str(LustAmount) not in lust_effects:
 		lust_effects[str(LustAmount)] = {}
 	
 	if StatChange not in lust_effects[str(LustAmount)]:
-		lust_effects[str(LustAmount)][StatChange] = {}
+		lust_effects[str(LustAmount)][StatChange] = 0
 	
-	lust_effects[str(LustAmount)][StatChange][MathOperation.to_lower()] = ValueChange
+	lust_effects[str(LustAmount)][StatChange] += ValueChange
 
 
-func remove_lust_effect(LustAmount: int, StatChange: String, MathOperation: String):
+func remove_lust_effect(LustAmount: int, StatChange: String):
 	if str(LustAmount) in lust_effects:
-		if StatChange in lust_effects[str(LustAmount)]:
-			lust_effects[str(LustAmount)][StatChange].erase(MathOperation.to_lower())
-			
-			if lust_effects[str(LustAmount)][StatChange].is_empty():
-				lust_effects[str(LustAmount)].erase(StatChange)
-			
-			if lust_effects[str(LustAmount)].is_empty():
-				lust_effects.erase(str(LustAmount))
+		lust_effects[str(LustAmount)].erase(StatChange)
+		
+		if lust_effects[str(LustAmount)].is_empty():
+			lust_effects.erase(str(LustAmount))
