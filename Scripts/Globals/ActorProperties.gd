@@ -13,6 +13,7 @@ const MaxSexHealthDamagePercent: int = 100
 # Related to Actors
 enum ActorType {NPC, PLAYER}
 enum ActorClass {WARRIOR, ARCHER, MAGE}
+enum SexSkillTypes {ANAL, ORAL, PENIS, VAGINAL}
 # Warrior: Sword & Shield. Can block | Standard dodge | Can't counter
 # Archer Bow & Dagger. Can't block | Longer Dodge | Can't counter
 # Mage: Staff & Scroll. Can block some damage | Shorter dodge | Can counter
@@ -41,3 +42,18 @@ enum Species {WOLF, DRAGON, KAIJU}
 # StateMachineProperties
 #enum StateTerrain {GROUND, AIR, WATER}
 
+func get_sex_skill(SexSkill: SexSkillTypes, VitalityHornyModule: VitalityHorny) -> int:
+	var _return_skill = 0
+	
+	if VitalityHornyModule:
+		if SexSkill == SexSkillTypes.ANAL:
+			_return_skill = VitalityHornyModule.sex_skill_vaginal
+		elif SexSkill == SexSkillTypes.ORAL:
+			_return_skill = VitalityHornyModule.sex_skill_oral
+		elif SexSkill == SexSkillTypes.PENIS:
+			_return_skill = VitalityHornyModule.sex_skill_penis
+		elif SexSkill == SexSkillTypes.VAGINAL:
+			_return_skill = VitalityHornyModule.sex_skill_vaginal
+	
+	return _return_skill
+	
