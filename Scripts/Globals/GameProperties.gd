@@ -4,17 +4,18 @@ extends Node
 const grid_size: int = 16
 
 # Possible difficulties for the game.
-enum Difficulty {EASY, NORMAL, HARD, IMPOSSIBLE}
+enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 
-const Arousal_Change_Bottoms : Array = [-100, -75, -50, -25, -5, 5, 15, 25, 40, 60]
-const Arousal_Change_Tops : Array = [-100, -85, -60, -35, -15, 5, 20, 35, 50, 60]
+# When cumming, arousal will be changed by -100 + (this value * cum_times).
+# When an actor cums a lot, he becomes a addicted. Hence cumming doesn't clear
+# arousal as well.
+# Tops cum more, bottoms cum less. Balance these values considering that.
+# Currently considering a player might get grabbed around 5 times.
+const Arousal_Clearing_Penalty_Bottoms : int = 16
+const Arousal_Clearing_Penalty_Tops : int = 8
 
-# Applies effects to actor depending on it's lust value. This is designed around player only but can work on NPC
-# provided they have the proper variable enabled.
-# per-level values will be added to the proper variable for each lust level increase/decrease.
-# Numbered values will add the value to the proper variable starting from that value until the
-# next higher value is reached. Ex. Starting from lust 20, it'll add 2 to arousal until reaching arousal 39
-# on reachign 40 it'll start adding 3 until the next number is reached.
+# Applies effects to actor depending on it's lust value when the relevant value is updated.
+# Per-level effects are only applied when the lust value of the actor changes.
 var lust_effects: Dictionary = {
 	"per-level": {
 		"sex-damage-dealt": -0.75,
