@@ -7,8 +7,6 @@ var enabled: bool = true
 
 var parent_module: ModuleVitality
 
-var _health_module: VitalityHealth = null
-var _skill_module: VitalitySkill = null
 var change_self_with_lust: bool = false
 
 var actor_sex_role: ActorProperties.SexRole = ActorProperties.SexRole.TOP
@@ -114,17 +112,17 @@ var base_sex_damage_dealt: float = 1.0 :
 	set(value):
 		if enabled:
 			base_sex_damage_dealt = maxf(value, 0.0)
-			sex_damage_dealt = ActorLibs.calculate_skilli(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_skillf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var mod_sex_damage_dealt: float = 0.0 :
 	set(value):
 		if enabled:
 			mod_sex_damage_dealt = value
-			sex_damage_dealt = ActorLibs.calculate_skilli(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_skillf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var mult_sex_damage_dealt: float = 1.0:
 	set(value):
 		if enabled:
 			mult_sex_damage_dealt = value
-			sex_damage_dealt = ActorLibs.calculate_skilli(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_skillf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var sex_damage_dealt: float = 0:
 	set(value):
 		if enabled:
@@ -134,17 +132,17 @@ var base_sex_damage_received: float = 1.0 :
 	set(value):
 		if enabled:
 			base_sex_damage_received = maxf(value, 0.0)
-			sex_damage_received = ActorLibs.calculate_skilli(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_skillf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var mod_sex_damage_received: float = 0.0:
 	set(value):
 		if enabled:
 			mod_sex_damage_received = value
-			sex_damage_received = ActorLibs.calculate_skilli(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_skillf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var mult_sex_damage_received: float = 1.0:
 	set(value):
 		if enabled:
 			mult_sex_damage_received = value
-			sex_damage_received = ActorLibs.calculate_skilli(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_skillf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var sex_damage_received: float = 0:
 	set(value):
 		if enabled:
@@ -152,11 +150,17 @@ var sex_damage_received: float = 0:
 
 # Goes from 0 to 100. When at 100 the orgasm signal will be sent. The vitality module should handle
 # the cum effects & calculations and also run the cum() function in this object to calculate current_arousal change.
-var orgasm_buildup: int = 0 :
+var cum_threshold: int = 100
+var cum_meter: int = 0 :
 	set(value):
-		orgasm_buildup = clampi(value, 0, 100)
-		if orgasm_buildup == 100 and can_cum:
-			orgasm_signal.emit()
+		cum_meter = maxi(value, 0)
+
+# Value to add to cum progress is multiplied by cum_gain_mult. 
+var cum_gain_mult: float = 1.0 
+# This value gets added to cum_gain_mult every-time a cum event is triggered. Making it easier or harder
+# to reach climax next time.
+# For tops a 0.25 is planned. For bottoms a -0.1 is planned
+var cum_gain_mult_change: float = 0.0
 
 # Cum
 var can_cum: bool = true
@@ -181,19 +185,16 @@ var current_lust: int = 0:
 	set(value):
 		previous_lust = current_lust
 		current_lust = clampi(value, 0, max_lust)
-		if previous_lust != current_lust:
-			if change_self_with_lust:
-				SexLibs.change_stats_with_lust(_health_module, _skill_module, self)
-			elif _health_module or _skill_module:
-				SexLibs.change_stats_with_lust(_health_module, _skill_module, null)
 
 # Arousal
-var max_arousal: int = 100 :
+var max_arousal: int = 100 : # Has no lust integration
 	set(value):
 		max_arousal = maxi(value, 1)
 var current_arousal: int :
 	set(value):
 		current_arousal = clampi(value, 0, max_arousal)
+		if change_self_with_lust:
+			current_arousal += SexLibs.get_stat_with_lusti("arousal", current_lust)
 
 # Used to exectue a highly damaging lewd skill
 var base_sex_limit_break: int = 1:
@@ -221,14 +222,23 @@ var current_sex_limit_break: int = 0 :
 		current_sex_limit_break = clampi(value, 0, max_sex_limit_break)
 
 
+func progress_cum_meter(ProgressAmount: int) -> void:
+	cum_meter += floori(ProgressAmount * cum_gain_mult)
+
+
 func cum() -> void:
 	if actor_sex_role == ActorProperties.SexRole.BOTTOM:
-		current_arousal += GameProperties.Arousal_Change_Bottoms[clampi(orgasm_counter_effect, 0, 9)]
+		current_arousal += (GameProperties.Arousal_Clearing_Penalty_Bottoms * orgasm_counter_effect) - 100
 	elif actor_sex_role == ActorProperties.SexRole.TOP:
-		current_arousal += GameProperties.Arousal_Change_Tops[clampi(orgasm_counter_effect, 0, 9)]
-
-	orgasm_counter_effect += 1
-	orgasm_counter += 1
+		current_arousal += (GameProperties.Arousal_Clearing_Penalty_Tops * orgasm_counter_effect) - 100
+	
+	cum_meter = 0
+	
+	var cum_times: int = cum_meter / cum_threshold
+	
+	orgasm_counter_effect += cum_times
+	orgasm_counter += cum_times
+	cum_gain_mult += cum_gain_mult_change * cum_times
 
 
 func full_restore() -> void:
