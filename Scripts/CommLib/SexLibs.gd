@@ -57,7 +57,7 @@ func change_stats_with_lust(VitalityStats: VitalityHealth, SkillStats: VitalityS
 	var _lust_steps: int = HornyStats.lust - HornyStats.previous_lust
 	var _lust_steps_dict: Dictionary = {}
 	var _lust_val_keys: Array = GameProperties.lust_effects.keys()
-	var _stat_change: float
+	var _stat_change: int
 	
 	_lust_val_keys.erase("per-level")
 	
@@ -72,9 +72,9 @@ func change_stats_with_lust(VitalityStats: VitalityHealth, SkillStats: VitalityS
 				if stat == "arousal":
 					HornyStats.arousal += _stat_change
 				elif stat == "sex-damage-received":
-					HornyStats.sex_damage_received += _stat_change
+					HornyStats.sex_damage_received += _lust_steps * GameProperties.lust_effects["per-level"][stat]
 				elif stat == "sex-damage-dealt":
-					HornyStats.sex_damage_dealt += _stat_change
+					HornyStats.sex_damage_dealt += _lust_steps * GameProperties.lust_effects["per-level"][stat]
 				elif stat == "sex-skill":
 					for sex_skill in GameProperties.lust_effects["per-level"][stat].keys():
 						if sex_skill == "anal":
@@ -122,9 +122,9 @@ func change_stats_with_lust(VitalityStats: VitalityHealth, SkillStats: VitalityS
 					if effect_apply == "arousal":
 						HornyStats.arousal += _stat_change
 					elif effect_apply == "sex-damage-received":
-						HornyStats.sex_damage_received += _stat_change
+						HornyStats.sex_damage_received += GameProperties.lust_effects[key_effect][effect_apply] * _lust_steps_dict[key_effect]
 					elif effect_apply == "sex-damage-dealt":
-						HornyStats.sex_damage_dealt += _stat_change
+						HornyStats.sex_damage_dealt += GameProperties.lust_effects[key_effect][effect_apply] * _lust_steps_dict[key_effect]
 					elif effect_apply == "sex-skill":
 						for sex_skill in GameProperties.lust_effects["per-level"][effect_apply].keys():
 							if sex_skill == "anal":
@@ -163,4 +163,31 @@ func change_stats_with_lust(VitalityStats: VitalityHealth, SkillStats: VitalityS
 						VitalityStats.mod_max_stamina += _stat_change
 					elif effect_apply == "mana":
 						VitalityStats.mod_max_mana += _stat_change
-					
+
+
+func get_stat_with_lustf(StatType: String, CurrentLust: int) -> float:
+	var _index: String = get_lust_effect_key(CurrentLust)
+	var _return_value: float = 0.0
+
+	if _index != "-1":
+		if StatType in GameProperties.lust_effects[_index]:
+			_return_value += GameProperties.lust_effects[_index]
+	
+	if StatType in GameProperties.lust_effects["per-level"]:
+		_return_value += GameProperties.lust_effects["per-level"][StatType]
+
+	return _return_value
+
+
+func get_stat_with_lusti(StatType: String, CurrentLust: int) -> int:
+	var _index: String = get_lust_effect_key(CurrentLust)
+	var _return_value: int = 0
+
+	if _index != "-1":
+		if StatType in GameProperties.lust_effects[_index]:
+			_return_value += GameProperties.lust_effects[_index]
+	
+	if StatType in GameProperties.lust_effects["per-level"]:
+		_return_value += GameProperties.lust_effects["per-level"][StatType]
+
+	return _return_value
