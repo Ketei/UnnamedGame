@@ -3,6 +3,11 @@ class_name VitalityHorny
 
 signal orgasm_signal
 
+# Signal for elements that are to be displayed in-game
+signal arousal_change(NewCurrentAmount, MaxAmount)
+signal cum_meter_change(NewAmount, MaxAmount)
+signal sex_limit_break_change(NewCurrentAmount, MaxAmount)
+
 var enabled: bool = true
 
 var parent_module: ModuleVitality
@@ -150,10 +155,14 @@ var sex_damage_received: float = 0:
 
 # Goes from 0 to 100. When at 100 the orgasm signal will be sent. The vitality module should handle
 # the cum effects & calculations and also run the cum() function in this object to calculate current_arousal change.
-var cum_threshold: int = 100
+var cum_threshold: int = 100:
+	set(value):
+		cum_threshold = maxi(value, 1)
+		cum_meter_change.emit(cum_meter, cum_threshold)
 var cum_meter: int = 0 :
 	set(value):
 		cum_meter = maxi(value, 0)
+		cum_meter_change.emit(cum_meter, cum_threshold)
 
 # Value to add to cum progress is multiplied by cum_gain_mult. 
 var cum_gain_mult: float = 1.0 
@@ -190,11 +199,13 @@ var current_lust: int = 0:
 var max_arousal: int = 100 : # Has no lust integration
 	set(value):
 		max_arousal = maxi(value, 1)
+		arousal_change.emit(current_arousal, max_arousal)
 var current_arousal: int :
 	set(value):
 		current_arousal = clampi(value, 0, max_arousal)
 		if change_self_with_lust:
 			current_arousal += SexLibs.get_stat_with_lusti("arousal", current_lust)
+		arousal_change.emit(current_arousal, max_arousal)
 
 # Used to exectue a highly damaging lewd skill
 var base_sex_limit_break: int = 1:
@@ -217,9 +228,11 @@ var max_sex_limit_break: int = 1 :
 		max_sex_limit_break = maxi(value, 1)
 		if max_sex_limit_break < current_sex_limit_break:
 			current_sex_limit_break = max_sex_limit_break
+		sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
 var current_sex_limit_break: int = 0 :
 	set(value):
 		current_sex_limit_break = clampi(value, 0, max_sex_limit_break)
+		sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
 
 
 func progress_cum_meter(ProgressAmount: int) -> void:
