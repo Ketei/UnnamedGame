@@ -157,29 +157,57 @@ var sex_damage_received: float = 0:
 # the cum effects & calculations and also run the cum() function in this object to calculate current_arousal change.
 var cum_threshold: int = 100:
 	set(value):
-		cum_threshold = maxi(value, 1)
-		cum_meter_change.emit(cum_meter, cum_threshold)
+		if enabled:
+			cum_threshold = maxi(value, 1)
+			cum_meter_change.emit(cum_meter, cum_threshold)
 var cum_meter: int = 0 :
 	set(value):
-		cum_meter = maxi(value, 0)
-		cum_meter_change.emit(cum_meter, cum_threshold)
+		if enabled:
+			cum_meter = maxi(value, 0)
+			cum_meter_change.emit(cum_meter, cum_threshold)
 
 # Value to add to cum progress is multiplied by cum_gain_mult. 
-var cum_gain_mult: float = 1.0 
+var cum_gain_mult: float = 1.0 :
+	set(value):
+		if enabled:
+			cum_gain_mult = value
 # This value gets added to cum_gain_mult every-time a cum event is triggered. Making it easier or harder
 # to reach climax next time.
 # For tops a 0.25 is planned. For bottoms a -0.1 is planned
-var cum_gain_mult_change: float = 0.0
+var cum_gain_mult_change: float = 0.0 :
+	set(value):
+		if enabled:
+			cum_gain_mult_change = value
 
 # Cum
-var can_cum: bool = true
-var orgasm_counter: int = 0
-var orgasm_counter_effect: int = 0
+var can_cum: bool = true :
+	set(value):
+		if enabled:
+			can_cum = value
+var orgasm_counter: int = 0 :
+	set(value):
+		if enabled:
+			orgasm_counter = value
+var orgasm_counter_effect: int = 0 :
+	set(value):
+		if enabled:
+			orgasm_counter_effect = value
 
 # Sexual Endurance
-var max_sexual_endurance: int = 100 :
+var base_sexual_endurance: int = 0 :
 	set(value):
-		max_sexual_endurance = maxi(value, 0)
+		if enabled:
+			base_sexual_endurance = value
+			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance
+var max_sexual_endurance: int = 0 :
+	set(value):
+		if enabled:
+			max_sexual_endurance = maxi(value, 0)
+var mod_sexual_endurance: int = 0 :
+	set(value):
+		if enabled:
+			mod_sexual_endurance = value
+			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance
 var current_sexual_endurance: int = 0:
 	set(value):
 		if enabled:
@@ -188,24 +216,31 @@ var current_sexual_endurance: int = 0:
 # Lust
 var max_lust: int = 100 :
 	set(value):
-		max_lust = maxi(value, 1)
-var previous_lust: int
+		if enabled:
+			max_lust = maxi(value, 1)
+var previous_lust: int :
+	set(value):
+		if enabled:
+			previous_lust = value
 var current_lust: int = 0:
 	set(value):
-		previous_lust = current_lust
-		current_lust = clampi(value, 0, max_lust)
+		if enabled:
+			previous_lust = current_lust
+			current_lust = clampi(value, 0, max_lust)
+			if change_self_with_lust:
+				trigger_lust_stats_change()
 
 # Arousal
 var max_arousal: int = 100 : # Has no lust integration
 	set(value):
-		max_arousal = maxi(value, 1)
-		arousal_change.emit(current_arousal, max_arousal)
+		if enabled:
+			max_arousal = maxi(value, 1)
+			arousal_change.emit(current_arousal, max_arousal)
 var current_arousal: int :
 	set(value):
-		current_arousal = clampi(value, 0, max_arousal)
-		if change_self_with_lust:
-			current_arousal += SexLibs.get_stat_with_lusti("arousal", current_lust)
-		arousal_change.emit(current_arousal, max_arousal)
+		if enabled:
+			current_arousal = clampi(value, 0, max_arousal)
+			arousal_change.emit(current_arousal, max_arousal)
 
 # Used to exectue a highly damaging lewd skill
 var base_sex_limit_break: int = 1:
@@ -225,14 +260,16 @@ var mult_sex_limit_break: float = 1.0:
 			max_sex_limit_break = ActorLibs.calculate_skilli(base_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
 var max_sex_limit_break: int = 1 :
 	set(value):
-		max_sex_limit_break = maxi(value, 1)
-		if max_sex_limit_break < current_sex_limit_break:
-			current_sex_limit_break = max_sex_limit_break
-		sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
+		if enabled:
+			max_sex_limit_break = maxi(value, 1)
+			if max_sex_limit_break < current_sex_limit_break:
+				current_sex_limit_break = max_sex_limit_break
+			sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
 var current_sex_limit_break: int = 0 :
 	set(value):
-		current_sex_limit_break = clampi(value, 0, max_sex_limit_break)
-		sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
+		if enabled:
+			current_sex_limit_break = clampi(value, 0, max_sex_limit_break)
+			sex_limit_break_change.emit(current_sex_limit_break, max_sex_limit_break)
 
 
 func progress_cum_meter(ProgressAmount: int) -> void:
@@ -256,3 +293,20 @@ func cum() -> void:
 
 func full_restore() -> void:
 	current_sexual_endurance = max_sexual_endurance
+
+
+# This method holds all the stats that have changes with lust implemented. To implement new, add then here
+# and adjust the variable set() method. a mod_X variable is reccomended so that the original value isn't lost.
+func trigger_lust_stats_change() -> void:
+	mod_sex_skill_anal += SexLibs.get_stat_with_lusti("sex-skill-anal", current_lust, previous_lust)
+	mod_sex_skill_oral += SexLibs.get_stat_with_lusti("sex-skill-penis", current_lust, previous_lust)
+	mod_sex_skill_penis += SexLibs.get_stat_with_lusti("sex-skill-penis", current_lust, previous_lust)
+	mod_sex_skill_vaginal += SexLibs.get_stat_with_lusti("sex-skill-vaginal", current_lust, previous_lust)
+	
+	mod_sex_damage_dealt += SexLibs.get_stat_with_lustf("sex-damage-dealt", current_lust, previous_lust)
+	mod_sex_damage_received += SexLibs.get_stat_with_lustf("sex-damage-dealt", current_lust, previous_lust)
+	
+	mod_sexual_endurance += SexLibs.get_stat_with_lusti("sexual-endurance", current_lust, previous_lust)
+	
+	mod_sex_limit_break += SexLibs.get_stat_with_lusti("sex-limit-break", current_lust, previous_lust)
+
