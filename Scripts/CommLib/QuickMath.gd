@@ -49,25 +49,3 @@ func is_between(Value : float, From : float, To : float) -> bool:
 	
 	return is_value_between
 
-
-func calculate_multiplier(MagnitudeList: Array) -> float:
-	var current_magnitude: float = 1.0
-	
-	if 0 < MagnitudeList.size():
-		for multiplier in MagnitudeList:
-			current_magnitude -= multiplier
-	
-	return clampf(current_magnitude, 0.0, 1.0)
-
-
-func fstep_toward_zero(Value: float, Step: float) -> float:
-	var direction: float
-	
-	if Value < 0:
-		direction = absf(Step)
-	elif 0 < Value:
-		direction = -absf(Step)
-	else:
-		direction = 0.0
-	
-	return Value + direction
