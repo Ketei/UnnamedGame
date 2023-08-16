@@ -28,11 +28,11 @@ func get_lust_effect_key(LustAmount: int) -> String:
 	return str(_return_key)
 
 
-func get_lust_effect_steps(HornyStats: VitalityHorny) -> Dictionary:
+func get_lust_effect_steps(CurrentLust: int, PreviousLust: int) -> Dictionary:
 	var _return_steps: Dictionary = {}
-	var _prev_lust = HornyStats.previous_lust
+	var _prev_lust = PreviousLust
 	var _step_add: int = 0
-	var _horny_target: int = HornyStats.lust - HornyStats.previous_lust
+	var _horny_target: int = CurrentLust - PreviousLust
 	
 	if 0 < _horny_target:
 		_step_add = 1
@@ -47,120 +47,36 @@ func get_lust_effect_steps(HornyStats: VitalityHorny) -> Dictionary:
 				_return_steps[_lust_key] = 0
 			
 			_return_steps[_lust_key] += _step_add
-		_prev_lust = move_toward(_prev_lust, HornyStats.lust, 1)
+		_prev_lust = move_toward(_prev_lust, CurrentLust, 1)
 	
 	return _return_steps
 
 
-# Use arousal - previous arousal to handle per-level increases/decreases
-func change_stats_with_lust(VitalityStats: VitalityHealth, SkillStats: VitalitySkill, HornyStats: VitalityHorny) -> void:
-	var _lust_steps: int = HornyStats.lust - HornyStats.previous_lust
-	var _lust_steps_dict: Dictionary = {}
-	var _lust_val_keys: Array = GameProperties.lust_effects.keys()
-	var _stat_change: float
+func get_stat_with_lustf(StatType: String, CurrentLust: int, PrevLust: int) -> float:
+	var _return_value: float = 0
 	
-	_lust_val_keys.erase("per-level")
+	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
 	
-	if HornyStats:
-		_lust_steps_dict = get_lust_effect_steps(HornyStats)
+	for lust_number in _lust_effect_steps.keys():
+		if StatType in GameProperties.lust_effects[lust_number]:
+			_return_value += GameProperties.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
 	
-	if _lust_steps != 0:
-		for stat in GameProperties.lust_effects["per-level"].keys():
-			_stat_change = _lust_steps * GameProperties.lust_effects["per-level"][stat]
-			
-			if HornyStats:
-				if stat == "arousal":
-					HornyStats.arousal += _stat_change
-				elif stat == "sex-damage-received":
-					HornyStats.sex_damage_received += _stat_change
-				elif stat == "sex-damage-dealt":
-					HornyStats.sex_damage_dealt += _stat_change
-				elif stat == "sex-skill":
-					for sex_skill in GameProperties.lust_effects["per-level"][stat].keys():
-						if sex_skill == "anal":
-							HornyStats.mod_sex_skill_anal += _stat_change
-						elif sex_skill == "oral":
-							HornyStats.mod_sex_skill_oral += _stat_change
-						elif sex_skill == "penis":
-							HornyStats.mod_sex_skill_penis += _stat_change
-						elif sex_skill == "vaginal":
-							HornyStats.mod_sex_skill_penis += _stat_change
-				elif stat == "sex-endurance":
-					HornyStats.max_sexual_endurance += _stat_change
-				elif stat == "sex-limit-break":
-					HornyStats.max_sex_limit_break += _stat_change
+	if StatType in GameProperties.lust_effects["per-level"]:
+		_return_value += GameProperties.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
 
-			if SkillStats:
-				if stat == "strength":
-					SkillStats.mod_strength += _stat_change
-				elif stat == "endurance":
-					SkillStats.mod_endurance += _stat_change
-				elif stat == "charisma":
-					SkillStats.mod_charisma += _stat_change
-				elif stat == "intelligence":
-					SkillStats.mod_intelligence += _stat_change
-				elif stat == "luck":
-					SkillStats.mod_luck += _stat_change
-				elif stat == "defense-physical":
-					SkillStats.mod_defense_physical += _stat_change
-				elif stat == "defense-magical":
-					SkillStats.mod_defense_magical += _stat_change
+	return _return_value
 
-			if VitalityStats:
-				if stat == "health":
-					VitalityStats.mod_max_health += _stat_change
-				elif stat == "stamina":
-					VitalityStats.mod_max_stamina += _stat_change
-				elif stat == "mana":
-					VitalityStats.mod_max_mana += _stat_change
 
-		for key_effect in _lust_steps_dict.keys():
-			for effect_apply in GameProperties.lust_effects[key_effect]:
-				_stat_change = GameProperties.lust_effects[key_effect][effect_apply] * _lust_steps_dict[key_effect]
-				
-				if HornyStats:
-					if effect_apply == "arousal":
-						HornyStats.arousal += _stat_change
-					elif effect_apply == "sex-damage-received":
-						HornyStats.sex_damage_received += _stat_change
-					elif effect_apply == "sex-damage-dealt":
-						HornyStats.sex_damage_dealt += _stat_change
-					elif effect_apply == "sex-skill":
-						for sex_skill in GameProperties.lust_effects["per-level"][effect_apply].keys():
-							if sex_skill == "anal":
-								HornyStats.mod_sex_skill_anal += _stat_change
-							elif sex_skill == "oral":
-								HornyStats.mod_sex_skill_oral += _stat_change
-							elif sex_skill == "penis":
-								HornyStats.mod_sex_skill_penis += _stat_change
-							elif sex_skill == "vaginal":
-								HornyStats.mod_sex_skill_penis += _stat_change
-					elif effect_apply == "sex-endurance":
-						HornyStats.max_sexual_endurance += _stat_change
-					elif effect_apply == "sex-limit-break":
-						HornyStats.max_sex_limit_break += _stat_change
+func get_stat_with_lusti(StatType: String, CurrentLust: int, PrevLust: int) -> int:
+	var _return_value: int = 0
+	
+	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
+	
+	for lust_number in _lust_effect_steps.keys():
+		if StatType in GameProperties.lust_effects[lust_number]:
+			_return_value += GameProperties.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
+	
+	if StatType in GameProperties.lust_effects["per-level"]:
+		_return_value += GameProperties.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
 
-				if SkillStats:
-					if effect_apply == "strength":
-						SkillStats.mod_strength += _stat_change
-					elif effect_apply == "endurance":
-						SkillStats.mod_endurance += _stat_change
-					elif effect_apply == "charisma":
-						SkillStats.mod_charisma += _stat_change
-					elif effect_apply == "intelligence":
-						SkillStats.mod_intelligence += _stat_change
-					elif effect_apply == "luck":
-						SkillStats.mod_luck += _stat_change
-					elif effect_apply == "defense-physical":
-						SkillStats.mod_defense_physical += _stat_change
-					elif effect_apply == "defense-magical":
-						SkillStats.mod_defense_magical += _stat_change
-
-				if VitalityStats:
-					if effect_apply == "health":
-						VitalityStats.mod_max_health += _stat_change
-					elif effect_apply == "stamina":
-						VitalityStats.mod_max_stamina += _stat_change
-					elif effect_apply == "mana":
-						VitalityStats.mod_max_mana += _stat_change
-					
+	return _return_value

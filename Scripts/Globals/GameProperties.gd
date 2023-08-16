@@ -4,8 +4,40 @@ extends Node
 const grid_size: int = 16
 
 # Possible difficulties for the game.
-enum Difficulty {EASY, NORMAL, HARD}
+enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 
+# When cumming, arousal will be changed by -100 + (this value * cum_times).
+# When an actor cums a lot, he becomes a addicted. Hence cumming doesn't clear
+# arousal as well.
+# Tops cum more, bottoms cum less. Balance these values considering that.
+# Currently considering a player might get grabbed around 5 times.
+const Arousal_Clearing_Penalty_Bottoms : int = 16
+const Arousal_Clearing_Penalty_Tops : int = 8
+
+# Applies effects to actor depending on it's lust value when the relevant value is updated.
+# Per-level effects are only applied when the lust value of the actor changes.
+var lust_effects: Dictionary = {
+	"per-level": {
+		"sex-damage-dealt": -0.75,
+		"sex-damage-received": 0.02
+	},
+	"20": {
+		"arousal": 2
+	},
+	"40": {
+		"arousal": 3
+	},
+	"60": {
+		"arousal": 5
+	},
+	"80": {
+		"arousal": 10
+	},
+	"100": {
+		"arousal": 25
+	}
+}
+# ---------------------------
 
 # Relating to terrains
 enum TerrainState {GROUND, AIR, WATER}
@@ -36,3 +68,21 @@ func change_keybind(EventName: String, NewKeybindKeyCode: int):
 		var _new_keybind = InputEventKey.new()
 		_new_keybind.keycode = NewKeybindKeyCode
 		InputMap.action_add_event(EventName, _new_keybind)
+
+
+func add_lust_effect(LustAmount: int, StatChange: String, ValueChange: float) -> void:
+	if str(LustAmount) not in lust_effects:
+		lust_effects[str(LustAmount)] = {}
+	
+	if StatChange not in lust_effects[str(LustAmount)]:
+		lust_effects[str(LustAmount)][StatChange] = 0
+	
+	lust_effects[str(LustAmount)][StatChange] += ValueChange
+
+
+func remove_lust_effect(LustAmount: int, StatChange: String):
+	if str(LustAmount) in lust_effects:
+		lust_effects[str(LustAmount)].erase(StatChange)
+		
+		if lust_effects[str(LustAmount)].is_empty():
+			lust_effects.erase(str(LustAmount))
