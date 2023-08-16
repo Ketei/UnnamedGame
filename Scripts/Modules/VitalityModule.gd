@@ -74,9 +74,7 @@ func set_up_module():
 		sex_module.connect("changed_cum_meter", changed_cum_meter)
 		sex_module.connect("changed_sex_limit_break", changed_sex_limit_break)
 		sex_module.connect("changed_lust", _changed_lust)
-		
-		sex_module.update_all_sex_stats()
-	
+
 	full_restore()
 	
 	if health_module or skill_module or sex_module:
