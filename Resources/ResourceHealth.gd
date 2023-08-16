@@ -24,9 +24,6 @@ class_name ResourceVitality
 ## Natural actor resistance to magical damage.
 @export var defense_magical: int = 0
 
-## Sex levels used to calculate sex damage/defense.
-@export var sex_skill_anal: int = 0
-@export var sex_skill_oral: int = 0
-@export var sex_skill_penis: int = 0
-@export var sex_skill_vaginal: int = 0
-
+## Only relevant if used along with the horny module. Check ActorProperties
+## to see what stats will be changed
+@export var change_self_with_lust: bool = false
