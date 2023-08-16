@@ -1,8 +1,6 @@
 extends Node
 class_name VitalityHorny
 
-signal orgasm_signal
-
 # Signal for elements that are to be displayed in-game
 signal changed_arousal(NewCurrentAmount, MaxAmount)
 signal changed_cum_meter(NewAmount, MaxAmount)
