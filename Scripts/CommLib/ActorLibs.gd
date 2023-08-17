@@ -12,9 +12,9 @@ func calculate_damage(ActorAttack: float, ActorDefense: int, ActorEndurance: int
 	return maxi(ceili(_damage), 1)
 
 
-func calculate_skillf(BaseSkill: float, ModSkill: float, MultSkill: float) -> float:
-	return floorf((BaseSkill + ModSkill) * MultSkill)
+func calculate_statf(BaseStat: float, ModStat: float, MultStat: float) -> float:
+	return floorf((BaseStat + ModStat) * MultStat)
 
 
-func calculate_skilli(BaseSkill: int, ModSkill: int, MultSkill: float) -> int:
-	return floori(float(BaseSkill + ModSkill) * MultSkill)
+func calculate_stati(BaseStat: int, ModStat: int, MultStat: float) -> int:
+	return floori(float(BaseStat + ModStat) * MultStat)

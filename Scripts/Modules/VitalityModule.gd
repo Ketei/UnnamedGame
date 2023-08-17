@@ -7,7 +7,7 @@ class_name ModuleVitality
 ## If a resource is loaded, the respective object will be created and values set
 ## to those of the resource. An effect applier will ONLY be created if at least
 ## one resource exists
-@export var _vitality_resource: ResourceVitality
+@export var _vitality_resource: ResourceHealth
 @export var _skill_resource: ResourceSkill
 @export var _lewd_resource: ResourceHorny
 
@@ -33,17 +33,24 @@ func set_up_module():
 		health_module.base_health = _vitality_resource.health
 		health_module.base_stamina = _vitality_resource.stamina
 		health_module.base_mana = _vitality_resource.mana
-		health_module.connect("depleted_health", health_depleted)
-		health_module.connect("depleted_stamina", stamina_depleted)
-		health_module.connect("depleted_mana", mana_depleted)
+		health_module.change_self_with_lust = _vitality_resource.change_self_with_lust
+		health_module.connect("changed_health", changed_health)
+		health_module.connect("changed_stamina", changed_stamina)
+		health_module.connect("changed_mana", changed_mana)
 	
 	if _skill_resource:
 		skill_module = VitalitySkill.new()
+		skill_module.max_strength = _skill_resource.max_strength
 		skill_module.base_strenght = _skill_resource.strenght
+		skill_module.max_endurance = _skill_resource.max_endurance
 		skill_module.base_endurance = _skill_resource.endurance
+		skill_module.max_charisma = _skill_resource.max_charisma
 		skill_module.base_charisma = _skill_resource.charisma
+		skill_module.max_intelligence = _skill_resource.max_intelligence
 		skill_module.base_intelligence = _skill_resource.intelligence
+		skill_module.max_luck = _skill_resource.max_luck
 		skill_module.base_luck = _skill_resource.luck
+		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
 	
 	if _lewd_resource:
 		sex_module = VitalityHorny.new()
@@ -64,10 +71,16 @@ func set_up_module():
 		sex_module.max_arousal = _lewd_resource.max_arousal
 		sex_module.max_sexual_endurance = _lewd_resource.sexual_endurance
 		
-		sex_module.connect("orgasm_signal", trigger_orgasm)
+		sex_module.actor_sex_role = _lewd_resource.actor_sex_role
+		sex_module.change_self_with_lust = _lewd_resource.change_self_with_lust
 		
-		sex_module.update_all_sex_stats()
-	
+		sex_module.base_sex_limit_break = _lewd_resource.sex_limit_break
+		
+		sex_module.connect("changed_arousal", changed_arousal)
+		sex_module.connect("changed_cum_meter", changed_cum_meter)
+		sex_module.connect("changed_sex_limit_break", changed_sex_limit_break)
+		sex_module.connect("changed_lust", _changed_lust)
+
 	full_restore()
 	
 	if health_module or skill_module or sex_module:
@@ -90,25 +103,51 @@ func _module_enabled_override(Value: bool) -> void:
 
 
 ## Override this function to do custom stuff when signaled
-## Function executed when health on health module reaches 0
-func health_depleted() -> void:
+## Function executed when health or max health changes
+func changed_health(CurrentValue: int, MaxValue: int) -> void:
 	pass
 
 
 ## Override this function to do custom stuff when signaled
-## Function executed when mana on health module reaches 0
-func mana_depleted() -> void:
+## Function executed when mana or max mana changes
+func changed_mana(CurrentValue: int, MaxValue: int) -> void:
 	pass
 
 
 ## Override this function to do custom stuff when signaled
-## Function executed when stamina on health module reaches 0
-func stamina_depleted() -> void:
+## Function executed when stamina or max stamina changes
+func changed_stamina(CurrentValue: int, MaxValue: int) -> void:
 	pass
 
 
-## Override this function to do custom stuff when signaled
-## Function executed when cum bar reaches 100. Don't forget to also run
-## sex_module.cum() to update arousal values and orgasm counter
-func trigger_orgasm() -> void:
+func changed_arousal(CurrentValue: int, MaxValue: int) -> void:
 	pass
+
+
+## When cum_meter (current value == max value) an orgasm should be triggered.
+## Don't forget to also run sex_module.cum() to update arousal values and orgasm counter
+func changed_cum_meter(CurrentValue: int, MaxValue: int) -> void:
+	pass
+
+
+func changed_sex_limit_break(CurrentValue: int, MaxValue: int) -> void:
+	pass
+
+
+# Note that this doesn't get MaxLust value. Might change in the future
+func chaged_lust(CurrentValue: int, PreviousValue: int) -> void:
+	pass
+
+
+# Do not override. Use the one without _ instead.
+func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
+	if health_module:
+		if health_module.change_self_with_lust:
+			health_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
+	
+	if skill_module:
+		if skill_module.change_self_with_lust:
+			skill_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
+	
+	chaged_lust(CurrentValue, PreviousValue)
+
