@@ -45,6 +45,7 @@ func set_up_module():
 		skill_module.base_charisma = _skill_resource.charisma
 		skill_module.base_intelligence = _skill_resource.intelligence
 		skill_module.base_luck = _skill_resource.luck
+		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
 	
 	if _lewd_resource:
 		sex_module = VitalityHorny.new()
@@ -126,8 +127,8 @@ func changed_cum_meter(CurrentValue: int, MaxValue: int) -> void:
 
 func changed_sex_limit_break(CurrentValue: int, MaxValue: int) -> void:
 	pass
-	
-	
+
+
 # Note that this doesn't get MaxLust value. Might change in the future
 func chaged_lust(CurrentValue: int, PreviousValue: int) -> void:
 	pass
@@ -138,6 +139,10 @@ func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 	if health_module:
 		if health_module.change_self_with_lust:
 			health_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
+	
+	if skill_module:
+		if skill_module.change_self_with_lust:
+			skill_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
 	
 	chaged_lust(CurrentValue, PreviousValue)
 
