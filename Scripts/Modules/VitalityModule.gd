@@ -7,7 +7,7 @@ class_name ModuleVitality
 ## If a resource is loaded, the respective object will be created and values set
 ## to those of the resource. An effect applier will ONLY be created if at least
 ## one resource exists
-@export var _vitality_resource: ResourceVitality
+@export var _vitality_resource: ResourceHealth
 @export var _skill_resource: ResourceSkill
 @export var _lewd_resource: ResourceHorny
 
@@ -40,10 +40,15 @@ func set_up_module():
 	
 	if _skill_resource:
 		skill_module = VitalitySkill.new()
+		skill_module.max_strength = _skill_resource.max_strength
 		skill_module.base_strenght = _skill_resource.strenght
+		skill_module.max_endurance = _skill_resource.max_endurance
 		skill_module.base_endurance = _skill_resource.endurance
+		skill_module.max_charisma = _skill_resource.max_charisma
 		skill_module.base_charisma = _skill_resource.charisma
+		skill_module.max_intelligence = _skill_resource.max_intelligence
 		skill_module.base_intelligence = _skill_resource.intelligence
+		skill_module.max_luck = _skill_resource.max_luck
 		skill_module.base_luck = _skill_resource.luck
 		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
 	
