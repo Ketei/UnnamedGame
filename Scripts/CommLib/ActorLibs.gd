@@ -41,8 +41,8 @@ func vitality_combat_update_with_skills(CombatModule: VitalityCombat, SkillModul
 	CombatModule.skill_change_defense_magical = roundi(CombatModule.base_defense_magical * (SkillModule.endurance / 10))
 	CombatModule.skill_change_defense_physical = roundi(CombatModule.base_defense_physical * (SkillModule.endurance / 10))
 	
-	CombatModule.skill_change_damage_magical = SkillModule.intelligence * 2
-	CombatModule.skill_change_damage_physical = SkillModule.strength * 2
+	CombatModule.skill_change_damage_magical = SkillModule.intelligence / 2
+	CombatModule.skill_change_damage_physical = SkillModule.strength / 2
 
 
 func calculate_statf(BaseStat: float, ModStat: float, MultStat: float) -> float:
