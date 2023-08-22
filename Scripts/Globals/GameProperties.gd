@@ -8,8 +8,6 @@ enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
 # Types of damage in game
 const AttackTypes: Dictionary = {
-	"physical": DamageTypes.PHYSICAL,
-	"magical": DamageTypes.MAGICAL,
 	"blunt": DamageTypes.PHYSICAL,
 	"slashing": DamageTypes.PHYSICAL,
 	"piercing": DamageTypes.PHYSICAL,
@@ -19,8 +17,6 @@ const AttackTypes: Dictionary = {
 	"sex": DamageTypes.TRUE,
 	"true": DamageTypes.TRUE
 }
-
-#{BLUNT, SLASHING, PIERCING, FIRE, COLD, LIGHTNING, SEX}
 
 # When cumming, arousal will be changed by -100 + (this value * cum_times).
 # When an actor cums a lot, he becomes a addicted. Hence cumming doesn't clear
