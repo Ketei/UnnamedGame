@@ -3,6 +3,8 @@ class_name VitalityCombat
 
 var enabled: bool = true
 
+var change_self_with_lust: bool = false
+
 # A positive number means a boost. A negative number means a reduction. 100% = 1.0
 # Nothing is gained from having over +100% in resistances(1.0). As this negates all damage received.
 # Nothing is gained from having under -100% in afinities(-1.0). As this zeroes all damage dealt.
@@ -88,10 +90,16 @@ var defense_magical: int = 0 :
 
 func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
 	mod_damage_physical += SexLibs.get_stat_with_lusti("damage-physical", CurrentLust, PreviousLust)
+	mult_damage_physical += SexLibs.get_stat_with_lustf("mult-damage-physical", CurrentLust, PreviousLust)
+	
 	mod_damage_magical += SexLibs.get_stat_with_lusti("damage-magical", CurrentLust, PreviousLust)
+	mult_damage_magical += SexLibs.get_stat_with_lustf("mult-damage-magical", CurrentLust, PreviousLust)
 	
 	mod_defense_magical += SexLibs.get_stat_with_lusti("defense-magical", CurrentLust, PreviousLust)
+	mult_defense_magical += SexLibs.get_stat_with_lustf("mult-defense-magical", CurrentLust, PreviousLust)
+	
 	mod_defense_physical += SexLibs.get_stat_with_lusti("defense-physical", CurrentLust, PreviousLust)
+	mult_defense_physical += SexLibs.get_stat_with_lustf("mult-defense-physical", CurrentLust, PreviousLust)
 
 
 func mod_resistance(ResistanceName: String, ModResistance: float) -> void:
