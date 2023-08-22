@@ -43,15 +43,15 @@ func set_up_module():
 	if _skill_resource:
 		skill_module = VitalitySkill.new()
 		skill_module.max_strength = _skill_resource.max_strength
-		skill_module.base_strenght = _skill_resource.strenght
+		skill_module.base_strenght = _skill_resource.starting_strenght
 		skill_module.max_endurance = _skill_resource.max_endurance
-		skill_module.base_endurance = _skill_resource.endurance
+		skill_module.base_endurance = _skill_resource.starting_endurance
 		skill_module.max_charisma = _skill_resource.max_charisma
-		skill_module.base_charisma = _skill_resource.charisma
+		skill_module.base_charisma = _skill_resource.starting_charisma
 		skill_module.max_intelligence = _skill_resource.max_intelligence
-		skill_module.base_intelligence = _skill_resource.intelligence
+		skill_module.base_intelligence = _skill_resource.starting_intelligence
 		skill_module.max_luck = _skill_resource.max_luck
-		skill_module.base_luck = _skill_resource.luck
+		skill_module.base_luck = _skill_resource.starting_luck
 		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
 	
 	if _combat_resource:
