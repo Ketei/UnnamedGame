@@ -5,6 +5,18 @@ const grid_size: int = 16
 
 # Possible difficulties for the game.
 enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
+enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
+# Types of damage in game
+const AttackTypes: Dictionary = {
+	"blunt": DamageTypes.PHYSICAL,
+	"slashing": DamageTypes.PHYSICAL,
+	"piercing": DamageTypes.PHYSICAL,
+	"fire": DamageTypes.MAGICAL,
+	"cold": DamageTypes.MAGICAL,
+	"lightning": DamageTypes.MAGICAL,
+	"sex": DamageTypes.TRUE,
+	"true": DamageTypes.TRUE
+}
 
 # When cumming, arousal will be changed by -100 + (this value * cum_times).
 # When an actor cums a lot, he becomes a addicted. Hence cumming doesn't clear
@@ -16,6 +28,8 @@ const Arousal_Clearing_Penalty_Tops : int = 8
 
 # Applies effects to actor depending on it's lust value when the relevant value is updated.
 # Per-level effects are only applied when the lust value of the actor changes.
+# Effects need to be called by the relevant module in order to be applied. Methods to calculate
+# how much can be found on SexLibs
 var lust_effects: Dictionary = {
 	"per-level": {
 		"sex-damage-dealt": -0.75,

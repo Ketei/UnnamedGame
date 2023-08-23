@@ -9,12 +9,14 @@ class_name ModuleVitality
 ## one resource exists
 @export var _vitality_resource: ResourceHealth
 @export var _skill_resource: ResourceSkill
+@export var _combat_resource: ResourceCombat
 @export var _lewd_resource: ResourceHorny
 
 var effect_applier: EffectApplier
 
 var health_module: VitalityHealth
 var skill_module: VitalitySkill
+var combat_module: VitalityCombat
 var sex_module: VitalityHorny
 
 
@@ -41,16 +43,24 @@ func set_up_module():
 	if _skill_resource:
 		skill_module = VitalitySkill.new()
 		skill_module.max_strength = _skill_resource.max_strength
-		skill_module.base_strenght = _skill_resource.strenght
+		skill_module.base_strenght = _skill_resource.starting_strenght
 		skill_module.max_endurance = _skill_resource.max_endurance
-		skill_module.base_endurance = _skill_resource.endurance
+		skill_module.base_endurance = _skill_resource.starting_endurance
 		skill_module.max_charisma = _skill_resource.max_charisma
-		skill_module.base_charisma = _skill_resource.charisma
+		skill_module.base_charisma = _skill_resource.starting_charisma
 		skill_module.max_intelligence = _skill_resource.max_intelligence
-		skill_module.base_intelligence = _skill_resource.intelligence
+		skill_module.base_intelligence = _skill_resource.starting_intelligence
 		skill_module.max_luck = _skill_resource.max_luck
-		skill_module.base_luck = _skill_resource.luck
+		skill_module.base_luck = _skill_resource.starting_luck
 		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
+	
+	if _combat_resource:
+		combat_module = VitalityCombat.new()
+		combat_module.resistances = _combat_resource.resistances.duplicate()
+		combat_module.affinities = _combat_resource.affinities.duplicate()
+		combat_module.base_defense_physical = _combat_resource.defense_physical
+		combat_module.base_defense_magical = _combat_resource.defense_magical
+		combat_module.change_self_with_lust = _combat_resource.change_self_with_lust
 	
 	if _lewd_resource:
 		sex_module = VitalityHorny.new()
@@ -83,7 +93,7 @@ func set_up_module():
 
 	full_restore()
 	
-	if health_module or skill_module or sex_module:
+	if health_module or skill_module or combat_module or sex_module:
 		effect_applier = EffectApplier.new()
 		effect_applier._vitality_module = self
 		self.add_child(effect_applier)
@@ -97,6 +107,8 @@ func _module_enabled_override(Value: bool) -> void:
 		health_module.enabled = Value
 	if skill_module:
 		skill_module.enabled = Value
+	if combat_module:
+		combat_module.enabled = Value
 	if sex_module:
 		sex_module.enabled = Value
 	enabled = Value
@@ -148,6 +160,10 @@ func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 	if skill_module:
 		if skill_module.change_self_with_lust:
 			skill_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
+	
+	if combat_module:
+		if combat_module.change_self_with_lust:
+			combat_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
 	
 	chaged_lust(CurrentValue, PreviousValue)
 
