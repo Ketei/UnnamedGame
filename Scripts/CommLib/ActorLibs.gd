@@ -8,7 +8,7 @@ func get_speed_tracker() -> SpeedManager:
 func calculate_damage_with_combat(AttackerCombat: VitalityCombat, DefenderCombat: VitalityCombat = null) -> int:
 	var _return_damage: int = 0
 	
-	var _damage : float
+	var _damage : float = 0
 	var _resistance: float = 0
 	
 	for attack_type in AttackerCombat.attack_types.keys():
@@ -37,12 +37,13 @@ func calculate_damage_with_combat(AttackerCombat: VitalityCombat, DefenderCombat
 
 
 # Called by vitality manager when skills are updated and combat module exists.
+# This assumes both a vitality and a combat exists. Planned for players & scaling unique npcs
 func vitality_combat_update_with_skills(CombatModule: VitalityCombat, SkillModule: VitalitySkill) -> void:
-	CombatModule.skill_change_defense_magical = roundi(CombatModule.base_defense_magical * (SkillModule.endurance / 10))
-	CombatModule.skill_change_defense_physical = roundi(CombatModule.base_defense_physical * (SkillModule.endurance / 10))
+	CombatModule.skill_change_defense_magical = SkillModule.endurance / 2
+	CombatModule.skill_change_defense_physical = SkillModule.endurance
 	
-	CombatModule.skill_change_damage_magical = SkillModule.intelligence / 2
-	CombatModule.skill_change_damage_physical = SkillModule.strength / 2
+	CombatModule.skill_change_damage_magical = SkillModule.intelligence
+	CombatModule.skill_change_damage_physical = SkillModule.strength
 
 
 func calculate_statf(BaseStat: float, ModStat: float, MultStat: float) -> float:
