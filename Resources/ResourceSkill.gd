@@ -24,4 +24,10 @@ class_name ResourceSkill
 @export var max_defense_magical: int = 0
 @export var starting_defense_magical: int = 0
 
+## Please note that this will only set max skill value, if you want a different starting starting value
+## you'll have to manually set it by calling Object.custom_skill_set_value(SkillName, ValueType, SkillValue)
+## where ValueType is "base-skill" or "mod-skill".
+## Format is skill_name(str): max_skill_value(int)
+@export var custom_skills: Dictionary = {}
+
 @export var change_self_with_lust: bool = false
