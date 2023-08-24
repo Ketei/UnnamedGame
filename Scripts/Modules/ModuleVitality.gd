@@ -54,8 +54,8 @@ func set_up_module():
 		skill_module.base_luck = _skill_resource.starting_luck
 		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
 		for skill_name in _skill_resource.custom_skills.keys():
-			skill_module.create_custom_skill(skill_name)
-			skill_module.custom_skill_set_value(skill_name, "max-skill", _skill_resource.custom_skills[skill_name])
+			skill_create_custom_skill(skill_name)
+			skill_custom_skill_set_value(skill_name, "max-skill", _skill_resource.custom_skills[skill_name])
 		skill_module.skill_updated.connect(_changed_skill)
 	
 	if _combat_resource:
@@ -155,7 +155,8 @@ func chaged_lust(_CurrentValue: int, _PreviousValue: int) -> void:
 	pass
 
 
-# Do not override. Use the one without _ instead.
+# Do not override. Use the one without _ instead. If you do override be sure to run the appropiate
+# functions.
 func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 	if health_module:
 		if health_module.change_self_with_lust:
@@ -211,4 +212,44 @@ func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> v
 				combat_module.skill_defense_physical += _skill_apply[skill_change]
 			elif skill_change == "defense-magical":
 				combat_module.skill_defense_magical += _skill_apply[skill_change]
+
+
+## Valid ValueType are: base-skill, mod-skill, mult-skill & max-skill
+func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
+	if enabled and skill_module:
+		if skill_module.enabled:
+			if SkillName in skill_module.custom_skills and ValueType != "skill":
+				if SkillName == "mult-skill":
+					skill_module.custom_skills[SkillName][ValueType] = ModValue
+				else:
+					skill_module.custom_skills[SkillName][ValueType] = int(ModValue)
+				skill_module.custom_skill_update(SkillName)
+			else:
+				print_debug("No custom skill with name " + SkillName + " exists. Please create it first")
+
+
+func skill_create_custom_skill(SkillName:String) -> void:
+	if enabled and skill_module:
+		if skill_module.enabled:
+			if SkillName not in skill_module.custom_skills:
+				skill_module.custom_skills[SkillName] = {
+					"base-skill" = 0,
+					"mod-skill" = 0,
+					"mult-skill" = 1.0,
+					"max-skill" = 0,
+					"skill" = 0
+				}
+
+
+func skill_custom_skill_get_value(SkillName: String) -> int:
+	var _return_skill = null
+	if skill_module:
+		if SkillName in skill_module.custom_skills:
+			_return_skill = skill_module.custom_skills[SkillName]["skill"]
+		else:
+			print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor. Returning null")
+	else:
+		print_debug("Skill module not enabled. Returning null")
+
+	return _return_skill
 
