@@ -1,6 +1,8 @@
 extends Node
 class_name VitalitySkill
 
+signal skill_updated(skill_name)
+
 var enabled: bool = true
 
 var change_self_with_lust: int = false
@@ -29,6 +31,7 @@ var strength: int = 0:
 	set(value):
 		if enabled:
 			strength = clampi(value, 0, max_strength)
+			skill_updated.emit("strength")
 
 ## Affects your damage reduction & tolerance to sexual attacks
 var base_endurance: int = 0 :
@@ -54,6 +57,7 @@ var endurance: int = 0 :
 	set(value):
 		if enabled:
 			endurance = clampi(value, 0, max_endurance)
+			skill_updated.emit("endurance")
 
 ## Affects NPC interactions & Store prices.
 var base_charisma: int = 0 :
@@ -79,6 +83,7 @@ var charisma: int = 0 :
 	set(value):
 		if enabled:
 			charisma = clampi(value, 0, max_charisma)
+			skill_updated.emit("charisma")
 
 ## Affects magic damage
 var base_intelligence: int = 0 :
@@ -104,6 +109,7 @@ var intelligence: int = 0 :
 	set(value):
 		if enabled:
 			intelligence = clampi(value, 0, max_intelligence)
+			skill_updated.emit("intelligence")
 
 ## Affects critical hits & Minigame odds
 var base_luck: int = 0 :
@@ -128,6 +134,7 @@ var luck: int = 0 :
 	set(value):
 		if enabled:
 			luck = clampi(value, 0, max_luck)
+			skill_updated.emit("luck")
 
 
 func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
