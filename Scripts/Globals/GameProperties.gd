@@ -1,11 +1,13 @@
 extends Node
 
-# Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
-const grid_size: int = 16
-
 # Possible difficulties for the game.
 enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
+enum TerrainState {GROUND, AIR, WATER}
+
+# Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
+const grid_size: int = 16
+
 # Types of damage in game
 const AttackTypes: Dictionary = {
 	"blunt": DamageTypes.PHYSICAL,
@@ -16,6 +18,18 @@ const AttackTypes: Dictionary = {
 	"lightning": DamageTypes.MAGICAL,
 	"sex": DamageTypes.TRUE,
 	"true": DamageTypes.TRUE
+}
+
+const TerrainNames : Dictionary = {
+	"0": "Ground",
+	"1": "Air",
+	"2": "Water"
+	}
+
+# A movement mutiplier. If the key of this dict matches one of terrain names
+# the actor movement will be multiplied by the amount stated.
+const TerrainMoveMult : Dictionary = {
+	"2": 0.85
 }
 
 # When cumming, arousal will be changed by -100 + (this value * cum_times).
@@ -53,17 +67,26 @@ var lust_effects: Dictionary = {
 }
 # ---------------------------
 
-# Relating to terrains
-enum TerrainState {GROUND, AIR, WATER}
-const TerrainNames : Dictionary = {
-	"0": "Ground",
-	"1": "Air",
-	"2": "Water"
+# Used to change actor's values when it's skill changes.
+# SkillName(str): {SkillEffect(str): SkillChange(float)}
+
+# SkillName -> strength, endurance, charisma, intelligence, luck
+
+# SkillEffect -> health, stamina, mana, sex-skill-penis, sex-skill-oral, sex-skill-anal, sex-skill-vaginal
+# sex-damage-dealt, sex-damage-received, sex-endurance, sex-limit-break
+
+var skill_effects: Dictionary = {
+	"strength": {
+		"damage-physical": 1
+	},
+	"intelligence": {
+		"damage-magical": 1
+	},
+	"endurance": {
+		"health": 2,
+		"defense-physical": 1,
+		"defense-magical": 0.5
 	}
-# A movement mutiplier. If the key of this dict matches one of terrain names
-# the actor movement will be multiplied by the amount stated.
-const TerrainMoveMult : Dictionary = {
-	"2": 0.85
 }
 
 
@@ -100,3 +123,13 @@ func remove_lust_effect(LustAmount: int, StatChange: String):
 		
 		if lust_effects[str(LustAmount)].is_empty():
 			lust_effects.erase(str(LustAmount))
+
+
+func get_skill_effects(SkillName: String, SkillLevel: int, PrevSkillLevel: int) -> Dictionary:
+	var _return_dict: Dictionary = {}
+	
+	if SkillName in skill_effects:
+		for skill_change in skill_effects[SkillName]:
+			_return_dict[skill_change] = skill_effects[SkillName][skill_change] * (SkillLevel - PrevSkillLevel)
+	
+	return _return_dict
