@@ -158,31 +158,6 @@ func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
 			custom_skills[skill] += SexLibs.get_stat_with_lusti(skill, CurrentLust, PreviousLust) 
 
 
-## Valid ValueType are: base-skill, mod-skill, mult-skill & max-skill
-func custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
-	if enabled:
-		if SkillName in custom_skills and ValueType != "skill":
-			if SkillName == "mult-skill":
-				custom_skills[SkillName][ValueType] = ModValue
-			else:
-				custom_skills[SkillName][ValueType] = int(ModValue)
-			custom_skill_update(SkillName)
-		else:
-			print_debug("No custom skill with name " + SkillName + " exists. Please create it first")
-
-
-func create_custom_skill(SkillName:String) -> void:
-	if enabled:
-		if SkillName not in custom_skills:
-			custom_skills[SkillName] = {
-				"base-skill" = 0,
-				"mod-skill" = 0,
-				"mult-skill" = 1.0,
-				"max-skill" = 0,
-				"skill" = 0
-			}
-
-
 func custom_skill_update(SkillName: String) -> void:
 	if enabled:
 		if SkillName in custom_skills:
@@ -190,13 +165,3 @@ func custom_skill_update(SkillName: String) -> void:
 			custom_skills[SkillName]["skill"] = clampi(ActorLibs.calculate_stati(custom_skills[SkillName]["base-skill"], custom_skills[SkillName]["mod-skill"], custom_skills[SkillName]["mult-skill"]), 0, custom_skills[SkillName]["max-skill"])
 			skill_updated.emit(SkillName, custom_skills[SkillName]["skill"], _prev_skill_value)
 
-
-func custom_skill_get_value(SkillName: String) -> int:
-	var _return_skill = 0
-	
-	if SkillName in custom_skills:
-		_return_skill = custom_skills[SkillName]["skill"]
-	else:
-		print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor.")
-	
-	return _return_skill
