@@ -1,11 +1,15 @@
 extends Node
 class_name VitalitySkill
 
-signal skill_updated(skill_name)
+signal skill_updated(skill_name: String, skill_value: int, previous_skill_value: int)
+
+var _prev_skill_value: int = 0
 
 var enabled: bool = true
 
 var change_self_with_lust: int = false
+
+var custom_skills: Dictionary = {}
 
 ## Affects physical damage
 var base_strength: int = 0 :
@@ -30,8 +34,9 @@ var max_strength: int = 0 :
 var strength: int = 0:
 	set(value):
 		if enabled:
+			_prev_skill_value = strength
 			strength = clampi(value, 0, max_strength)
-			skill_updated.emit("strength")
+			skill_updated.emit("strength", strength, _prev_skill_value)
 
 ## Affects your damage reduction & tolerance to sexual attacks
 var base_endurance: int = 0 :
@@ -56,8 +61,9 @@ var max_endurance: int = 0 :
 var endurance: int = 0 :
 	set(value):
 		if enabled:
+			_prev_skill_value = endurance
 			endurance = clampi(value, 0, max_endurance)
-			skill_updated.emit("endurance")
+			skill_updated.emit("endurance", endurance, _prev_skill_value)
 
 ## Affects NPC interactions & Store prices.
 var base_charisma: int = 0 :
@@ -82,8 +88,9 @@ var max_charisma: int = 0 :
 var charisma: int = 0 :
 	set(value):
 		if enabled:
+			_prev_skill_value = charisma
 			charisma = clampi(value, 0, max_charisma)
-			skill_updated.emit("charisma")
+			skill_updated.emit("charisma", charisma, _prev_skill_value)
 
 ## Affects magic damage
 var base_intelligence: int = 0 :
@@ -108,8 +115,9 @@ var max_intelligence: int = 0 :
 var intelligence: int = 0 :
 	set(value):
 		if enabled:
+			_prev_skill_value = intelligence
 			intelligence = clampi(value, 0, max_intelligence)
-			skill_updated.emit("intelligence")
+			skill_updated.emit("intelligence", intelligence, _prev_skill_value)
 
 ## Affects critical hits & Minigame odds
 var base_luck: int = 0 :
@@ -133,14 +141,62 @@ var max_luck: int = 0 :
 var luck: int = 0 :
 	set(value):
 		if enabled:
+			_prev_skill_value = luck
 			luck = clampi(value, 0, max_luck)
-			skill_updated.emit("luck")
+			skill_updated.emit("luck", luck, _prev_skill_value)
 
 
 func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
-	mod_strength += SexLibs.get_stat_with_lusti("strength", CurrentLust, PreviousLust)
-	mod_endurance += SexLibs.get_stat_with_lusti("endurance", CurrentLust, PreviousLust)
-	mod_charisma += SexLibs.get_stat_with_lusti("charisma", CurrentLust, PreviousLust)
-	mod_intelligence += SexLibs.get_stat_with_lusti("intelligence", CurrentLust, PreviousLust)
-	mod_luck += SexLibs.get_stat_with_lusti("luck", CurrentLust, PreviousLust)
+	if enabled:
+		mod_strength += SexLibs.get_stat_with_lusti("strength", CurrentLust, PreviousLust)
+		mod_endurance += SexLibs.get_stat_with_lusti("endurance", CurrentLust, PreviousLust)
+		mod_charisma += SexLibs.get_stat_with_lusti("charisma", CurrentLust, PreviousLust)
+		mod_intelligence += SexLibs.get_stat_with_lusti("intelligence", CurrentLust, PreviousLust)
+		mod_luck += SexLibs.get_stat_with_lusti("luck", CurrentLust, PreviousLust)
+		
+		for skill in custom_skills.keys():
+			custom_skills[skill] += SexLibs.get_stat_with_lusti(skill, CurrentLust, PreviousLust) 
 
+
+## Valid ValueType are: base-skill, mod-skill, mult-skill & max-skill
+func custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
+	if enabled:
+		if SkillName in custom_skills and ValueType != "skill":
+			if SkillName == "mult-skill":
+				custom_skills[SkillName][ValueType] = ModValue
+			else:
+				custom_skills[SkillName][ValueType] = int(ModValue)
+			custom_skill_update(SkillName)
+		else:
+			print_debug("No custom skill with name " + SkillName + " exists. Please create it first")
+
+
+func create_custom_skill(SkillName:String) -> void:
+	if enabled:
+		if SkillName not in custom_skills:
+			custom_skills[SkillName] = {
+				"base-skill" = 0,
+				"mod-skill" = 0,
+				"mult-skill" = 1.0,
+				"max-skill" = 0,
+				"skill" = 0
+			}
+
+
+func custom_skill_update(SkillName: String) -> void:
+	if enabled:
+		if SkillName in custom_skills:
+			_prev_skill_value = custom_skills[SkillName]["skill"]
+			custom_skills[SkillName]["skill"] = clampi(ActorLibs.calculate_stati(custom_skills[SkillName]["base-skill"], custom_skills[SkillName]["mod-skill"], custom_skills[SkillName]["mult-skill"]), 0, custom_skills[SkillName]["max-skill"])
+			skill_updated.emit(SkillName, custom_skills[SkillName]["skill"], _prev_skill_value)
+
+
+func custom_skill_get_value(SkillName: String) -> int:
+	var _return_skill = 0
+	
+	if SkillName in custom_skills:
+		_return_skill = custom_skills[SkillName]["skill"]
+	else:
+		print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor.")
+	
+	return _return_skill
