@@ -72,8 +72,9 @@ var lust_effects: Dictionary = {
 
 # SkillName -> strength, endurance, charisma, intelligence, luck
 
-# SkillEffect -> health, stamina, mana, sex-skill-penis, sex-skill-oral, sex-skill-anal, sex-skill-vaginal
-# sex-damage-dealt, sex-damage-received, sex-endurance, sex-limit-break
+# SkillEffect -> health, stamina, mana | sex-skill-penis, sex-skill-oral, sex-skill-anal, sex-skill-vaginal
+# sex-damage-dealt, sex-damage-received, sex-endurance, sex-limit-break | damage-physical, damage-magical,
+# defense-physical, defense-magical
 
 var skill_effects: Dictionary = {
 	"strength": {
