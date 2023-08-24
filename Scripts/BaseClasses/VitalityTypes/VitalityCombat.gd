@@ -20,7 +20,7 @@ var mod_damage_physical: int = 0 :
 	set(value):
 		if enabled:
 			mod_damage_physical = value
-var skill_change_damage_physical: int = 0
+var skill_damage_physical: int = 0
 var mult_damage_physical: float = 1.0 :
 	set(value):
 		if enabled:
@@ -30,7 +30,7 @@ var mod_damage_magical: int = 0 :
 	set(value):
 		if enabled:
 			mod_damage_magical = value
-var skill_change_damage_magical: int = 0
+var skill_damage_magical: int = 0
 var mult_damage_magical: float = 1.0 :
 	set(value):
 		if enabled:
@@ -41,22 +41,18 @@ var base_defense_physical: int = 0 :
 	set(value):
 		if enabled:
 			base_defense_physical = maxi(value, 0)
-			defense_physical = ActorLibs.calculate_stati(base_defense_physical, mod_defense_physical, mult_defense_physical) + skill_change_defense_physical
+			defense_physical = ActorLibs.calculate_stati(base_defense_physical + skill_defense_physical, mod_defense_physical, mult_defense_physical)
+var skill_defense_physical: int = 0
 var mod_defense_physical: int = 0 :
 	set(value):
 		if enabled:
 			mod_defense_physical = value
-			defense_physical = ActorLibs.calculate_stati(base_defense_physical, mod_defense_physical, mult_defense_physical) + skill_change_defense_physical
+			defense_physical = ActorLibs.calculate_stati(base_defense_physical + skill_defense_physical, mod_defense_physical, mult_defense_physical)
 var mult_defense_physical: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_defense_physical = maxf(value, 0.0)
-			defense_physical = ActorLibs.calculate_stati(base_defense_physical, mod_defense_physical, mult_defense_physical) + skill_change_defense_physical
-var skill_change_defense_physical: int = 0 :
-	set(value):
-		if enabled:
-			skill_change_defense_physical = value
-			defense_physical = ActorLibs.calculate_stati(base_defense_physical, mod_defense_physical, mult_defense_physical) + skill_change_defense_physical
+			defense_physical = ActorLibs.calculate_stati(base_defense_physical + skill_defense_physical, mod_defense_physical, mult_defense_physical)
 var defense_physical: int = 0 :
 	set(value):
 		if enabled:
@@ -67,21 +63,18 @@ var base_defense_magical: int = 0 :
 	set(value):
 		if enabled:
 			base_defense_magical = maxi(value, 0)
-			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_change_defense_magical, mod_defense_magical, mult_defense_magical)
+			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_defense_magical, mod_defense_magical, mult_defense_magical)
+var skill_defense_magical: int = 0
 var mod_defense_magical: int = 0 :
 	set(value):
 		if enabled:
 			mod_defense_magical = value
-			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_change_defense_magical, mod_defense_magical, mult_defense_magical)
+			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_defense_magical, mod_defense_magical, mult_defense_magical)
 var mult_defense_magical: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_defense_magical = maxf(value, 0.0)
-			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_change_defense_magical, mod_defense_magical, mult_defense_magical)
-var skill_change_defense_magical: int = 0 :
-	set(value):
-		if enabled:
-			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_change_defense_magical, mod_defense_magical, mult_defense_magical)
+			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_defense_magical, mod_defense_magical, mult_defense_magical)
 var defense_magical: int = 0 :
 	set(value):
 		if enabled:

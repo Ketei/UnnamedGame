@@ -36,9 +36,9 @@ func set_up_module():
 		health_module.base_stamina = _vitality_resource.stamina
 		health_module.base_mana = _vitality_resource.mana
 		health_module.change_self_with_lust = _vitality_resource.change_self_with_lust
-		health_module.connect("changed_health", changed_health)
-		health_module.connect("changed_stamina", changed_stamina)
-		health_module.connect("changed_mana", changed_mana)
+		health_module.changed_health.connect(changed_health)
+		health_module.changed_stamina.connect(changed_stamina)
+		health_module.changed_mana.connect(changed_mana)
 	
 	if _skill_resource:
 		skill_module = VitalitySkill.new()
@@ -53,6 +53,10 @@ func set_up_module():
 		skill_module.max_luck = _skill_resource.max_luck
 		skill_module.base_luck = _skill_resource.starting_luck
 		skill_module.change_self_with_lust = _skill_resource.change_self_with_lust
+		for skill_name in _skill_resource.custom_skills.keys():
+			skill_module.create_custom_skill(skill_name)
+			skill_module.custom_skill_set_value(skill_name, "max-skill", _skill_resource.custom_skills[skill_name])
+		skill_module.skill_updated.connect(_changed_skill)
 	
 	if _combat_resource:
 		combat_module = VitalityCombat.new()
@@ -86,10 +90,10 @@ func set_up_module():
 		
 		sex_module.base_sex_limit_break = _lewd_resource.sex_limit_break
 		
-		sex_module.connect("changed_arousal", changed_arousal)
-		sex_module.connect("changed_cum_meter", changed_cum_meter)
-		sex_module.connect("changed_sex_limit_break", changed_sex_limit_break)
-		sex_module.connect("changed_lust", _changed_lust)
+		sex_module.changed_arousal.connect(changed_arousal)
+		sex_module.changed_cum_meter.connect(changed_cum_meter)
+		sex_module.changed_sex_limit_break.connect(changed_sex_limit_break)
+		sex_module.changed_lust.connect(_changed_lust)
 
 	full_restore()
 	
@@ -116,38 +120,38 @@ func _module_enabled_override(Value: bool) -> void:
 
 ## Override this function to do custom stuff when signaled
 ## Function executed when health or max health changes
-func changed_health(CurrentValue: int, MaxValue: int) -> void:
+func changed_health(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
 ## Override this function to do custom stuff when signaled
 ## Function executed when mana or max mana changes
-func changed_mana(CurrentValue: int, MaxValue: int) -> void:
+func changed_mana(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
 ## Override this function to do custom stuff when signaled
 ## Function executed when stamina or max stamina changes
-func changed_stamina(CurrentValue: int, MaxValue: int) -> void:
+func changed_stamina(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
-func changed_arousal(CurrentValue: int, MaxValue: int) -> void:
+func changed_arousal(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
 ## When cum_meter (current value == max value) an orgasm should be triggered.
 ## Don't forget to also run sex_module.cum() to update arousal values and orgasm counter
-func changed_cum_meter(CurrentValue: int, MaxValue: int) -> void:
+func changed_cum_meter(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
-func changed_sex_limit_break(CurrentValue: int, MaxValue: int) -> void:
+func changed_sex_limit_break(_CurrentValue: int, _MaxValue: int) -> void:
 	pass
 
 
 # Note that this doesn't get MaxLust value. Might change in the future
-func chaged_lust(CurrentValue: int, PreviousValue: int) -> void:
+func chaged_lust(_CurrentValue: int, _PreviousValue: int) -> void:
 	pass
 
 
@@ -166,4 +170,45 @@ func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 			combat_module.trigger_lust_stats_change(CurrentValue, PreviousValue)
 	
 	chaged_lust(CurrentValue, PreviousValue)
+
+
+func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> void:
+	var _skill_apply: Dictionary = GameProperties.get_skill_effects(SkillName, SkillValue, PreviousSkillValue)
+	
+	for skill_change in _skill_apply.keys():
+		if health_module:
+			if skill_change == "health":
+				health_module.skill_health += _skill_apply[skill_change]
+			elif skill_change == "stamina":
+				health_module.skill_stamina += _skill_apply[skill_change]
+			elif skill_change == "mana":
+				health_module.skill_mana += _skill_apply[skill_change]
+		
+		if sex_module:
+			if skill_change == "sex-skill-penis":
+				sex_module.skill_sex_skill_penis += _skill_apply[skill_change]
+			elif skill_change == "sex-skill-oral":
+				sex_module.skill_sex_skill_oral += _skill_apply[skill_change]
+			elif skill_change == "sex-skill-anal":
+				sex_module.skill_sex_skill_anal += _skill_apply[skill_change]
+			elif skill_change == "sex-skill-vaginal":
+				sex_module.skill_sex_skill_vaginal += _skill_apply[skill_change]
+			elif skill_change == "sex-damage-dealt": # float
+				sex_module.skill_sex_damage_dealt += _skill_apply[skill_change]
+			elif skill_change == "sex-damage-received": # float
+				sex_module.skill_sex_damage_received += _skill_apply[skill_change]
+			elif skill_change == "sex-endurance":
+				sex_module.skill_sexual_endurance += _skill_apply[skill_change]
+			elif skill_change == "sex-limit-break":
+				sex_module.skill_sex_limit_break += _skill_apply[skill_change]
+		
+		if combat_module:
+			if skill_change == "damage-physical":
+				combat_module.skill_damage_physical += _skill_apply[skill_change]
+			elif skill_change == "damage-magical":
+				combat_module.skill_damage_magical += _skill_apply[skill_change]
+			elif skill_change == "defense-physical":
+				combat_module.skill_defense_physical += _skill_apply[skill_change]
+			elif skill_change == "defense-magical":
+				combat_module.skill_defense_magical += _skill_apply[skill_change]
 

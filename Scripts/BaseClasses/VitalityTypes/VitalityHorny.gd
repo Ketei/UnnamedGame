@@ -21,17 +21,22 @@ var base_sex_skill_penis: int = 0 :
 	set(value):
 		if enabled:
 			base_sex_skill_penis = clampi(value, 0, max_sex_skill_penis)
-			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
+			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis + skill_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
+var skill_sex_skill_penis: int = 0:
+	set(value):
+		if enabled:
+			skill_sex_skill_penis = value
+			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis + skill_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
 var mod_sex_skill_penis: int = 0 :
 	set(value):
 		if enabled:
 			mod_sex_skill_penis = value
-			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
+			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis + skill_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
 var mult_sex_skill_penis: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_sex_skill_penis = value
-			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
+			max_sex_skill_penis = ActorLibs.calculate_stati(base_sex_skill_penis + skill_sex_skill_penis, mod_sex_skill_penis, mult_sex_skill_penis)
 var max_sex_skill_penis: int = 0 :
 	set(value):
 		if enabled:
@@ -45,17 +50,22 @@ var base_sex_skill_oral: int = 0 :
 	set(value):
 		if enabled:
 			base_sex_skill_oral = clampi(value, 0, max_sex_skill_oral)
-			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
+			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral + skill_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
+var skill_sex_skill_oral: int = 0:
+	set(value):
+		if enabled:
+			skill_sex_skill_oral = value
+			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral + skill_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
 var mod_sex_skill_oral: int = 0 :
 	set(value):
 		if enabled:
 			mod_sex_skill_oral = value
-			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
+			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral + skill_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
 var mult_sex_skill_oral: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_sex_skill_oral = value
-			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
+			max_sex_skill_oral = ActorLibs.calculate_stati(base_sex_skill_oral + skill_sex_skill_oral, mod_sex_skill_oral, mult_sex_skill_oral)
 var max_sex_skill_oral: int = 0 :
 	set(value):
 		if enabled:
@@ -69,17 +79,22 @@ var base_sex_skill_anal: int = 0 :
 	set(value):
 		if enabled:
 			base_sex_skill_anal = clampi(value, 0, max_sex_skill_anal)
-			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
+			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal + skill_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
+var skill_sex_skill_anal: int = 0:
+	set(value):
+		if enabled:
+			sex_skill_anal = value
+			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal + skill_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
 var mod_sex_skill_anal: int = 0 :
 	set(value):
 		if enabled:
 			mod_sex_skill_anal = value
-			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
+			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal + skill_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
 var mult_sex_skill_anal: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_sex_skill_anal = value
-			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
+			max_sex_skill_anal = ActorLibs.calculate_stati(base_sex_skill_anal + skill_sex_skill_anal, mod_sex_skill_anal, mult_sex_skill_anal)
 var max_sex_skill_anal: int = 0 :
 	set(value):
 		if enabled:
@@ -93,17 +108,22 @@ var base_sex_skill_vaginal: int = 0 :
 	set(value):
 		if enabled:
 			base_sex_skill_vaginal = clampi(value, 0, max_sex_skill_vaginal)
-			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
+			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal + skill_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
+var skill_sex_skill_vaginal: int = 0:
+	set(value):
+		if enabled:
+			skill_sex_skill_vaginal = value
+			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal + skill_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
 var mod_sex_skill_vaginal: int = 0 :
 	set(value):
 		if enabled:
 			mod_sex_skill_vaginal = value
-			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
+			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal + skill_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
 var mult_sex_skill_vaginal: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_sex_skill_vaginal = value
-			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
+			max_sex_skill_vaginal = ActorLibs.calculate_stati(base_sex_skill_vaginal + skill_sex_skill_vaginal, mod_sex_skill_vaginal, mult_sex_skill_vaginal)
 var max_sex_skill_vaginal: int = 0 :
 	set(value):
 		if enabled:
@@ -117,17 +137,22 @@ var base_sex_damage_dealt: float = 1.0 :
 	set(value):
 		if enabled:
 			base_sex_damage_dealt = maxf(value, 0.0)
-			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt + skill_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+var skill_sex_damage_dealt: float = 0.0:
+	set(value):
+		if enabled:
+			skill_sex_damage_dealt = value
+			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt + skill_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var mod_sex_damage_dealt: float = 0.0 :
 	set(value):
 		if enabled:
 			mod_sex_damage_dealt = value
-			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt + skill_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var mult_sex_damage_dealt: float = 1.0:
 	set(value):
 		if enabled:
 			mult_sex_damage_dealt = value
-			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
+			sex_damage_dealt = ActorLibs.calculate_statf(base_sex_damage_dealt + skill_sex_damage_dealt, mod_sex_damage_dealt, mult_sex_damage_dealt)
 var sex_damage_dealt: float = 0:
 	set(value):
 		if enabled:
@@ -137,17 +162,22 @@ var base_sex_damage_received: float = 1.0 :
 	set(value):
 		if enabled:
 			base_sex_damage_received = maxf(value, 0.0)
-			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received + skill_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+var skill_sex_damage_received: float = 0.0:
+	set(value):
+		if enabled:
+			skill_sex_damage_received = value
+			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received + skill_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var mod_sex_damage_received: float = 0.0:
 	set(value):
 		if enabled:
 			mod_sex_damage_received = value
-			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received + skill_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var mult_sex_damage_received: float = 1.0:
 	set(value):
 		if enabled:
 			mult_sex_damage_received = value
-			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
+			sex_damage_received = ActorLibs.calculate_statf(base_sex_damage_received + skill_sex_damage_received, mod_sex_damage_received, mult_sex_damage_received)
 var sex_damage_received: float = 0:
 	set(value):
 		if enabled:
@@ -198,7 +228,12 @@ var base_sexual_endurance: int = 0 :
 	set(value):
 		if enabled:
 			base_sexual_endurance = maxi(value, 0)
-			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance
+			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance + skill_sexual_endurance
+var skill_sexual_endurance: int = 0:
+	set(value):
+		if enabled:
+			skill_sexual_endurance = value
+			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance + skill_sexual_endurance
 var max_sexual_endurance: int = 0 :
 	set(value):
 		if enabled:
@@ -207,7 +242,7 @@ var mod_sexual_endurance: int = 0 :
 	set(value):
 		if enabled:
 			mod_sexual_endurance = value
-			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance
+			max_sexual_endurance = base_sexual_endurance + mod_sexual_endurance + skill_sexual_endurance
 var current_sexual_endurance: int = 0:
 	set(value):
 		if enabled:
@@ -248,17 +283,22 @@ var base_sex_limit_break: int = 1:
 	set(value):
 		if enabled:
 			base_sex_limit_break = maxi(value, 1)
-			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
+			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break + skill_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
 var mod_sex_limit_break: int = 0:
 	set(value):
 		if enabled:
 			mod_sex_limit_break = value
-			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
+			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break + skill_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
+var skill_sex_limit_break: int = 0:
+	set(value):
+		if enabled:
+			skill_sex_limit_break = value
+			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break + skill_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
 var mult_sex_limit_break: float = 1.0:
 	set(value):
 		if enabled:
 			mult_sex_limit_break = value
-			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
+			max_sex_limit_break = ActorLibs.calculate_stati(base_sex_limit_break + skill_sex_limit_break, mod_sex_limit_break, mult_sex_limit_break)
 var max_sex_limit_break: int = 1 :
 	set(value):
 		if enabled:
