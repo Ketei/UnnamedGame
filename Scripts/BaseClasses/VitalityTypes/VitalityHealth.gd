@@ -14,17 +14,22 @@ var base_health: int = 0 :
 	set(value):
 		if enabled:
 			base_health = maxi(value, 1)
-			max_health = ActorLibs.calculate_stati(base_health, mod_health, mult_health)
+			max_health = ActorLibs.calculate_stati(base_health + skill_health, mod_health, mult_health)
+var skill_health: int = 0:
+	set(value):
+		if enabled:
+			skill_health = value
+			max_health = ActorLibs.calculate_stati(base_health + skill_health, mod_health, mult_health)
 var mod_health: int = 0 :
 	set(value):
 		if enabled:
 			mod_health = value
-			max_health = ActorLibs.calculate_stati(base_health, mod_health, mult_health)
+			max_health = ActorLibs.calculate_stati(base_health + skill_health, mod_health, mult_health)
 var mult_health: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_health = maxf(value, 0.0)
-			max_health = ActorLibs.calculate_stati(base_health, mod_health, mult_health)
+			max_health = ActorLibs.calculate_stati(base_health + skill_health, mod_health, mult_health)
 var max_health: int :
 	set(value):
 		if enabled:
@@ -36,17 +41,22 @@ var base_stamina: int = 0:
 	set(value):
 		if enabled:
 			base_stamina = maxi(value, 1)
-			max_stamina = ActorLibs.calculate_stati(base_stamina, mod_stamina, mult_stamina)
+			max_stamina = ActorLibs.calculate_stati(base_stamina + skill_stamina, mod_stamina, mult_stamina)
+var skill_stamina: int = 0:
+	set(value):
+		if enabled:
+			skill_stamina = value
+			max_stamina = ActorLibs.calculate_stati(base_stamina + skill_stamina, mod_stamina, mult_stamina)
 var mod_stamina: int = 0 :
 	set(value):
 		if enabled:
 			mod_stamina = value
-			max_stamina = ActorLibs.calculate_stati(base_stamina, mod_stamina, mult_stamina)
+			max_stamina = ActorLibs.calculate_stati(base_stamina + skill_stamina, mod_stamina, mult_stamina)
 var mult_stamina: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_stamina = maxf(value, 0.0)
-			max_stamina = ActorLibs.calculate_stati(base_stamina, mod_stamina, mult_stamina)
+			max_stamina = ActorLibs.calculate_stati(base_stamina + skill_stamina, mod_stamina, mult_stamina)
 var max_stamina: int :
 	set(value):
 		if enabled:
@@ -58,17 +68,22 @@ var base_mana: int = 0:
 	set(value):
 		if enabled:
 			base_mana = maxi(value, 1)
-			max_mana = ActorLibs.calculate_stati(base_mana, max_mana, mult_mana)
+			max_mana = ActorLibs.calculate_stati(base_mana + skill_mana, max_mana, mult_mana)
+var skill_mana: int = 0:
+	set(value):
+		if enabled:
+			skill_mana = value
+			max_mana = ActorLibs.calculate_stati(base_mana + skill_mana, max_mana, mult_mana)
 var mod_mana: int = 0 :
 	set(value):
 		if enabled:
 			mod_mana = value
-			max_mana = ActorLibs.calculate_stati(base_mana, max_mana, mult_mana)
+			max_mana = ActorLibs.calculate_stati(base_mana + skill_mana, max_mana, mult_mana)
 var mult_mana: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_mana = maxf(value, 0.0)
-			max_mana = ActorLibs.calculate_stati(base_mana, max_mana, mult_mana)
+			max_mana = ActorLibs.calculate_stati(base_mana + skill_mana, max_mana, mult_mana)
 var max_mana: int :
 	set(value):
 		if enabled:
