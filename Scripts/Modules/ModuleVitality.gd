@@ -21,7 +21,7 @@ var sex_module: VitalityHorny
 
 
 func full_restore():
-	if enabled:
+	if is_module_enabled:
 		if health_module:
 			health_module.full_restore()
 		if sex_module:
@@ -102,20 +102,20 @@ func set_up_module():
 		effect_applier._vitality_module = self
 		self.add_child(effect_applier)
 	
-	enabled = true
+	is_module_enabled = true
 
 
 func _module_enabled_override(Value: bool) -> void:
 	effect_applier._timer_module_enabled(Value)
 	if health_module:
-		health_module.enabled = Value
+		health_module.is_module_enabled = Value
 	if skill_module:
-		skill_module.enabled = Value
+		skill_module.is_module_enabled = Value
 	if combat_module:
-		combat_module.enabled = Value
+		combat_module.is_module_enabled = Value
 	if sex_module:
-		sex_module.enabled = Value
-	enabled = Value
+		sex_module.is_module_enabled = Value
+	is_module_enabled = Value
 
 
 ## Override this function to do custom stuff when signaled
@@ -216,8 +216,8 @@ func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> v
 
 ## Valid ValueType are: base-skill, mod-skill, mult-skill & max-skill
 func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
-	if enabled and skill_module:
-		if skill_module.enabled:
+	if is_module_enabled and skill_module:
+		if skill_module.is_module_enabled:
 			if SkillName in skill_module.custom_skills and ValueType != "skill":
 				if SkillName == "mult-skill":
 					skill_module.custom_skills[SkillName][ValueType] = ModValue
@@ -229,8 +229,8 @@ func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue
 
 
 func skill_create_custom_skill(SkillName:String) -> void:
-	if enabled and skill_module:
-		if skill_module.enabled:
+	if is_module_enabled and skill_module:
+		if skill_module.is_module_enabled:
 			if SkillName not in skill_module.custom_skills:
 				skill_module.custom_skills[SkillName] = {
 					"base-skill" = 0,
@@ -249,7 +249,7 @@ func skill_custom_skill_get_value(SkillName: String) -> int:
 		else:
 			print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor. Returning null")
 	else:
-		print_debug("Skill module not enabled. Returning null")
+		print_debug("Skill module not is_module_enabled. Returning null")
 
 	return _return_skill
 
