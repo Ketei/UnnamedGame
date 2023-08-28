@@ -10,14 +10,14 @@ var timers_dict : Dictionary = {}
 func get_timer(TimerName: String) -> TimerForModule:
 	var return_timer: TimerForModule = null
 	
-	if TimerName.to_lower() in timers_dict:
+	if timers_dict.has(TimerName.to_lower()):
 		return_timer = timers_dict[TimerName.to_lower()]
 	
 	return return_timer
 
 
 func create_timer(TimerName: String, TimerTime: float, TimerOneShot := true, IsPersistent := false) -> void:
-	if enabled:
+	if is_module_enabled:
 		var new_timer = TimerForModule.new()
 		new_timer.wait_time = TimerTime
 		new_timer.one_shot = TimerOneShot
@@ -30,7 +30,7 @@ func create_timer(TimerName: String, TimerTime: float, TimerOneShot := true, IsP
 
 
 func add_timer(TimerToAdd: TimerForModule):
-	if enabled:
+	if is_module_enabled:
 		var _new_timer = TimerToAdd
 		self.add_child(_new_timer)
 		timers_dict[TimerToAdd.name] = _new_timer
@@ -39,7 +39,7 @@ func add_timer(TimerToAdd: TimerForModule):
 
 
 func start_timer(TimerName:String, TimerTime: float = 0.0):
-	if enabled:
+	if is_module_enabled:
 		var timer_time: float = TimerTime
 		if TimerName.to_lower() in timers_dict:
 			if timer_time == 0.0:
@@ -51,7 +51,7 @@ func start_timer(TimerName:String, TimerTime: float = 0.0):
 
 
 func stop_timer(TimerName:String) -> void:
-	if enabled:
+	if is_module_enabled:
 		if timers_dict.has(TimerName.to_lower()):
 			timers_dict[TimerName].stop()
 
@@ -75,11 +75,11 @@ func set_up_module():
 			timers_dict[timer_node.name.to_lower()] = timer_node
 			timer_node.connect("timer_timeout", _on_timer_timeout)
 	
-	enabled = true
+	is_module_enabled = true
 
 
 func _module_enabled_override(Value: bool) -> void:
-	if enabled != Value:
+	if is_module_enabled != Value:
 		for timer in timers_dict.keys():
 			timers_dict[timer].paused = Value
-	enabled = Value
+	is_module_enabled = Value
