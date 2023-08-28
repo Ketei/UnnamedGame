@@ -10,7 +10,7 @@ var timers_dict : Dictionary = {}
 func get_timer(TimerName: String) -> TimerForModule:
 	var return_timer: TimerForModule = null
 	
-	if TimerName.to_lower() in timers_dict:
+	if timers_dict.has(TimerName.to_lower()):
 		return_timer = timers_dict[TimerName.to_lower()]
 	
 	return return_timer

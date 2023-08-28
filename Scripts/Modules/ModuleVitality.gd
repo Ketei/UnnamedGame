@@ -218,7 +218,7 @@ func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> v
 func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
 	if is_module_enabled and skill_module:
 		if skill_module.is_module_enabled:
-			if SkillName in skill_module.custom_skills and ValueType != "skill":
+			if skill_module.custom_skills.has(SkillName) and ValueType != "skill":
 				if SkillName == "mult-skill":
 					skill_module.custom_skills[SkillName][ValueType] = ModValue
 				else:
@@ -231,7 +231,7 @@ func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue
 func skill_create_custom_skill(SkillName:String) -> void:
 	if is_module_enabled and skill_module:
 		if skill_module.is_module_enabled:
-			if SkillName not in skill_module.custom_skills:
+			if not skill_module.custom_skills.has(SkillName):
 				skill_module.custom_skills[SkillName] = {
 					"base-skill" = 0,
 					"mod-skill" = 0,
@@ -244,7 +244,7 @@ func skill_create_custom_skill(SkillName:String) -> void:
 func skill_custom_skill_get_value(SkillName: String) -> int:
 	var _return_skill = null
 	if skill_module:
-		if SkillName in skill_module.custom_skills:
+		if skill_module.custom_skills.has(SkillName):
 			_return_skill = skill_module.custom_skills[SkillName]["skill"]
 		else:
 			print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor. Returning null")
