@@ -32,8 +32,6 @@ func get_normal_gravity(JumpInTiles:float, JumpTimeToFloor:float) -> float:
 func is_between(Value : float, From : float, To : float) -> bool:
 	var high_number : float
 	var low_number : float
-	
-	var is_value_between : bool
 
 	if From < To:
 		high_number = To
@@ -43,9 +41,35 @@ func is_between(Value : float, From : float, To : float) -> bool:
 		low_number = To
 
 	if low_number <= Value and Value <= high_number:
-		is_value_between = true
+		return true
 	else:
-		is_value_between = false
+		return false
+
+
+## Unlike the array method of erase() which will reindex all elements to the rigth of the removed element
+## to (elementIndex -1) this will move the last element of the array to the removed element place and 
+## reduce the array size by 1. This is a lot faster but will not preserve the array order. 
+## If you want to keep the array's order use Array.erase() instead.
+func erase_array_element(ElementToErase, TargetArray: Array):
+	if not TargetArray.has(ElementToErase):
+		return
 	
-	return is_value_between
+	if TargetArray.size() == 1:
+		TargetArray.clear()
+	else:
+		TargetArray[TargetArray.find(ElementToErase)] = TargetArray.back()
+		TargetArray.resize(TargetArray.size() - 1)
+
+
+## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
+## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
+## then replace that element with the new one. The position to be inserted at must be valid one.
+## This is a lot faster but will not preserve the array order. If you want to keep the array's order 
+## use Array.insert() instead.
+func insert_in_array(PositionToInsertAt: int, ElementToInsert, TargetArray: Array):
+	if TargetArray.size() == 0:
+		TargetArray.append(ElementToInsert)
+	else:
+		TargetArray.append(TargetArray[PositionToInsertAt])
+		TargetArray[PositionToInsertAt] = ElementToInsert
 
