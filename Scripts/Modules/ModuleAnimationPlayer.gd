@@ -1,100 +1,84 @@
-## AnimationPlayer set up for module manager. An autoplay animation or playing
-## an animation is required or enabling/disabling the module COULD cause issues.
+## AnimationPlayer set up for module manager with some custom functions.
 extends AnimationPlayer
 class_name ModuleAnimationPlayer
 
-## A dictionary that stores the string names of the animations along with their
-## terrain state. 
-@export var animation_categories = {
-	"Ground": {
-		"Idle": [],
-		"Move": [],
-		"Sprint": [],
-		"Dash": [],
-		"Attack": [],
-		"KnockDown": [],
-		"Stun": [],
-		"Damage": []
-	},
-	"Air": {
-		"Jump": [],
-		"Fall": [],
-		"KnockDown": [],
-		"Damage": []
-	},
-	"Water": {
-		"Idle": [],
-		"Move": [],
-		"Dash": [],
-		"KnockDown": [],
-		"Stun": [],
-		"Damage": []
-	}
-}
+# PackName(String):ActionName(String):AnimationName(Array[String]) <- AnimationName(String)
+## A dictionary that stores the string names of the actions inside their respective
+## packs. Naming pattern is all lowercase with _ instead of whitespace.
+var animation_list = {}
+
 # Required for the manager to track them.
 var module_type: String = "AnimationPlayer"
 
-var enabled: bool = false : set = _module_enabled_override
+var is_module_enabled: bool = true : set = _module_is_module_enabled_override
 var module_manager : ModuleManager
 
 
-## Called by the module manager when setting up.
+## Called by the module manager when setting up. Register animations here.
 func set_up_module() -> void:
-	enabled = true
+	pass
+				
 
 
-func _module_enabled_override(Value: bool) -> void:
-	enabled = Value
-	if enabled:
-		play()
-	else:
-		pause()
+func _module_is_module_enabled_override(Value: bool) -> void:
+	is_module_enabled = Value
 
 
-## Registers an animation to the internal dictionary so it can be grabbed via class functions.
-func register_animation(AnimationTerrain: String, AnimationState: String, AnimationName: String) -> void:
-	if self.has_animation(AnimationName):
-		if AnimationTerrain not in animation_categories:
-			animation_categories[AnimationTerrain] = {}
-		
-		if AnimationState not in animation_categories[AnimationTerrain]:
-			animation_categories[AnimationTerrain][AnimationState] = []
-		
-		animation_categories[AnimationTerrain][AnimationState].append(AnimationName)
-	else:
-		print_debug("Warning: AnimationPlayer doesn't have an animation with the name: " + AnimationName)
+## Gets the first registered animation of the pack[action] unless play random is true,
+## if so, it'll get a random animation in the array.
+func get_anim_in_action_pack(PackName: String, ActionName: String, GetRandom := false) -> String:
+	if not is_action_in_pack(PackName, ActionName) or animation_list[PackName][ActionName].is_empty():
+		return ""
 	
-
-## Removes the animation name from the internal dictionary. This only affects play_terrain_animation()
-## This doesn't delete the animation and can be registered again with register_animation()
-func unregister_animation(AnimationTerrain: String, AnimationState: String, AnimationName: String):
-	if AnimationTerrain in animation_categories:
-		if AnimationState in animation_categories[AnimationTerrain]:
-			if AnimationName in animation_categories[AnimationTerrain][AnimationState]:
-				animation_categories[AnimationTerrain][AnimationState].erase(AnimationName)
-			else:
-				print_debug(AnimationName + " doesn't exist in animation array.")
-		else:
-			print_debug(AnimationState + " doesn't exist in terrain dictionary")
+	if GetRandom:
+		return animation_list[PackName][ActionName].pick_random()
 	else:
-		print_debug(AnimationTerrain + " is not a registered terrain")
+		return animation_list[PackName][ActionName].front()
 
 
-## Plays the first registered animation of the terrain and status unless play random is true,
-## if so, it'll get a random animation in the array specified.
-func play_terrain_animation(Terrain: String, AnimationState: String, PlayRandom := false):
-	if Terrain in animation_categories:
-		if AnimationState in animation_categories[Terrain]:
-			if 0 < animation_categories[Terrain][AnimationState].size():
-				# If random play but the array size is 1 there is no need to randomize.
-				if PlayRandom and 1 < animation_categories[Terrain][AnimationState].size():
-					play(animation_categories[Terrain][AnimationState][randi() % animation_categories[Terrain][AnimationState].size() - 1])
-				else:
-					play(animation_categories[Terrain][AnimationState].front())
-			else:
-				print_debug("Warning: No registered animations in array")
+## Returns true if the action key exists inside a pack. Ignores if the action has any animations registered.
+func is_action_in_pack(PackName: String, ActionName: String) -> bool:
+	if not animation_list.has(PackName):
+		return false
+	
+	if not animation_list[PackName].has(ActionName):
+		return false
+	
+	return true
+
+
+## Registers an animation in the action name of the specified animation pack. If you want the animation to be
+## the default of the action in the pack then it'll be inserted at the start of the array. It's reccomended
+## to NOT preserve the order if registering as default, since this means ALL registered animations
+# will have to be reindexed.
+func register_animation(TargetPack: String, ActionName: String, AnimationKey: String, RegisterAsDefault := false,  PreserveOrder := false) -> void:
+	if not is_module_enabled or not has_animation(AnimationKey):
+		return
+	
+	if not animation_list.has(TargetPack):
+		animation_list[TargetPack] = {}
+	
+	if not animation_list[TargetPack].has(ActionName):
+		animation_list[TargetPack][ActionName] = []
+	
+	if RegisterAsDefault:
+		if PreserveOrder:
+			animation_list[TargetPack][ActionName].insert(0, AnimationKey)
 		else:
-			print_debug(AnimationState + " doesn't exist in terrain dictionary")
+			QuickMath.insert_in_array(0, AnimationKey, animation_list[TargetPack][ActionName])
 	else:
-		print_debug(Terrain + " is not a registered terrain.")
+		animation_list[TargetPack][ActionName].append(AnimationKey)
 
+
+## Unregisters an animation in the action name of the specified animation pack. It's reccomended
+## NOT to preserve the order since this means all registered animations to the right will have to be reindexed.
+func unregister_animation(TargetPack: String, TargetAction: String, AnimationKey: String, PreserveOrder := false) -> void:
+	if not is_action_in_pack(TargetPack, TargetAction) or not is_module_enabled:
+		return
+	
+	if PreserveOrder:
+		animation_list[TargetPack][TargetAction].erase(AnimationKey)
+	else:
+		QuickMath.erase_array_element(AnimationKey, animation_list[TargetPack][TargetAction])
+	
+	
