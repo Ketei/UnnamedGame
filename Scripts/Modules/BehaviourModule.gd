@@ -2,6 +2,7 @@ extends Module
 class_name ModuleBehaviour
 
 signal behaviour_changed(OldBehaviour: String, NewBehaviour: String)
+signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
 
 ## This is the behaviour pack that will be loaded initially when the node enters the scene.
 ## The pack should have a default behaviour to be loaded successfully, otherwise an error
@@ -18,65 +19,101 @@ var target_node: Node = null # The node that this module will apply on
 
 
 func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
-	if is_module_enabled:
-		var _behaviour_preload: Behaviour
-		var _old_behaviour: String
-		if loaded_behaviour.behaviour_connected and is_module_enabled:
-			if loaded_packs.has(TargetPack):
-				if loaded_packs[TargetPack].available_behaviours.has(NewBehaviour):
-					_behaviour_preload = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
-					_old_behaviour = loaded_behaviour.behaviour_id
-					loaded_behaviour.exit()
-					loaded_behaviour = _behaviour_preload
-					current_pack = TargetPack
-					loaded_behaviour.enter()
-					behaviour_changed.emit(_old_behaviour, loaded_behaviour.behaviour_id)
+	if not is_module_enabled or not loaded_behaviour.behaviour_connected and not check_for_pack_and_behaviour(TargetPack, NewBehaviour):
+		return
+	
+	var _behaviour_preload: Behaviour
+	var _old_behaviour: String
+
+	_behaviour_preload = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
+	_old_behaviour = loaded_behaviour.behaviour_id
+	loaded_behaviour.exit()
+	disconnect_behaviour_signals()
+	loaded_behaviour = _behaviour_preload
+	connect_behaviour_signals()
+	current_pack = TargetPack
+	loaded_behaviour.enter()
+	behaviour_changed.emit(_old_behaviour, loaded_behaviour.behaviour_id)
+
+
+func connect_behaviour_signals() -> void:
+	if loaded_behaviour.change_animation.is_connected(_change_anim_signal):
+		return
+	
+	loaded_behaviour.change_animation.connect(_change_anim_signal)
+
+
+func disconnect_behaviour_signals() -> void:
+	if not loaded_behaviour.change_animation.is_connected(_change_anim_signal):
+		return
+	
+	loaded_behaviour.change_animation.disconnect(_change_anim_signal)
+
+
+func check_for_pack_and_behaviour(PackToCheck: String, BehaviourToCheck: String) -> bool:
+	if not loaded_packs.has(PackToCheck):
+		return false
+	
+	if not loaded_packs[PackToCheck].has(BehaviourToCheck):
+		return false
+	
+	return true
 
 
 # (Dis)Connects the behaviour from the others. Preventing the exit of the behaviour if the actor is
 # in it, or preventing it's entry if not. If no behaviour name is given, it'll change the currently loaded
 # behaviour
 func behaviour_connection(IsConnected: bool, BehaviourName: String = "", TargetPack: String = "") -> void:
-	if is_module_enabled:
-		if TargetPack == "":
-			TargetPack = current_pack
-		
-		if BehaviourName == "":
-			loaded_behaviour.behaviour_connected = IsConnected
-		else:
-			if loaded_packs.has(TargetPack):
-				if loaded_packs[TargetPack].available_behaviours.has(BehaviourName):
-					loaded_packs[TargetPack].available_behaviours[BehaviourName].behaviour_connected = IsConnected
+	if not is_module_enabled:
+		return
+
+	if TargetPack == "":
+		TargetPack = current_pack
+	if BehaviourName == "":
+		loaded_behaviour.behaviour_connected = IsConnected
+
+	if check_for_pack_and_behaviour(TargetPack, BehaviourName):
+		loaded_packs[TargetPack].available_behaviours[BehaviourName].behaviour_connected = IsConnected
 
 
 # Replaces one of the original behaviour packs for a custom one. The original pack is saved and can
 # be restored with the function restore_behaviour_pack. Only the original packs are saved and not
 # the custom ones.
 func replace_behaviour_pack(PackToReplace: String, NewBehaviourPack: BehaviourPack) -> void:
-	if is_module_enabled:
-		if loaded_packs.has(PackToReplace):
-			if not _original_behaviours.has(PackToReplace):
-				_original_behaviours[PackToReplace] = loaded_packs[PackToReplace]
-			loaded_packs[PackToReplace] = NewBehaviourPack
+	if not is_module_enabled or not loaded_packs.has(PackToReplace):
+		return
+
+	backup_pack(loaded_packs[PackToReplace])
+	loaded_packs[PackToReplace] = NewBehaviourPack
+
+
+func backup_pack(PackToBackup: BehaviourPack) -> void:
+	if _original_behaviours.has(PackToBackup.behaviour_pack_id):
+		return
+	
+	_original_behaviours[PackToBackup.behaviour_pack_id] = PackToBackup
 
 
 func add_behaviour_pack(PackToAdd: BehaviourPack) -> void:
-	if is_module_enabled:
-		if not loaded_packs.has(PackToAdd.behaviour_pack_id):
-			loaded_packs[PackToAdd.behaviour_pack_id] = PackToAdd
-		else:
-			print_debug("A pack with the same ID is already loaded. Either use the replace function or change the pack ID")
+	if not is_module_enabled:
+		return
+	
+	if not loaded_packs.has(PackToAdd.behaviour_pack_id):
+		loaded_packs[PackToAdd.behaviour_pack_id] = PackToAdd
+	else:
+		print_debug("A pack with the same ID is already loaded. Either use the replace function or change the pack ID")
 
 
 # Restores a behaviour pack as long as it exists. To get a list of pack backups use get_replaced_pack_list
 func restore_behaviour_pack(PackToRestore: String) -> void:
-	if is_module_enabled:
-		if _original_behaviours.has(PackToRestore):
-			loaded_packs[PackToRestore] = _original_behaviours[PackToRestore]
-			_original_behaviours.erase(PackToRestore)
+	if not is_module_enabled or not _original_behaviours.has(PackToRestore):
+		return
+
+	loaded_packs[PackToRestore] = _original_behaviours[PackToRestore]
+	_original_behaviours.erase(PackToRestore)
 
 
-func get_replaced_pack_list() -> Array:
+func get_backup_pack_list() -> Array:
 	return _original_behaviours.keys()
 
 
@@ -114,3 +151,6 @@ func set_up_module() -> void:
 	
 	is_module_enabled = true
 
+
+func _change_anim_signal(Pack: String, Action: String, Random: bool) -> void:
+	change_animation.emit(Pack, Action, Random)
