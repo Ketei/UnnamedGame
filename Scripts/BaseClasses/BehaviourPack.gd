@@ -12,7 +12,6 @@ signal transition_to(TargetPack: String, TargetBehaviour: String)
 var available_behaviours: Dictionary = {}
 
 var behaviour_pack_id: String = ""
-var loaded_behaviour: Behaviour = null
 
 
 func _emit_change_signal(PackTarget: String, BehaviourTarget: String):
@@ -21,15 +20,20 @@ func _emit_change_signal(PackTarget: String, BehaviourTarget: String):
 
 func set_up_pack(TargetNode: Node) -> void:
 	for child in get_children():
-		if child is Behaviour:
-			if child.behaviour_id in available_behaviours.keys():
-				print_debug("Duplicate behaviours encoutered. Duplicate ID: " + child.behaviour_id)
-				print_debug("Previous behaviour will be replaced.")
-			available_behaviours[child.behaviour_id] = child
-			child.set_target_node(TargetNode)
-			child.setup_behaviour()
-			if child.is_default:
-				default_behaviour = child
+		if child != Behaviour:
+			continue
+		
+		warn_if_duplicate_behaviour(child)
+		
+		available_behaviours[child.behaviour_id] = child
+		child.set_target_node(TargetNode)
+		child.setup_behaviour()
+		if child.is_default:
+			default_behaviour = child
 
-	for behaviour in available_behaviours.keys():
-		available_behaviours[behaviour].change_behaviour.connect(_emit_change_signal)
+
+func warn_if_duplicate_behaviour(BehaviourToCheck: Behaviour) -> void:
+	if BehaviourToCheck.behaviour_id in available_behaviours.keys():
+		print_debug("Duplicate behaviours encoutered. Duplicate ID: " + BehaviourToCheck.behaviour_id)
+		print_debug("Previous behaviour will be replaced.")
+
