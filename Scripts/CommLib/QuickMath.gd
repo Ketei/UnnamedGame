@@ -82,7 +82,7 @@ func insert_in_array(PositionToInsertAt: int, ElementToInsert, TargetArray: Arra
 ## Switches the place between the given element and the first element of the array. Will do nothing
 ## if the element doesn't exist
 func array_bring_to_front(MoveToFront, ArrayToChange: Array) -> void:
-	if MoveToFront not in ArrayToChange or ArrayToChange.size() <= 1:
+	if MoveToFront not in ArrayToChange or ArrayToChange.size() <= 1 or MoveToFront == ArrayToChange.front():
 		return
 	
 	var _element_index = ArrayToChange.find(MoveToFront)
