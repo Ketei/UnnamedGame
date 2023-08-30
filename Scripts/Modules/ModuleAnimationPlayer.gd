@@ -8,7 +8,7 @@ class_name ModuleAnimationPlayer
 var animation_list = {}
 
 # Required for the manager to track them.
-var module_type: String = "AnimationPlayer"
+var module_type: String = "animation-player"
 
 var is_module_enabled: bool = true : set = _module_enabled_override
 var module_manager : ModuleManager
@@ -93,3 +93,7 @@ func anim_data_validation(PackName: String, ActionName: String) -> void:
 	if not animation_list[PackName].has(ActionName):
 		animation_list[PackName][ActionName] = []
 
+## Custom function for the module. Does exactly the same as play() but picks the animation by giving it
+## a pack and action.
+func custom_play(PackName: String, ActionName: String, RandomAnim: bool = false, CustomBlend: float = -1, CustomSpeed: float = 1.0, FromEnd: bool = false) -> void:
+	play(get_anim_in_action_pack(PackName, ActionName, RandomAnim), CustomBlend, CustomSpeed, FromEnd)
