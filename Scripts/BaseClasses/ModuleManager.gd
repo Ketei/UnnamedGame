@@ -10,7 +10,7 @@ var _loaded_modules: Dictionary = {}
 
 func _ready():
 	for child in self.get_children():
-		if not child is Module or not child is ModuleAnimationPlayer:
+		if not _is_object_a_valid_module(child):
 			continue
 		
 		warn_if_repeated_modules(child.module_type)
@@ -21,6 +21,15 @@ func _ready():
 		
 		if child is ModuleBehaviour:
 			child.change_animation.connect(_change_animation)
+
+
+func _is_object_a_valid_module(ObjectToCheck) -> bool:
+	if ObjectToCheck is Module:
+		return true
+	elif ObjectToCheck is ModuleAnimationPlayer:
+		return true
+	else:
+		return false
 
 
 ## Returns true if the module is present and loaded
