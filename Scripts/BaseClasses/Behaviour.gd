@@ -2,6 +2,7 @@ extends Node
 class_name Behaviour
 
 signal change_behaviour(BehaviourPackTarget: String, BehaviourTarget: String)
+signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
 
 # Set to true if the behaviour is to be loaded as default. This is only relevant for packs that
 # are loaded as default/initial.
