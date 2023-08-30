@@ -54,12 +54,11 @@ func erase_array_element(ElementToErase, TargetArray: Array):
 	if not TargetArray.has(ElementToErase):
 		return
 	
-	if TargetArray.size() == 1:
-		TargetArray.clear()
-	else:
+	if TargetArray.back() != ElementToErase:
 		TargetArray[TargetArray.find(ElementToErase)] = TargetArray.back()
-		TargetArray.resize(TargetArray.size() - 1)
-
+	
+	TargetArray.resize(maxi(TargetArray.size() - 1, 0))
+		
 
 ## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
 ## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
