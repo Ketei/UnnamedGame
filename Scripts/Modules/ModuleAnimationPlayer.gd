@@ -10,7 +10,7 @@ var animation_list = {}
 # Required for the manager to track them.
 var module_type: String = "AnimationPlayer"
 
-var is_module_enabled: bool = true : set = _module_is_module_enabled_override
+var is_module_enabled: bool = true : set = _module_enabled_override
 var module_manager : ModuleManager
 
 
@@ -20,7 +20,7 @@ func set_up_module() -> void:
 				
 
 
-func _module_is_module_enabled_override(Value: bool) -> void:
+func _module_enabled_override(Value: bool) -> void:
 	is_module_enabled = Value
 
 
@@ -54,12 +54,8 @@ func is_action_in_pack(PackName: String, ActionName: String) -> bool:
 func register_animation(TargetPack: String, ActionName: String, AnimationKey: String, RegisterAsDefault := false,  PreserveOrder := false) -> void:
 	if not is_module_enabled or not has_animation(AnimationKey):
 		return
-	
-	if not animation_list.has(TargetPack):
-		animation_list[TargetPack] = {}
-	
-	if not animation_list[TargetPack].has(ActionName):
-		animation_list[TargetPack][ActionName] = []
+		
+	anim_data_validation(TargetPack, ActionName)
 	
 	if RegisterAsDefault:
 		if PreserveOrder:
@@ -80,5 +76,20 @@ func unregister_animation(TargetPack: String, TargetAction: String, AnimationKey
 		animation_list[TargetPack][TargetAction].erase(AnimationKey)
 	else:
 		QuickMath.erase_array_element(AnimationKey, animation_list[TargetPack][TargetAction])
+
+
+func set_default_animation(TargetPack: String, ActionName: String, AnimationKey: String) -> void:
+	if not is_action_in_pack(TargetPack, ActionName):
+		return
 	
+	if AnimationKey in animation_list[TargetPack][ActionName]:
+		QuickMath.array_bring_to_front(AnimationKey, animation_list[TargetPack][ActionName])
+
+
+func anim_data_validation(PackName: String, ActionName: String) -> void:
+	if not animation_list.has(PackName):
+		animation_list[PackName] = {}
 	
+	if not animation_list[PackName].has(ActionName):
+		animation_list[PackName][ActionName] = []
+
