@@ -22,11 +22,9 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 	if not is_module_enabled or not loaded_behaviour.behaviour_connected and not check_for_pack_and_behaviour(TargetPack, NewBehaviour):
 		return
 	
-	var _behaviour_preload: Behaviour
-	var _old_behaviour: String
+	var _behaviour_preload: Behaviour = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
+	var _old_behaviour: String = loaded_behaviour.behaviour_id
 
-	_behaviour_preload = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
-	_old_behaviour = loaded_behaviour.behaviour_id
 	loaded_behaviour.exit()
 	disconnect_behaviour_signals()
 	loaded_behaviour = _behaviour_preload
