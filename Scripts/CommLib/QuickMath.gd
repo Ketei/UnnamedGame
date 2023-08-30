@@ -63,13 +63,30 @@ func erase_array_element(ElementToErase, TargetArray: Array):
 
 ## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
 ## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
-## then replace that element with the new one. The position to be inserted at must be valid one.
+## then replace that element with the new one. The position to be inserted at must be valid one or nothing will happen.
 ## This is a lot faster but will not preserve the array order. If you want to keep the array's order 
 ## use Array.insert() instead.
 func insert_in_array(PositionToInsertAt: int, ElementToInsert, TargetArray: Array):
-	if TargetArray.size() == 0:
+	var _array_size: int = TargetArray.size()
+	
+	if _array_size < PositionToInsertAt:
+		return
+	
+	if _array_size <= 1 or PositionToInsertAt == _array_size:
 		TargetArray.append(ElementToInsert)
 	else:
 		TargetArray.append(TargetArray[PositionToInsertAt])
 		TargetArray[PositionToInsertAt] = ElementToInsert
 
+
+## Switches the place between the given element and the first element of the array. Will do nothing
+## if the element doesn't exist
+func array_bring_to_front(MoveToFront, ArrayToChange: Array) -> void:
+	if MoveToFront not in ArrayToChange or ArrayToChange.size() <= 1:
+		return
+	
+	var _element_index = ArrayToChange.find(MoveToFront)
+	var _element_memory = ArrayToChange.front()
+	
+	ArrayToChange[0] = MoveToFront
+	ArrayToChange[_element_index] = _element_memory
