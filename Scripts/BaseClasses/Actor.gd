@@ -12,55 +12,55 @@ enum GravityMode {NORMAL, JUMP}
 @export var actor_sprite: Sprite2D = null
 
 @export_category("Movement")
-@export var max_speed: float : set = _set_move_base_speed
-@export var acceleration: float = 0.0
-@export var friction: float = 0.0 : set = _set_friction
-@export var climb_base_speed: float : set = _set_max_climb_speed
+@export var self_terrain_move_mod: Dictionary = {}
+@export var max_speed: float : 
+	set(value) :
+		max_speed = maxf(value, 0.0) * ActorProperties.world_grid
+		_update_total_speed()
+@export var acceleration: float = 0.0 : 
+	set(value) :
+		acceleration = maxf(value, 0.0) * ActorProperties.world_grid
+		_update_total_speed()
+@export var friction: float = 0.0 : 
+	set(value) :
+		friction = maxf(value, 0.0) * ActorProperties.world_grid
+		_update_total_speed()
+@export var climb_base_speed: float : 
+	set(value) :
+		climb_base_speed = maxf(value, 0.0) * ActorProperties.world_grid
 
 @export_category("Gravity")
-@export var max_gravity: float = 0.0
+@export var max_gravity: float = 0.0 : 
+	set(value) :
+		max_gravity = maxf(value, 0.0) * ActorProperties.world_grid
 @export var _jump_time_to_floor: float
 @export var _jump_time_to_peak: float
 @export var _jump_height: float
 
 # Toggles
 var is_gravity_enabled: bool = true
-var is_control_enabled: bool = true # Player: Input controls | NPC: AI processing control
-## When it turns true, if the actor sprite is set in the actor node it'll also flip the sprite horizontally
-var is_facing_left: bool = false
+
+# Horizontal Movement
+var speed_mod: float = 0.0:
+	set(value):
+		speed_mod = value
+		_update_total_speed()
+var speed_mult: float = 1.0 :
+		set(value):
+			speed_mult = maxf(value, 0.0)
+			_update_total_speed()
+var _terrain_mod: float = 1.0:
+	set(value):
+		_terrain_mod = maxf(value, 0.0)
+		_update_total_speed()
+var _total_speed = 0.0
 
 # Settings
 var gravity: float = 0.0
 
-# Trackers
-## The speed tracker is used to change speed with smooth acceleration
-# if I need to free _init move the function to library and call it on_ready
-#AccelSteps: int, Speed: float, Increase: float
-@onready var speed_manager: SpeedManager = SpeedManager.new()
-
 @onready var jump_velocity = QuickMath.get_jump_velocity(_jump_height, _jump_time_to_peak)
 @onready var jump_gravity = QuickMath.get_jump_gravity(_jump_height, _jump_time_to_peak)
 @onready var normal_gravity = QuickMath.get_normal_gravity(_jump_height, _jump_time_to_floor)
-
-
-# setgets
-func _set_move_base_speed(NewMaxSpeed: float) -> void:
-	max_speed = absf(NewMaxSpeed) * ActorProperties.world_grid
-
-
-func _set_max_climb_speed(NewMaxSpeed: float) -> void:
-	climb_base_speed = absf(NewMaxSpeed) * ActorProperties.world_grid
-	
-
-func _set_friction(NewFriction: float) -> void:
-	friction = absf(NewFriction)
-
-
-func _set_is_facing_left(IsFacingLeft: bool) -> void:
-	is_facing_left = IsFacingLeft
-	if actor_sprite:
-		actor_sprite.flip_h = true
-# -------------------------------------------------------------------------------------------------
 
 
 func change_gravity_mode(NewGravityMode: GravityMode) -> void:
@@ -71,23 +71,39 @@ func change_gravity_mode(NewGravityMode: GravityMode) -> void:
 
 
 func apply_gravity(delta: float) -> void:
-	if is_gravity_enabled:
-		velocity.y = move_toward(velocity.y, max_gravity, velocity.y + (gravity * delta))
-
-## Sets a new velocity.x for the actor. DirectionStrength uses positive values between 0.0 and 1.0
-## DirectionStrength is used to calculate the % of max_speed that is max_speed. Mostly useful for controller input.
-## Direction of the movement is defined by is_facing_left
-func move_actor(MovementStrenght: float, Delta: float):
-	var _new_velocity: float
+	if not is_gravity_enabled:
+		return
 	
-	if MovementStrenght == 0.0 and velocity.x == 0.0:
-		# Avoids unnecessary sets on velocity or calcs on a new velocity.
-		pass
-	else:
-		_new_velocity = speed_manager.get_new_velocity(velocity.x, max_speed * absf(MovementStrenght), acceleration, friction, Delta)
-		
-		if is_facing_left:
-			_new_velocity *= -1
+	velocity.y = move_toward(velocity.y, max_gravity, velocity.y + (gravity * delta))
 
-		if _new_velocity != velocity.x:
-			velocity.x = _new_velocity
+
+func change_actor_speed(AxisDirection: float, Delta: float) -> void:
+	if AxisDirection == 0.0 and velocity.x == 0.0:
+		return
+	
+	velocity.x = move_toward(velocity.x, _total_speed * AxisDirection, get_accel_change(AxisDirection, velocity.x) * Delta)
+
+
+func get_accel_change(AxisValue: float, SpeedValue: float):
+	if SpeedValue == 0.0 or (0 < AxisValue) == (0 < SpeedValue): # If going from non-moving to moving or control direction == moving direction
+		return acceleration
+	elif AxisValue == 0.0: # If going from moving to non-moving
+		return friction
+	else: # If going from moving to 1 direction to the opposite
+		return (acceleration / 3) + friction
+	
+
+func _update_total_speed() -> void:
+	_total_speed = maxf(((max_speed + speed_mod) * speed_mult) * _terrain_mod, 0.0)
+
+
+func set_terrain_mult_by_name(TerrainName: String):
+	if TerrainName in self_terrain_move_mod:
+		_terrain_mod = self_terrain_move_mod[TerrainName]
+	elif TerrainName in GameProperties.TerrainMoveMult:
+		_terrain_mod = GameProperties.TerrainMoveMult[TerrainName]
+
+
+func add_terrain_modifier(TerrainName: String, TerrainModifier: float) -> void:
+	self_terrain_move_mod[TerrainName] = maxf(TerrainModifier, 0.0)
+
