@@ -116,15 +116,24 @@ func get_backup_pack_list() -> Array:
 
 
 func _input(event):
-	if is_module_enabled:
-		if loaded_behaviour:
-			loaded_behaviour.handle_input(event)
+	if not is_module_enabled or not loaded_behaviour:
+		return
+
+	loaded_behaviour.handle_input(event)
+
+
+func _unhandled_key_input(event):
+	if not is_module_enabled or not loaded_behaviour:
+		return
+		
+	loaded_behaviour.handle_key_input(event)
 
 
 func _physics_process(delta):
-	if is_module_enabled:
-		if loaded_behaviour:
-			loaded_behaviour.handle_physics(delta)
+	if not is_module_enabled or not loaded_behaviour:
+		return
+	
+	loaded_behaviour.handle_physics(delta)
 
 
 func set_up_module() -> void:
@@ -132,9 +141,11 @@ func set_up_module() -> void:
 	target_node = module_manager.parent_node
 
 	for child in self.get_children():
-		if child is BehaviourPack:
-			loaded_packs[child.behaviour_pack_id] = child
-			child.set_up_pack(target_node)
+		if not child is BehaviourPack:
+			continue
+		
+		loaded_packs[child.behaviour_pack_id] = child
+		child.set_up_pack(target_node)
 	
 	if default_pack:
 		if default_pack.default_behaviour:
