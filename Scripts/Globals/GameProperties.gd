@@ -20,16 +20,10 @@ const AttackTypes: Dictionary = {
 	"true": DamageTypes.TRUE
 }
 
-const TerrainNames : Dictionary = {
-	"0": "Ground",
-	"1": "Air",
-	"2": "Water"
-	}
-
 # A movement mutiplier. If the key of this dict matches one of terrain names
 # the actor movement will be multiplied by the amount stated.
 const TerrainMoveMult : Dictionary = {
-	"2": 0.85
+	"water": 0.85
 }
 
 # When cumming, arousal will be changed by -100 + (this value * cum_times).
@@ -91,14 +85,6 @@ var skill_effects: Dictionary = {
 }
 
 
-func get_terrain_name(TerrainID: int) -> String:
-	var return_string: String = ""
-	if str(TerrainID) in TerrainNames:
-		return_string = TerrainNames[TerrainID]
-	
-	return return_string
-
-
 # Switch to control lib when it exists
 func change_keybind(EventName: String, NewKeybindKeyCode: int):
 	if InputMap.has_action(EventName):
@@ -119,18 +105,22 @@ func add_lust_effect(LustAmount: int, StatChange: String, ValueChange: float) ->
 
 
 func remove_lust_effect(LustAmount: int, StatChange: String):
-	if str(LustAmount) in lust_effects:
-		lust_effects[str(LustAmount)].erase(StatChange)
+	if str(LustAmount) not in lust_effects:
+		return
+	
+	lust_effects[str(LustAmount)].erase(StatChange)
 		
-		if lust_effects[str(LustAmount)].is_empty():
-			lust_effects.erase(str(LustAmount))
+	if lust_effects[str(LustAmount)].is_empty():
+		lust_effects.erase(str(LustAmount))
 
 
 func get_skill_effects(SkillName: String, SkillLevel: int, PrevSkillLevel: int) -> Dictionary:
 	var _return_dict: Dictionary = {}
 	
-	if SkillName in skill_effects:
-		for skill_change in skill_effects[SkillName]:
-			_return_dict[skill_change] = skill_effects[SkillName][skill_change] * (SkillLevel - PrevSkillLevel)
+	if not skill_effects.has(SkillName):
+		return _return_dict
+
+	for skill_change in skill_effects[SkillName].keys():
+		_return_dict[skill_change] = skill_effects[SkillName][skill_change] * (SkillLevel - PrevSkillLevel)
 	
 	return _return_dict
