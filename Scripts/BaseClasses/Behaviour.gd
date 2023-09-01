@@ -35,6 +35,10 @@ func handle_input(_event : InputEvent) -> void:
 	pass
 
 
+func handle_key_input(_event: InputEvent) -> void:
+	pass
+
+
 func handle_physics(_delta : float) -> void:
 	pass
 
