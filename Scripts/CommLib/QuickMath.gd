@@ -92,7 +92,10 @@ func array_bring_to_front(MoveToFront, ArrayToChange: Array) -> void:
 
 
 func array_get_lowest_numberi(ArrayToCheck: Array) -> int:
-	var lowest_number: int = 0
+	if ArrayToCheck.is_empty():
+		return 0
+	
+	var lowest_number: int = ArrayToCheck.front()
 	
 	for number in ArrayToCheck:
 		if int(number) < lowest_number:
