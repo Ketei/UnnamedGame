@@ -3,7 +3,7 @@ class_name Actor
 
 # enums
 enum GravityMode {NORMAL, JUMP}
-enum MovementSpeed {RUN, WALK, CROUCH}
+enum MovementSpeed {RUN, WALK, CROUCH, SWIM}
 
 # General
 @export_category("Actor Properties")
@@ -14,10 +14,10 @@ enum MovementSpeed {RUN, WALK, CROUCH}
 
 @export_category("Movement")
 @export var self_terrain_move_mod: Dictionary = {}
-@export var run_speed: float : 
+@export var run_speed: float = 0.0: 
 	set(value) :
 		run_speed = maxf(value, 0.0) * GameProperties.grid_size
-@export var walk_speed: float : 
+@export var walk_speed: float = 0.0 : 
 	set(value) :
 		walk_speed = maxf(value, 0.0) * GameProperties.grid_size
 @export var acceleration: float = 0.0 : 
@@ -26,12 +26,13 @@ enum MovementSpeed {RUN, WALK, CROUCH}
 @export var friction: float = 0.0 : 
 	set(value) :
 		friction = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
-@export var climb_base_speed: float : 
+@export var climb_base_speed: float = 0.0 : 
 	set(value) :
 		climb_base_speed = maxf(value, 0.0) * GameProperties.grid_size
-@export var crouch_speed: float :
+@export var crouch_speed: float = 0.0 :
 	set(value):
 		crouch_speed = maxf(value, 0.0)
+@export var swim_speed: float = 0.0
 @export var air_jumps: int = 0 :
 	set(value):
 		air_jumps = maxi(value, 0)
@@ -54,8 +55,12 @@ var is_crouching: bool = false:
 	set(value):
 		is_crouching = value
 		_change_movement_status()
-var is_on_ground: bool = true
+var is_swimming: bool = false :
+	set(value):
+		is_swimming = value
+		_change_movement_status()
 var can_jump: bool = true
+var is_on_ground: bool = true
 var movement_status: MovementSpeed = MovementSpeed.RUN
 
 # Horizontal Movement
@@ -78,6 +83,7 @@ var air_jump_count: int = 0
 @onready var jump_velocity = QuickMath.get_jump_velocity(_jump_height, _jump_time_to_peak)
 @onready var jump_gravity = QuickMath.get_jump_gravity(_jump_height, _jump_time_to_peak)
 @onready var normal_gravity = QuickMath.get_normal_gravity(_jump_height, _jump_time_to_floor)
+
 
 func get_gravity() -> float:
 	if gravity_mode == GravityMode.NORMAL:
@@ -121,12 +127,16 @@ func _get_speed() -> float:
 		base_speed = walk_speed
 	elif movement_status == MovementSpeed.CROUCH:
 		base_speed = crouch_speed
+	elif  movement_status == MovementSpeed.SWIM:
+		base_speed = swim_speed
 
 	return maxf(((base_speed + speed_mod) * speed_mult) * _terrain_mod, 0.0)
 
 
 func _change_movement_status() -> void:
-	if is_crouching:
+	if is_swimming:
+		movement_status = MovementSpeed.SWIM
+	elif is_crouching:
 		movement_status = MovementSpeed.CROUCH
 	elif is_walking:
 		movement_status = MovementSpeed.WALK

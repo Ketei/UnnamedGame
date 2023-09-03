@@ -7,30 +7,40 @@ class_name Effect
 @export_multiline var description: String = ""
 
 ## An array that contains all the stat changes this effect. To be filled
-## with MiniModuleEffect objects only.
+## with EffectComponent objects only. When the effects start they will be moved
+## to active effect list.
 var effects_list: Array = []
 
-var target_vitality_module: ModuleVitality
+## Active effects, don't set manually
+var _active_effect_list: Array[EffectComponent] = []
 
 var effect_id: String
 
+var target_manager: ModuleManager
 
-func start_effect(TargetModule: ModuleVitality, EffectId: String):
+
+func start_effect() -> void:
 	for effect in effects_list:
-		if effect is MiniModuleEffect:
-			effect.target_vitality = TargetModule
-			effect._start_effect()
+		if not effect is EffectComponent:
+			continue
+
+		effect.module_manager = target_manager
+		effect.start_effect()
+		
+		if effect.apply_once:
+			effect.end_effect()
+		else:
+			_active_effect_list.append(effect)
+
+	effects_list.clear()
 
 
 func apply_effect(delta: float) -> void:
-	for effect in effects_list:
-		if effect is MiniModuleEffect:
-			effect._apply_effect()
-			
+	for effect in _active_effect_list:
+		effect.apply_effect(delta)
 
 
-func _end_effect() -> void:
-	for effect in effects_list:
-		if effect is MiniModuleEffect:
-			effect._end_effect()
+func end_effect() -> void:
+	for effect in _active_effect_list:
+		effect.end_effect()
 

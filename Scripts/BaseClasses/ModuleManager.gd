@@ -6,22 +6,35 @@ signal change_animation(AnimPack: String, AnimAction: String)
 @export var parent_node: Node
 # ModuleTypeName: ModuleID: ModuleNode
 var _loaded_modules: Dictionary = {}
-
+var _loaded_modules_array: Array = []
+var _module_init: Dictionary = {}
 
 func _ready():
 	for child in self.get_children():
 		if not _is_object_a_valid_module(child):
 			continue
 		
-		child.module_manager = self
-		child.set_up_module()
+		if not _module_init.has(str(child.module_priority)):
+			_module_init[str(child.module_priority)] = []
 		
-		warn_if_repeated_modules(child.module_type)
+		_module_init[str(child.module_priority)].append(child)
+	
+	for prio in range(_module_init.size()):
+		var loading_prio: int = QuickMath.array_get_lowest_numberi(_module_init.keys())
 		
-		_loaded_modules[child.module_type] = child
+		for module in _module_init[str(loading_prio)]:
+			module.module_manager = self
+			module.set_up_module()
+		
+			warn_if_repeated_modules(module.module_type)
+		
+			_loaded_modules[module.module_type] = module
 
-		if child is ModuleBehaviour:
-			child.change_animation.connect(_change_animation)
+			if module is ModuleBehaviour:
+				module.change_animation.connect(_change_animation)
+		_module_init.erase(str(loading_prio))
+	
+	_loaded_modules_array = _loaded_modules.keys()
 
 
 func _is_object_a_valid_module(ObjectToCheck) -> bool:
@@ -47,6 +60,16 @@ func get_module(ModuleName: String):
 		return null
 
 
+func register_module(NewModule: Module) -> void:
+	if has_module(NewModule.module_type):
+		print_debug("The module you're trying to register already exist")
+		return
+	NewModule.module_manager = self
+	NewModule.set_up_module()
+	_loaded_modules[NewModule.module_type] = NewModule
+	_loaded_modules_array.append(NewModule.module_type)
+
+
 func warn_if_repeated_modules(ModuleType: String) -> void:
 	if _loaded_modules.has(ModuleType):
 		print_debug("This actor already has a " + ModuleType + " module.")
@@ -60,9 +83,37 @@ func _change_animation(Pack: String, Action: String, PlayRandom: bool) -> void:
 	get_module("animation-player").custom_play(Pack, Action, PlayRandom)
 
 
+func actor_submerged(IsActorSubmerged: bool) -> void:
+	if not parent_node is Actor:
+		return
+	
+	if parent_node.is_swimming != IsActorSubmerged:
+		parent_node.is_swimming = IsActorSubmerged
+
+
 func is_on_ground() -> bool:
 	if has_module("terrain-tracker"):
 		return get_module("terrain-tracker").is_on_ground()
 	else:
 		return false
+
+
+func apply_effect(EffectToApply: Effect) -> void:
+	if has_module("vitality"):
+		pass
+
+
+func _physics_process(delta):
+	for module in _loaded_modules_array:
+		_loaded_modules[module].module_physics_process(delta)
+
+
+func _unhandled_input(event):
+	for module in _loaded_modules_array:
+		_loaded_modules[module].module_handle_input(event)
+
+
+func _unhandled_key_input(event):
+	for module in _loaded_modules_array:
+		_loaded_modules[module].module_handle_key_input(event)
 
