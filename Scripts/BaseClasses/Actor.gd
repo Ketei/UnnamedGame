@@ -7,7 +7,7 @@ enum MovementSpeed {RUN, WALK, CROUCH}
 
 # General
 @export_category("Actor Properties")
-@export var display_name: String = ""
+@export var actor_name: String = ""
 @export var actor_type: ActorProperties.ActorType
 @export var actor_gender: ActorProperties.Gender
 @export var actor_sprite: Sprite2D = null
@@ -16,27 +16,30 @@ enum MovementSpeed {RUN, WALK, CROUCH}
 @export var self_terrain_move_mod: Dictionary = {}
 @export var run_speed: float : 
 	set(value) :
-		run_speed = maxf(value, 0.0) * ActorProperties.world_grid
+		run_speed = maxf(value, 0.0) * GameProperties.grid_size
 @export var walk_speed: float : 
 	set(value) :
-		walk_speed = maxf(value, 0.0) * ActorProperties.world_grid
+		walk_speed = maxf(value, 0.0) * GameProperties.grid_size
 @export var acceleration: float = 0.0 : 
 	set(value) :
-		acceleration = maxf(value, 0.0) * ActorProperties.world_grid
+		acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
 @export var friction: float = 0.0 : 
 	set(value) :
-		friction = maxf(value, 0.0) * ActorProperties.world_grid
+		friction = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
 @export var climb_base_speed: float : 
 	set(value) :
-		climb_base_speed = maxf(value, 0.0) * ActorProperties.world_grid
+		climb_base_speed = maxf(value, 0.0) * GameProperties.grid_size
 @export var crouch_speed: float :
 	set(value):
 		crouch_speed = maxf(value, 0.0)
+@export var air_jumps: int = 0 :
+	set(value):
+		air_jumps = maxi(value, 0)
 
 @export_category("Gravity")
 @export var max_gravity: float = 0.0 : 
 	set(value) :
-		max_gravity = maxf(value, 0.0) * ActorProperties.world_grid
+		max_gravity = maxf(value, 0.0) * GameProperties.grid_size
 @export var _jump_time_to_floor: float
 @export var _jump_time_to_peak: float
 @export var _jump_height: float
@@ -51,6 +54,8 @@ var is_crouching: bool = false:
 	set(value):
 		is_crouching = value
 		_change_movement_status()
+var is_on_ground: bool = true
+var can_jump: bool = true
 var movement_status: MovementSpeed = MovementSpeed.RUN
 
 # Horizontal Movement
@@ -65,25 +70,30 @@ var _terrain_mod: float = 1.0:
 		_terrain_mod = maxf(value, 0.0)
 
 # Settings
-var gravity: float = 0.0
+var gravity_mode: GravityMode = GravityMode.NORMAL
+
+# Tracker
+var air_jump_count: int = 0
 
 @onready var jump_velocity = QuickMath.get_jump_velocity(_jump_height, _jump_time_to_peak)
 @onready var jump_gravity = QuickMath.get_jump_gravity(_jump_height, _jump_time_to_peak)
 @onready var normal_gravity = QuickMath.get_normal_gravity(_jump_height, _jump_time_to_floor)
 
-
-func change_gravity_mode(NewGravityMode: GravityMode) -> void:
-	if NewGravityMode == GravityMode.NORMAL:
-		gravity = normal_gravity
-	elif NewGravityMode == GravityMode.JUMP:
-		gravity = jump_gravity
+func get_gravity() -> float:
+	if gravity_mode == GravityMode.NORMAL:
+		return normal_gravity
+	elif gravity_mode == GravityMode.JUMP:
+		return jump_gravity
+	else:
+		return 0
 
 
 func apply_gravity(delta: float) -> void:
 	if not is_gravity_enabled:
 		return
-	
-	velocity.y = move_toward(velocity.y, max_gravity, velocity.y + (gravity * delta))
+
+	#velocity.y += get_gravity() * delta
+	velocity.y = minf(velocity.y + (get_gravity() * delta), max_gravity)
 
 
 func change_actor_speed(AxisDirection: float, Delta: float) -> void:
@@ -143,3 +153,29 @@ func set_facing_right(FacingRight: bool = true) -> void:
 		actor_sprite.flip_h = false
 	elif not FacingRight and not actor_sprite.flip_h:
 		actor_sprite.flip_h = true
+
+
+func jump() -> void: # Returns true if the jump is successful, false if can't
+	velocity.y = jump_velocity
+	gravity_mode = GravityMode.JUMP
+	
+	if not is_on_ground:
+		air_jump_count += 1
+
+
+func can_actor_jump() -> bool:
+	if not can_jump:
+		return false
+	elif is_on_ground or can_air_jump():
+		return true
+	else:
+		return false
+
+
+func can_air_jump() -> bool:
+	return (air_jump_count < air_jumps)
+
+
+func reset_air_jumps() -> void:
+	air_jump_count = 0
+

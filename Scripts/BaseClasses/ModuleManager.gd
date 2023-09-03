@@ -13,12 +13,13 @@ func _ready():
 		if not _is_object_a_valid_module(child):
 			continue
 		
-		warn_if_repeated_modules(child.module_type)
-		
-		_loaded_modules[child.module_type] = child
 		child.module_manager = self
 		child.set_up_module()
 		
+		warn_if_repeated_modules(child.module_type)
+		
+		_loaded_modules[child.module_type] = child
+
 		if child is ModuleBehaviour:
 			child.change_animation.connect(_change_animation)
 
@@ -30,6 +31,7 @@ func _is_object_a_valid_module(ObjectToCheck) -> bool:
 		return true
 	else:
 		return false
+		print_debug(str(ObjectToCheck) + " is not a valid module")
 
 
 ## Returns true if the module is present and loaded
@@ -51,9 +53,16 @@ func warn_if_repeated_modules(ModuleType: String) -> void:
 		print_debug(ModuleType + " will be replaced")		
 
 
-func _change_animation(Pack: String, Action: String, PlayRandom: bool):
+func _change_animation(Pack: String, Action: String, PlayRandom: bool) -> void:
 	if not has_module("animation-player"):
 		return
 	
 	get_module("animation-player").custom_play(Pack, Action, PlayRandom)
+
+
+func is_on_ground() -> bool:
+	if has_module("terrain-tracker"):
+		return get_module("terrain-tracker").is_on_ground()
+	else:
+		return false
 
