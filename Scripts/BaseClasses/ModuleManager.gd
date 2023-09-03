@@ -41,8 +41,8 @@ func _is_object_a_valid_module(ObjectToCheck) -> bool:
 	if ObjectToCheck is Module or ObjectToCheck is ModuleAnimationPlayer:
 		return true
 	else:
-		return false
 		print_debug(str(ObjectToCheck) + " is not a valid module")
+		return false
 
 
 ## Returns true if the module is present and loaded
@@ -97,8 +97,13 @@ func is_on_ground() -> bool:
 
 
 func apply_effect(EffectToApply: Effect) -> void:
-	if has_module("vitality"):
-		pass
+	if has_module("effect-applier"):
+		get_module("effect-applier").add_effect(EffectToApply)
+
+
+func remove_effect(EffectID: String) -> void:
+	if has_module("effect-applier"):
+		get_module("effect-applier").remove_effect(EffectID)
 
 
 func _physics_process(delta):
