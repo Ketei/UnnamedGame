@@ -89,3 +89,13 @@ func array_bring_to_front(MoveToFront, ArrayToChange: Array) -> void:
 	
 	ArrayToChange[0] = MoveToFront
 	ArrayToChange[_element_index] = _element_memory
+
+
+func array_get_lowest_numberi(ArrayToCheck: Array) -> int:
+	var lowest_number: int = 0
+	
+	for number in ArrayToCheck:
+		if int(number) < lowest_number:
+			lowest_number = int(number)
+	
+	return lowest_number
