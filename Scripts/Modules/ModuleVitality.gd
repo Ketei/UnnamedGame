@@ -12,12 +12,17 @@ class_name ModuleVitality
 @export var _combat_resource: ResourceCombat
 @export var _lewd_resource: ResourceHorny
 
-var effect_applier: EffectApplier
+var effect_applier: ModuleEffectApplier
 
 var health_module: VitalityHealth
 var skill_module: VitalitySkill
 var combat_module: VitalityCombat
 var sex_module: VitalityHorny
+
+
+func _ready():
+	module_priority = 1
+	module_type = "vitality"
 
 
 func full_restore():
@@ -29,7 +34,6 @@ func full_restore():
 
 
 func set_up_module():
-	module_type = "vitality"
 	if _vitality_resource:
 		health_module = VitalityHealth.new()
 		health_module.base_health = _vitality_resource.health
@@ -97,9 +101,11 @@ func set_up_module():
 
 	full_restore()
 	
-	if health_module or skill_module or combat_module or sex_module:
-		effect_applier = EffectApplier.new()
-		effect_applier._vitality_module = self
+	if module_manager.has_module("effect-applier"):
+		effect_applier = module_manager.get_module("effect-applier")
+	elif health_module or skill_module or combat_module or sex_module:
+		effect_applier = ModuleEffectApplier.new()
+		module_manager.register_module(effect_applier)
 		self.add_child(effect_applier)
 	
 	is_module_enabled = true

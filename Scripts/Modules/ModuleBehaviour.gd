@@ -18,6 +18,11 @@ var current_pack: String = ""
 var target_node: Node = null # The node that this module will apply on
 
 
+func _ready():
+	module_type = "behaviour"
+	module_priority = 0
+
+
 func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 	if not is_module_enabled or not loaded_behaviour.behaviour_connected or not check_for_pack_and_behaviour(TargetPack, NewBehaviour):
 		return
@@ -147,21 +152,21 @@ func load_pack(PackName: String) -> void:
 		loaded_behaviour.enter()
 
 
-func _input(event):
+func module_handle_input(event):
 	if not is_module_enabled or not loaded_behaviour:
 		return
 
 	loaded_behaviour.handle_input(event)
 
 
-func _unhandled_key_input(event):
+func module_handle_key_input(event):
 	if not is_module_enabled or not loaded_behaviour:
 		return
 		
 	loaded_behaviour.handle_key_input(event)
 
 
-func _physics_process(delta):
+func module_physics_process(delta):
 	if not is_module_enabled or not loaded_behaviour:
 		return
 	
@@ -169,7 +174,6 @@ func _physics_process(delta):
 
 
 func set_up_module() -> void:
-	module_type = "behaviour"
 	target_node = module_manager.parent_node
 
 	for child in self.get_children():

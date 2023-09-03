@@ -1,9 +1,5 @@
 extends Module
-class_name ModuleTarrainTracker
-
-var current_terrain: GameProperties.TerrainState
-
-var _is_floored: bool = false
+class_name ModuleTerrainTracker
 
 @export_category("Terrain Raycast")
 @export var raycast_left: RayCast2D = null
@@ -11,17 +7,41 @@ var _is_floored: bool = false
 @export var raycast_right: RayCast2D = null
 
 @export_category("Collision Boxes")
-## Used to track and set movement modyfiers
-@export var ground_collision: TerrainCollider = null
+## Used to track and set movement modifiers
+@export var ground_collision: Area2D = null
 
 ## Used to track if actor is swimming.
-@export var middle_collision: TerrainCollider = null
+@export var middle_collision: Area2D = null
+
+var is_submerged: bool = false
+
+
+func _ready():
+	module_type = "terrain-tracker"
+	module_priority = 0
 
 
 func set_up_module() -> void:
-	module_type = "terrain_tracker"
-	middle_collision.area_update.connect(update_terrain)
-	enabled = true
+	ground_collision.area_entered.connect(ground_terrain_changed.bind(true))
+	middle_collision.area_entered.connect(mid_terrain_changed.bind(true))
+	
+	ground_collision.area_exited.connect(ground_terrain_changed.bind(false))
+	middle_collision.area_exited.connect(mid_terrain_changed.bind(false))
+	
+	is_module_enabled = true
+
+
+func ground_terrain_changed(area, IsEntering: bool):
+	pass
+
+
+func mid_terrain_changed(area, IsEntering: bool):
+	module_manager.actor_submerged(IsEntering)
+
+
+func apply_terrain_effects(area) -> void:
+	if area is TerrainType:
+		pass
 
 
 func is_on_ground() -> bool:
@@ -31,31 +51,6 @@ func is_on_ground() -> bool:
 		return false
 
 
-func is_submerged() -> bool:
-	if "Water" in middle_collision.get_terrains():
-		return true
-	else:
-		return false
+func get_terrain_state():
+	pass
 
-
-func update_terrain() -> void:
-	if is_submerged():
-		current_terrain = GameProperties.TerrainState.WATER
-	elif  _is_floored:
-		current_terrain = GameProperties.TerrainState.GROUND
-	else:
-		current_terrain = GameProperties.TerrainState.AIR
-
-
-func get_terrain_state() -> String:
-	return GameProperties.get_terrain_name(current_terrain)
-
-
-# Priorities: Water > Air > Ground
-func _physics_process(delta):
-	if enabled:
-	# Handles switches between Ground <-> Air
-	# Compares used to prevent redundant assings
-		if _is_floored != is_on_ground():
-			_is_floored = is_on_ground()
-			update_terrain()

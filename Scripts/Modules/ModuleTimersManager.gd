@@ -6,6 +6,10 @@ signal timer_ended(TimerName)
 var timers_dict : Dictionary = {}
 
 
+func _ready():
+	module_type = "timers-manager"
+	module_priority = 0
+
 ## Returns a timer if it exist, if not returns null
 func get_timer(TimerName: String) -> TimerForModule:
 	var return_timer: TimerForModule = null
@@ -68,8 +72,6 @@ func _on_timer_timeout(TimerName:String):
 
 
 func set_up_module():
-	module_type = "timers_manager"
-	
 	for timer_node in get_children():
 		if timer_node is TimerForModule:
 			timers_dict[timer_node.name.to_lower()] = timer_node
