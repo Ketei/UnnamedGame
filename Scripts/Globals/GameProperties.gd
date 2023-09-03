@@ -6,7 +6,8 @@ enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
 enum TerrainState {GROUND, AIR, WATER}
 
 # Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
-const grid_size: int = 16
+const grid_size: int = 128
+const target_framerate: int = 60
 
 # Types of damage in game
 const AttackTypes: Dictionary = {
