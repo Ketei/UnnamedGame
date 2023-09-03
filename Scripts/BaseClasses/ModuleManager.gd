@@ -38,9 +38,7 @@ func _ready():
 
 
 func _is_object_a_valid_module(ObjectToCheck) -> bool:
-	if ObjectToCheck is Module:
-		return true
-	elif ObjectToCheck is ModuleAnimationPlayer:
+	if ObjectToCheck is Module or ObjectToCheck is ModuleAnimationPlayer:
 		return true
 	else:
 		return false
