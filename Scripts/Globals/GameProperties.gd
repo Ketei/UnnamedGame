@@ -3,7 +3,7 @@ extends Node
 # Possible difficulties for the game.
 enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
-enum TerrainState {GROUND, AIR, WATER}
+enum TerrainState {GROUND, AIR, LIQUID}
 
 # Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
 const grid_size: int = 128
