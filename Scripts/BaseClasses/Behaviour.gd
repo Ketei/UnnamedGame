@@ -47,5 +47,5 @@ func setup_behaviour() -> void:
 	pass
 
 
-func set_target_node(NewTargetNode) -> void:
+func set_target_node(_NewTargetNode) -> void:
 	pass
