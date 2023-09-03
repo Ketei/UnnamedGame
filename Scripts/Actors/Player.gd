@@ -1,9 +1,6 @@
 extends Actor
 class_name Player
 
-@export_category("Player Movement")
-@export var max_jumps: int = 0
-
 # TrackerName(str): InteractTracker
 # Add proper keys once finished: up, down, left, etc.
 var interact_tracker: Dictionary = {}
@@ -19,10 +16,3 @@ func remove_interact_tracker(TrackerKey: String):
 	else:
 		print_debug(TrackerKey + " doesn't exist.")
 
-
-func update_player_direction(HorizontalStrenght: float) -> void:
-	if HorizontalStrenght != 0.0:
-		if HorizontalStrenght < 0.0 and not is_facing_left:
-			is_facing_left = true
-		elif 0 < HorizontalStrenght and is_facing_left:
-			is_facing_left = false
