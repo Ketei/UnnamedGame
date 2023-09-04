@@ -18,6 +18,8 @@ signal terrain_changed(NewState)
 var is_on_ground: bool = true
 var is_submerged: bool = false
 
+var _array_off_timer: Timer
+
 var terrain_state: GameProperties.TerrainState = GameProperties.TerrainState.AIR:
 	set(value):
 		if value != terrain_state:
@@ -30,6 +32,10 @@ var effect_list: Array = []
 func _ready():
 	module_type = "terrain-tracker"
 	module_priority = 0
+	_array_off_timer = Timer.new()
+	_array_off_timer.one_shot = true
+	_array_off_timer.timeout.connect(change_floor_raycast_status.bind(true))
+	self.add_child(_array_off_timer)
 
 
 func _ground_terrain_changed(area, IsEntering: bool):
@@ -80,6 +86,12 @@ func _update_terrain_state() -> void:
 		terrain_state = GameProperties.TerrainState.AIR
 
 
+func change_floor_raycast_status(IsEnabled: bool) -> void:
+	raycast_left.enabled = IsEnabled
+	raycast_center.enabled = IsEnabled
+	raycast_right.enabled = IsEnabled
+
+
 func set_up_module() -> void:
 	ground_collision.area_entered.connect(_ground_terrain_changed.bind(true))
 	middle_collision.area_entered.connect(_mid_terrain_changed.bind(true))
@@ -87,13 +99,15 @@ func set_up_module() -> void:
 	ground_collision.area_exited.connect(_ground_terrain_changed.bind(false))
 	middle_collision.area_exited.connect(_mid_terrain_changed.bind(false))
 	
-	QuickConfig.set_object_collision_bit([1], ground_collision, true)
+	QuickConfig.set_object_collision_bit([2], ground_collision, false)
+	QuickConfig.disable_object_collision_bits(ground_collision, true)
 	
-	QuickConfig.set_object_collision_bit([1], middle_collision, true)
-	
-	QuickConfig.set_raycast_collision_mask([0], raycast_left)
-	QuickConfig.set_raycast_collision_mask([0], raycast_center)
-	QuickConfig.set_raycast_collision_mask([0], raycast_right)
+	QuickConfig.set_object_collision_bit([2], middle_collision, false)
+	QuickConfig.disable_object_collision_bits(middle_collision, true)
+
+	QuickConfig.set_raycast_collision_mask([1], raycast_left)
+	QuickConfig.set_raycast_collision_mask([1], raycast_center)
+	QuickConfig.set_raycast_collision_mask([1], raycast_right)
 
 	is_module_enabled = true
 
@@ -105,3 +119,6 @@ func module_physics_process(_delta: float) -> void:
 	_update_terrain_state()
 
 
+func temp_disable_ground_raycast(TimeToDisable: float) -> void:
+	change_floor_raycast_status(false)
+	_array_off_timer.start(TimeToDisable)

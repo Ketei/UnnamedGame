@@ -8,6 +8,7 @@ signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
 ## The pack should have a default behaviour to be loaded successfully, otherwise an error
 ## will be printed on the debug console.
 @export var default_pack: BehaviourPack
+@export var print_on_change: bool = false
 
 var loaded_packs: Dictionary = {}
 
@@ -37,6 +38,9 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 	current_pack = TargetPack
 	loaded_behaviour.enter()
 	behaviour_changed.emit(_old_behaviour, loaded_behaviour.behaviour_id)
+	
+	if print_on_change:
+		print_debug("Changed behaviour from " + _old_behaviour + " to " + loaded_behaviour.behaviour_id)
 
 
 func connect_behaviour_signals() -> void:
