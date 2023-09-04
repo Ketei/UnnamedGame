@@ -1,7 +1,7 @@
 extends Node
 class_name VitalitySkill
 
-signal skill_updated(skill_name: String, skill_value: int, previous_skill_value: int)
+signal skill_updated(skill_name: String, From: int, To: int)
 
 var _prev_skill_value: int = 0
 
@@ -12,12 +12,12 @@ var change_self_with_lust: int = false
 var custom_skills: Dictionary = {}
 
 ## Affects physical damage
-var base_strength: int = 0 :
+var base_strength: float = 0 :
 		set(value):
 			if enabled:
-				base_strength = maxi(value, 0)
+				base_strength = clampf(value, 0, max_strength)
 				strength = ActorLibs.calculate_stati(base_strength, mod_strength, mult_strength)
-var mod_strength: int = 0 :
+var mod_strength: float = 0 :
 	set(value):
 		if enabled:
 			mod_strength = value
@@ -31,20 +31,22 @@ var max_strength: int = 0 :
 	set(value):
 		if enabled:
 			max_strength = maxi(value, 0)
+			if max_strength < base_strength:
+				base_strength = max_strength
 var strength: int = 0:
 	set(value):
 		if enabled:
 			_prev_skill_value = strength
-			strength = clampi(value, 0, max_strength)
-			skill_updated.emit("strength", strength, _prev_skill_value)
+			strength = maxi(value, 0)
+			skill_updated.emit("strength", _prev_skill_value, strength)
 
 ## Affects your damage reduction & tolerance to sexual attacks
-var base_endurance: int = 0 :
+var base_endurance: float = 0 :
 	set(value):
 		if enabled:
-			base_endurance = maxi(value, 0)
+			base_endurance = clampf(value, 0, max_endurance)
 			endurance = ActorLibs.calculate_stati(base_endurance, mod_endurance, mult_endurance)
-var mod_endurance: int = 0 : 
+var mod_endurance: float = 0 : 
 	set(value):
 		if enabled:
 			mod_endurance = value
@@ -58,20 +60,22 @@ var max_endurance: int = 0 :
 	set(value):
 		if enabled:
 			max_endurance = maxi(value, 0)
+			if max_endurance < base_endurance:
+				base_endurance = max_endurance
 var endurance: int = 0 :
 	set(value):
 		if enabled:
 			_prev_skill_value = endurance
-			endurance = clampi(value, 0, max_endurance)
-			skill_updated.emit("endurance", endurance, _prev_skill_value)
+			endurance = maxi(value, 0)
+			skill_updated.emit("endurance", _prev_skill_value, endurance)
 
 ## Affects NPC interactions & Store prices.
-var base_charisma: int = 0 :
+var base_charisma: float = 0 :
 	set(value):
 		if enabled:
-			base_charisma = maxi(value, 0)
+			base_charisma = clampf(value, 0, max_charisma)
 			charisma = ActorLibs.calculate_stati(base_charisma, mod_charisma, mult_charisma)
-var mod_charisma: int = 0 :
+var mod_charisma: float = 0 :
 	set(value):
 		if enabled:
 			mod_charisma = value
@@ -85,20 +89,22 @@ var max_charisma: int = 0 :
 	set(value):
 		if enabled:
 			max_charisma = maxi(value, 0)
+			if max_charisma < base_charisma:
+				base_charisma = max_charisma
 var charisma: int = 0 :
 	set(value):
 		if enabled:
 			_prev_skill_value = charisma
-			charisma = clampi(value, 0, max_charisma)
-			skill_updated.emit("charisma", charisma, _prev_skill_value)
+			charisma = maxi(value, 0)
+			skill_updated.emit("charisma", _prev_skill_value, charisma)
 
 ## Affects magic damage
-var base_intelligence: int = 0 :
+var base_intelligence: float = 0 :
 	set(value):
 		if enabled:
-			base_intelligence = maxi(value, 0)
+			base_intelligence = clampf(value, 0, max_intelligence)
 			intelligence = ActorLibs.calculate_stati(base_intelligence, mod_intelligence, mult_intelligence)
-var mod_intelligence: int = 0 :
+var mod_intelligence: float = 0 :
 	set(value):
 		if enabled:
 			mod_intelligence = value
@@ -112,20 +118,22 @@ var max_intelligence: int = 0 :
 	set(value):
 		if enabled:
 			max_intelligence = maxi(value, 0)
+			if max_intelligence < base_intelligence:
+				base_intelligence = max_intelligence
 var intelligence: int = 0 :
 	set(value):
 		if enabled:
 			_prev_skill_value = intelligence
-			intelligence = clampi(value, 0, max_intelligence)
-			skill_updated.emit("intelligence", intelligence, _prev_skill_value)
+			intelligence = maxi(value, 0)
+			skill_updated.emit("intelligence", _prev_skill_value, intelligence)
 
 ## Affects critical hits & Minigame odds
-var base_luck: int = 0 :
+var base_luck: float = 0 :
 	set(value):
 		if enabled:
-			base_luck = maxi(value, 0)
+			base_luck = clampf(value, 0, max_luck)
 			luck = ActorLibs.calculate_stati(base_luck, mod_luck, mult_luck)
-var mod_luck: int = 0 :
+var mod_luck: float = 0 :
 	set(value):
 		if enabled:
 			mod_luck = value
@@ -138,30 +146,34 @@ var max_luck: int = 0 :
 	set(value):
 		if enabled:
 			max_luck = maxi(value, 0)
+			if max_luck < base_luck:
+				base_luck = max_luck
 var luck: int = 0 :
 	set(value):
 		if enabled:
 			_prev_skill_value = luck
-			luck = clampi(value, 0, max_luck)
-			skill_updated.emit("luck", luck, _prev_skill_value)
+			luck = maxi(value, 0)
+			skill_updated.emit("luck", _prev_skill_value, luck)
 
 
 func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
 	if enabled:
-		mod_strength += SexLibs.get_stat_with_lusti("strength", CurrentLust, PreviousLust)
-		mod_endurance += SexLibs.get_stat_with_lusti("endurance", CurrentLust, PreviousLust)
-		mod_charisma += SexLibs.get_stat_with_lusti("charisma", CurrentLust, PreviousLust)
-		mod_intelligence += SexLibs.get_stat_with_lusti("intelligence", CurrentLust, PreviousLust)
-		mod_luck += SexLibs.get_stat_with_lusti("luck", CurrentLust, PreviousLust)
+		mod_strength += SexLibs.get_stat_with_lustf("strength", CurrentLust, PreviousLust)
+		mod_endurance += SexLibs.get_stat_with_lustf("endurance", CurrentLust, PreviousLust)
+		mod_charisma += SexLibs.get_stat_with_lustf("charisma", CurrentLust, PreviousLust)
+		mod_intelligence += SexLibs.get_stat_with_lustf("intelligence", CurrentLust, PreviousLust)
+		mod_luck += SexLibs.get_stat_with_lustf("luck", CurrentLust, PreviousLust)
 		
 		for skill in custom_skills.keys():
-			custom_skills[skill] += SexLibs.get_stat_with_lusti(skill, CurrentLust, PreviousLust) 
+			custom_skills[skill] += SexLibs.get_stat_with_lustf(skill, CurrentLust, PreviousLust) 
 
 
 func custom_skill_update(SkillName: String) -> void:
 	if enabled:
 		if SkillName in custom_skills:
 			_prev_skill_value = custom_skills[SkillName]["skill"]
-			custom_skills[SkillName]["skill"] = clampi(ActorLibs.calculate_stati(custom_skills[SkillName]["base-skill"], custom_skills[SkillName]["mod-skill"], custom_skills[SkillName]["mult-skill"]), 0, custom_skills[SkillName]["max-skill"])
-			skill_updated.emit(SkillName, custom_skills[SkillName]["skill"], _prev_skill_value)
+			if custom_skills[SkillName]["max-skill"] < custom_skills[SkillName]["base-skill"]:
+				custom_skills[SkillName]["base-skill"] = custom_skills[SkillName]["max-skill"]
+			custom_skills[SkillName]["skill"] = maxi(ActorLibs.calculate_stati(custom_skills[SkillName]["base-skill"], custom_skills[SkillName]["mod-skill"], custom_skills[SkillName]["mult-skill"]), 0)
+			skill_updated.emit(SkillName, _prev_skill_value, custom_skills[SkillName]["skill"], )
 
