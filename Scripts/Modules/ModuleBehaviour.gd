@@ -20,7 +20,7 @@ var target_node: Node = null # The node that this module will apply on
 
 func _ready():
 	module_type = "behaviour"
-	module_priority = 0
+	module_priority = 99
 
 
 func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:

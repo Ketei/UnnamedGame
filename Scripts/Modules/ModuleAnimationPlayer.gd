@@ -116,7 +116,6 @@ func anim_data_validation(PackName: String, ActionName: String) -> void:
 ## a pack and action.
 func custom_play(PackName: String, ActionName: String, RandomAnim: bool = false, CustomBlend: float = -1, CustomSpeed: float = 1.0, FromEnd: bool = false) -> void:
 	var _anim_to_play: String = get_anim_in_action_pack(PackName, ActionName, RandomAnim)
-	
-	if _anim_to_play != "" and current_animation != _anim_to_play:
+	if _anim_to_play != "":
 		play(_anim_to_play, CustomBlend, CustomSpeed, FromEnd)
 
