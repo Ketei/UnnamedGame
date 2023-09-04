@@ -89,13 +89,6 @@ func actor_submerged(IsActorSubmerged: bool) -> void:
 		parent_node.is_swimming = IsActorSubmerged
 
 
-func is_on_ground() -> bool:
-	if has_module("terrain-tracker"):
-		return get_module("terrain-tracker").is_on_ground()
-	else:
-		return false
-
-
 func apply_effect(EffectToApply: Effect) -> void:
 	if has_module("effect-applier"):
 		get_module("effect-applier").add_effect(EffectToApply)
@@ -105,6 +98,13 @@ func remove_effect(EffectID: String) -> void:
 	if has_module("effect-applier"):
 		get_module("effect-applier").remove_effect(EffectID)
 
+
+func get_terrain_state() -> GameProperties.TerrainState:
+	if not has_module("terrain-tracker"):
+		return GameProperties.TerrainState.GROUND
+	
+	return get_module("terrain-tracker").terrain_state
+	
 
 func _physics_process(delta):
 	for module in _loaded_modules_array:

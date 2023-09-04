@@ -2,8 +2,7 @@ extends CharacterBody2D
 class_name Actor
 
 # enums
-enum GravityMode {NORMAL, JUMP}
-enum MovementSpeed {RUN, WALK, CROUCH, SWIM}
+enum GravityMode {NORMAL, JUMP, ZERO}
 
 # General
 @export_category("Actor Properties")
@@ -47,21 +46,10 @@ enum MovementSpeed {RUN, WALK, CROUCH, SWIM}
 
 # Toggles
 var is_gravity_enabled: bool = true
-var is_walking: bool = false:
-	set(value):
-		is_walking = value
-		_change_movement_status()
-var is_crouching: bool = false:
-	set(value):
-		is_crouching = value
-		_change_movement_status()
-var is_swimming: bool = false :
-	set(value):
-		is_swimming = value
-		_change_movement_status()
+var is_walking: bool = false
+var is_crouching: bool = false
 var can_jump: bool = true
-var is_on_ground: bool = true
-var movement_status: MovementSpeed = MovementSpeed.RUN
+var is_swimming: bool = false
 
 # Horizontal Movement
 var speed_mod: float = 0.0:
@@ -90,23 +78,31 @@ func get_gravity() -> float:
 		return normal_gravity
 	elif gravity_mode == GravityMode.JUMP:
 		return jump_gravity
-	else:
+	elif gravity_mode == GravityMode.ZERO:
 		return 0
+	else:
+		return normal_gravity
 
 
 func apply_gravity(delta: float) -> void:
 	if not is_gravity_enabled:
 		return
 
-	#velocity.y += get_gravity() * delta
-	velocity.y = minf(velocity.y + (get_gravity() * delta), max_gravity)
+	if gravity_mode != GravityMode.ZERO:
+		velocity.y = minf(velocity.y + (get_gravity() * delta), max_gravity)
+	else:
+		if velocity.y != 0:
+			velocity.y = move_toward(velocity.y, 0, 10)
 
 
 func change_actor_speed(AxisDirection: float, Delta: float) -> void:
 	if AxisDirection == 0.0 and velocity.x == 0.0:
 		return
-	
-	velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x) * Delta)
+
+	if gravity_mode != GravityMode.ZERO:
+		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x) * Delta)
+	else:
+		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, swim_speed / 3)
 
 
 func _get_accel_change(AxisValue: float, SpeedValue: float):
@@ -121,27 +117,16 @@ func _get_accel_change(AxisValue: float, SpeedValue: float):
 func _get_speed() -> float:
 	var base_speed: float
 	
-	if movement_status == MovementSpeed.RUN:
-		base_speed = run_speed
-	elif movement_status == MovementSpeed.WALK:
-		base_speed = walk_speed
-	elif movement_status == MovementSpeed.CROUCH:
-		base_speed = crouch_speed
-	elif  movement_status == MovementSpeed.SWIM:
-		base_speed = swim_speed
-
-	return maxf(((base_speed + speed_mod) * speed_mult) * _terrain_mod, 0.0)
-
-
-func _change_movement_status() -> void:
 	if is_swimming:
-		movement_status = MovementSpeed.SWIM
-	elif is_crouching:
-		movement_status = MovementSpeed.CROUCH
+		base_speed = swim_speed
+	elif  is_crouching:
+		base_speed = crouch_speed
 	elif is_walking:
-		movement_status = MovementSpeed.WALK
+		base_speed = walk_speed
 	else:
-		movement_status = MovementSpeed.RUN
+		base_speed = run_speed
+	
+	return maxf(((base_speed + speed_mod) * speed_mult) * _terrain_mod, 0.0)
 
 
 func set_terrain_mult_by_name(TerrainName: String):
@@ -165,21 +150,22 @@ func set_facing_right(FacingRight: bool = true) -> void:
 		actor_sprite.flip_h = true
 
 
-func jump() -> void: # Returns true if the jump is successful, false if can't
-	velocity.y = jump_velocity
-	gravity_mode = GravityMode.JUMP
-	
-	if not is_on_ground:
-		air_jump_count += 1
-
-
-func can_actor_jump() -> bool:
+func jump(JumpFromGround: bool = true) -> bool: # Returns true if the jump is successful, false if can't
 	if not can_jump:
 		return false
-	elif is_on_ground or can_air_jump():
+
+	if JumpFromGround:
+		velocity.y = jump_velocity
+		gravity_mode = GravityMode.JUMP
 		return true
 	else:
-		return false
+		if can_air_jump():
+			velocity.y = jump_velocity
+			gravity_mode = GravityMode.JUMP
+			air_jump_count += 1
+			return true
+		else:
+			return false
 
 
 func can_air_jump() -> bool:
