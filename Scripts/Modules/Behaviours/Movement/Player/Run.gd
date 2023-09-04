@@ -3,9 +3,11 @@ extends Behaviour
 
 var player : Player
 var _axis_direction: float
+var terrain_tracker: ModuleTerrainTracker
 
 func setup_behaviour() -> void:
 	behaviour_id = "run"
+	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
 
 func enter(_args:= {}):
@@ -13,6 +15,12 @@ func enter(_args:= {}):
 		return
 	
 	change_animation.emit("movement-ground", "run", false)
+	terrain_tracker.terrain_changed.connect(_change_terrain_state)
+
+
+func exit():
+	if terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
+		terrain_tracker.terrain_changed.disconnect(_change_terrain_state)
 
 
 func handle_key_input(event : InputEvent) -> void:
@@ -20,16 +28,15 @@ func handle_key_input(event : InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("gc_jump"):
-		if player.can_actor_jump():
-			print("Let's jump")
+		if player.jump(true):
 			change_behaviour.emit("movement", "jump")
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
-		if player.movement_status == player.MovementSpeed.CROUCH:
+		if player.is_crouching:
 			change_behaviour.emit("movement", "walk")
 	elif event.is_action_pressed("gc_walk"):
 		player.is_walking = not player.is_walking
-		if player.movement_status == player.MovementSpeed.WALK:
+		if player.is_walking:
 			change_behaviour.emit("movement", "walk")
 
 
@@ -58,3 +65,12 @@ func set_facing_direction():
 	if _axis_direction != 0:
 		player.set_facing_right(0 < player.velocity.x)
 
+
+func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
+	if NewState == GameProperties.TerrainState.AIR:
+		if 0 < player.velocity.y:
+			change_behaviour.emit("movement", "fall")
+		else:
+			change_behaviour.emit("movement", "jump")
+	elif NewState == GameProperties.TerrainState.LIQUID:
+		change_behaviour.emit("movement", "swim-idle")

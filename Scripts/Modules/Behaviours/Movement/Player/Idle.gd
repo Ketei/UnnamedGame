@@ -2,20 +2,30 @@ extends Behaviour
 # Behaviour set up for actors
 
 var player: Player
+var terrain_tracker: ModuleTerrainTracker
+
 
 func setup_behaviour() -> void:
 	behaviour_id = "idle"
 	is_default = true
+	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
 
 func enter(_args:= {}):
 	if not player:
 		return
-	
+
+	terrain_tracker.terrain_changed.connect(_change_terrain_state)
+
 	if player.is_crouching:
 		change_animation.emit("movement-ground", "idle-crouch", false)
 	else:
 		change_animation.emit("movement-ground", "idle", false)
+
+
+func exit():
+	if terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
+		terrain_tracker.terrain_changed.disconnect(_change_terrain_state)
 
 
 func handle_key_input(event : InputEvent) -> void:
@@ -23,10 +33,7 @@ func handle_key_input(event : InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("gc_jump"):
-		if player.can_actor_jump():
-			print("Let'sa jump")
-			player.jump()
-			change_behaviour.emit("movement", "jump")
+		player.jump(true)
 	
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
@@ -38,17 +45,11 @@ func handle_key_input(event : InputEvent) -> void:
 	
 	elif event.is_action_pressed("gc_walk"):
 		player.is_walking = not player.is_walking
-	
 	elif event.is_action_pressed("gc_left") or event.is_action_pressed("gc_right"):
-		if Input.get_axis("gc_left", "gc_right") == 0:
-			return
-		
-		if player.movement_status == player.MovementSpeed.RUN:
-			change_behaviour.emit("movement", "run")
-			print("GoToRun")
-		else:
+		if player.is_walking:
 			change_behaviour.emit("movement", "walk")
-			print("GoToWalk")
+		else:
+			change_behaviour.emit("movement", "run")
 
 
 func set_target_node(NewTargetNode) -> void:
@@ -59,6 +60,17 @@ func set_target_node(NewTargetNode) -> void:
 func handle_physics(delta : float) -> void:
 	if not player:
 		return
-	
+
 	player.apply_gravity(delta)
 	player.move_and_slide()
+
+
+func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
+	if NewState == GameProperties.TerrainState.AIR:
+		if 0 < player.velocity.y:
+			change_behaviour.emit("movement", "fall")
+		else:
+			change_behaviour.emit("movement", "jump")
+	elif NewState == GameProperties.TerrainState.LIQUID:
+		change_behaviour.emit("movement", "swim-idle")
+
