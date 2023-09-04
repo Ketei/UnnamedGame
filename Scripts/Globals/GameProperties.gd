@@ -115,7 +115,7 @@ func remove_lust_effect(LustAmount: int, StatChange: String):
 		lust_effects.erase(str(LustAmount))
 
 
-func get_skill_effects(SkillName: String, SkillLevel: int, PrevSkillLevel: int) -> Dictionary:
+func get_skill_effects(SkillName: String, PrevSkillLevel: int, SkillLevel: int) -> Dictionary:
 	var _return_dict: Dictionary = {}
 	
 	if not skill_effects.has(SkillName):
