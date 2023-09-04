@@ -8,6 +8,7 @@ func enter(_args:= {}):
 	if not player:
 		return
 	
+	current_terrain = terrain_tracker.terrain_state
 	change_animation.emit("movement-air", "jump")
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
@@ -31,7 +32,8 @@ func handle_key_input(event: InputEvent) -> void:
 		player.velocity.y /= 2.0
 	
 	if event.is_action_pressed("gc_jump"):
-		if player.jump():
+		if player.jump(false):
+			terrain_tracker.temp_disable_ground_raycast(0.2)
 			change_animation.emit("movement-air", "jump")
 
 

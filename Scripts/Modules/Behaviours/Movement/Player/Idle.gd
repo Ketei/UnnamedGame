@@ -33,9 +33,10 @@ func handle_key_input(event : InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("gc_jump"):
-		player.jump(true)
+		if player.jump(true):
+			terrain_tracker.temp_disable_ground_raycast(0.2)
 	
-	elif event.is_action_pressed("gc_crouch"):
+	if event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
 		
 		if player.is_crouching:
