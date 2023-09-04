@@ -32,16 +32,6 @@ func _ready():
 	module_priority = 0
 
 
-func set_up_module() -> void:
-	ground_collision.area_entered.connect(_ground_terrain_changed.bind(true))
-	middle_collision.area_entered.connect(_mid_terrain_changed.bind(true))
-	
-	ground_collision.area_exited.connect(_ground_terrain_changed.bind(false))
-	middle_collision.area_exited.connect(_mid_terrain_changed.bind(false))
-	
-	is_module_enabled = true
-
-
 func _ground_terrain_changed(area, IsEntering: bool):
 	if IsEntering:
 		_apply_terrain_effects(area)
@@ -68,7 +58,7 @@ func _apply_terrain_effects(area) -> void:
 
 func _remove_terrain_effects(area) -> void:
 	if area is TerrainType:
-		effect_list.erase(area.terrain_effect.effect_id)
+		QuickMath.erase_array_element(area.terrain_effect.effect_id, effect_list)
 		
 		if not effect_list.has(area.terrain_effect.effect_id):
 			module_manager.remove_effect(area.terrain_effect.effect_id)
@@ -90,9 +80,28 @@ func _update_terrain_state() -> void:
 		terrain_state = GameProperties.TerrainState.AIR
 
 
+func set_up_module() -> void:
+	ground_collision.area_entered.connect(_ground_terrain_changed.bind(true))
+	middle_collision.area_entered.connect(_mid_terrain_changed.bind(true))
+	
+	ground_collision.area_exited.connect(_ground_terrain_changed.bind(false))
+	middle_collision.area_exited.connect(_mid_terrain_changed.bind(false))
+	
+	QuickConfig.set_object_collision_bit([1], ground_collision, true)
+	
+	QuickConfig.set_object_collision_bit([1], middle_collision, true)
+	
+	QuickConfig.set_raycast_collision_mask([0], raycast_left)
+	QuickConfig.set_raycast_collision_mask([0], raycast_center)
+	QuickConfig.set_raycast_collision_mask([0], raycast_right)
+
+	is_module_enabled = true
+
+
 func module_physics_process(_delta: float) -> void:
 	if not is_module_enabled:
 		return
 	
 	_update_terrain_state()
+
 
