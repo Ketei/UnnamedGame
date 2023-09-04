@@ -179,8 +179,8 @@ func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 	chaged_lust(CurrentValue, PreviousValue)
 
 
-func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> void:
-	var _skill_apply: Dictionary = GameProperties.get_skill_effects(SkillName, SkillValue, PreviousSkillValue)
+func _changed_skill(SkillName: String, From: int, To: int) -> void:
+	var _skill_apply: Dictionary = GameProperties.get_skill_effects(SkillName, From, To)
 	
 	for skill_change in _skill_apply.keys():
 		if health_module:
@@ -222,40 +222,42 @@ func _changed_skill(SkillName: String, SkillValue: int, PreviousSkillValue) -> v
 
 ## Valid ValueType are: base-skill, mod-skill, mult-skill & max-skill
 func skill_custom_skill_set_value(SkillName: String, ValueType: String, ModValue: float) -> void:
-	if is_module_enabled and skill_module:
-		if skill_module.is_module_enabled:
-			if skill_module.custom_skills.has(SkillName) and ValueType != "skill":
-				if SkillName == "mult-skill":
-					skill_module.custom_skills[SkillName][ValueType] = ModValue
-				else:
-					skill_module.custom_skills[SkillName][ValueType] = int(ModValue)
-				skill_module.custom_skill_update(SkillName)
-			else:
-				print_debug("No custom skill with name " + SkillName + " exists. Please create it first")
+	if not is_module_enabled or not skill_module:
+		return
+		
+	if not skill_module.is_module_enabled or ValueType not in ["base-skill", "mod-skill", "mult-skill", "max-skill"]:
+		return
+	
+	
+	if skill_module.custom_skills.has(SkillName):
+		skill_module.custom_skills[SkillName][ValueType] = ModValue
+		skill_module.custom_skill_update(SkillName)
+	else:
+		print_debug("No custom skill with name " + SkillName + " exists. Please create it first")
 
 
 func skill_create_custom_skill(SkillName:String) -> void:
-	if is_module_enabled and skill_module:
-		if skill_module.is_module_enabled:
-			if not skill_module.custom_skills.has(SkillName):
-				skill_module.custom_skills[SkillName] = {
-					"base-skill" = 0,
-					"mod-skill" = 0,
-					"mult-skill" = 1.0,
-					"max-skill" = 0,
-					"skill" = 0
-				}
+	if not is_module_enabled or not skill_module:
+		return
+	
+	if not skill_module.is_module_enabled or skill_module.custom_skills.has(SkillName):
+		return
+
+	skill_module.custom_skills[SkillName] = {
+		"base-skill" = 0.0,
+		"mod-skill" = 0.0,
+		"mult-skill" = 1.0,
+		"max-skill" = 0,
+		"skill" = 0
+	}
 
 
 func skill_custom_skill_get_value(SkillName: String) -> int:
-	var _return_skill = null
-	if skill_module:
-		if skill_module.custom_skills.has(SkillName):
-			_return_skill = skill_module.custom_skills[SkillName]["skill"]
-		else:
-			print_debug("Warning: Skill named " + SkillName + " doesn't exist in actor. Returning null")
-	else:
-		print_debug("Skill module not is_module_enabled. Returning null")
-
-	return _return_skill
+	if not skill_module:
+		return 0
+		
+	if not skill_module.custom_skills.has(SkillName):
+		return 0
+	
+	return skill_module.custom_skills[SkillName]["skill"]
 
