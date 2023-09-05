@@ -31,6 +31,8 @@ func handle_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_released("gc_jump") and player.velocity.y < 0:
 		player.velocity.y -= (player.jump_velocity * 0.7) * (_jump_timer_restore.time_left / player._jump_time_to_peak)
+		if player.gravity_mode == Actor.GravityMode.JUMP:
+			player.gravity_mode = Actor.GravityMode.NORMAL
 	
 	elif event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(false):
