@@ -150,28 +150,29 @@ func set_facing_right(FacingRight: bool = true) -> void:
 		actor_sprite.flip_h = true
 
 
-func jump(JumpFromGround: bool = true) -> bool: # Returns true if the jump is successful, false if can't
-	if not can_jump:
-		return false
-
+func jump(JumpFromGround: bool, JumpForce: float = jump_velocity) -> void:
 	if JumpFromGround:
-		velocity.y = jump_velocity
+		velocity.y = JumpForce
 		gravity_mode = GravityMode.JUMP
-		return true
 	else:
-		if can_air_jump():
-			velocity.y = jump_velocity
-			gravity_mode = GravityMode.JUMP
-			air_jump_count += 1
-			return true
+		if velocity.y < JumpForce:
+			velocity.y = JumpForce
 		else:
-			return false
+			velocity.y += JumpForce
+		gravity_mode = GravityMode.JUMP
+		air_jump_count += 1
 
 
 func can_air_jump() -> bool:
 	return (air_jump_count < air_jumps)
 
 
-func reset_air_jumps() -> void:
-	air_jump_count = 0
+func can_actor_jump(IsOnGround := true) -> bool:
+	if not can_jump:
+		return false
+	
+	if IsOnGround:
+		return true
+	
+	return can_air_jump()
 
