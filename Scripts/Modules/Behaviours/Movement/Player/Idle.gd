@@ -14,9 +14,16 @@ func setup_behaviour() -> void:
 func enter(_args:= {}):
 	if not player:
 		return
+	
+	if Input.get_axis("gc_left","gc_right") != 0.0:
+		if player.is_walking:
+			change_behaviour.emit("movement", "walk")
+		else:
+			change_behaviour.emit("movement", "run")
+		return
 
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
-
+	
 	if player.is_crouching:
 		change_animation.emit("movement-ground", "idle-crouch", false)
 	else:
@@ -33,10 +40,12 @@ func handle_key_input(event : InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("gc_jump"):
-		if player.jump(true):
+		if player.can_actor_jump(true):
+			player.jump(true)
 			terrain_tracker.temp_disable_ground_raycast(0.2)
+			change_behaviour.emit("movement", "jump")
 	
-	if event.is_action_pressed("gc_crouch"):
+	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
 		
 		if player.is_crouching:
@@ -61,7 +70,8 @@ func set_target_node(NewTargetNode) -> void:
 func handle_physics(delta : float) -> void:
 	if not player:
 		return
-
+	
+	player.change_actor_speed(0.0, delta)
 	player.apply_gravity(delta)
 	player.move_and_slide()
 

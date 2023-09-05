@@ -27,7 +27,8 @@ func handle_key_input(event: InputEvent) -> void:
 		return
 	
 	if event.is_action_pressed("gc_jump"):
-		if player.jump(false):
+		if player.can_actor_jump(true):
+			player.jump(true)
 			terrain_tracker.temp_disable_ground_raycast(0.2)
 			change_behaviour.emit("movement", "jump")
 	
