@@ -2,7 +2,6 @@ extends Behaviour
 # Behaviour set up for Actors
 
 var player : Player
-var _axis_direction: float
 var terrain_tracker: ModuleTerrainTracker
 
 func setup_behaviour() -> void:
@@ -46,15 +45,17 @@ func handle_physics(delta : float) -> void:
 	if not player:
 		return
 	
-	_axis_direction = Input.get_axis("gc_left", "gc_right")
+	player.update_input_axis(true, false)
 	
-	if player.velocity.x == 0 and _axis_direction == 0:
+	if player.velocity.x == 0 and player.axis_strenght.x == 0:
 		change_behaviour.emit("movement", "idle")
 		return
 	
+	if player.axis_strenght.x != 0:
+		player.set_facing_right(0 < player.axis_strenght.x)
+	
 	player.apply_gravity(delta)
-	set_facing_direction()
-	player.change_actor_speed(_axis_direction, delta)
+	player.change_actor_speed(player.axis_strenght.x, delta)
 	player.move_and_slide()
 
 
@@ -62,10 +63,6 @@ func set_target_node(NewTargetNode) -> void:
 	if NewTargetNode is Player:
 		player = NewTargetNode
 
-
-func set_facing_direction():
-	if _axis_direction != 0:
-		player.set_facing_right(0 < player.velocity.x)
 
 
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:

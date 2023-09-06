@@ -5,22 +5,27 @@ var player: Player
 var terrain_tracker: ModuleTerrainTracker
 
 
-func setup_behaviour() -> void:
+func _ready():
 	behaviour_id = "idle"
 	is_default = true
+
+func setup_behaviour() -> void:
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
 
 func enter(_args:= {}):
 	if not player:
 		return
-	
-	if Input.get_axis("gc_left","gc_right") != 0.0:
-		if player.is_walking:
-			change_behaviour.emit("movement", "walk")
+		#return
+	if terrain_tracker.terrain_state == GameProperties.TerrainState.AIR:
+		if player.velocity.y < 0:
+			change_behaviour.emit("movement", "jump")
 		else:
-			change_behaviour.emit("movement", "run")
+			change_behaviour.emit("movement", "fall")
 		return
+	
+	if player.air_jump_count != 0:
+		player.air_jump_count = 0
 
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
@@ -28,7 +33,7 @@ func enter(_args:= {}):
 		change_animation.emit("movement-ground", "idle-crouch", false)
 	else:
 		change_animation.emit("movement-ground", "idle", false)
-
+	
 
 func exit():
 	if terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
@@ -52,14 +57,8 @@ func handle_key_input(event : InputEvent) -> void:
 			change_animation.emit("movement-ground", "idle-crouch", false)
 		else:
 			change_animation.emit("movement-ground", "idle", false)
-	
 	elif event.is_action_pressed("gc_walk"):
 		player.is_walking = not player.is_walking
-	elif event.is_action_pressed("gc_left") or event.is_action_pressed("gc_right"):
-		if player.is_walking:
-			change_behaviour.emit("movement", "walk")
-		else:
-			change_behaviour.emit("movement", "run")
 
 
 func set_target_node(NewTargetNode) -> void:
@@ -69,6 +68,15 @@ func set_target_node(NewTargetNode) -> void:
 
 func handle_physics(delta : float) -> void:
 	if not player:
+		return
+	
+	player.update_input_axis(true, false)
+	
+	if player.axis_strenght.x != 0.0:
+		if player.is_walking:
+			change_behaviour.emit("movement", "walk")
+		else:
+			change_behaviour.emit("movement", "run")
 		return
 	
 	player.change_actor_speed(0.0, delta)

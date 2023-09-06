@@ -6,12 +6,16 @@ var current_terrain: GameProperties.TerrainState
 var jump_buffer: TimerForModule
 var _jump_timer_restore: Timer
 
+
 func enter(_args:= {}):
 	if not player:
 		return
-
+	
+	if not player.is_on_air:
+		player.is_on_air = true
+	
 	current_terrain = terrain_tracker.terrain_state
-	change_animation.emit("movement-air", "jump")
+	change_animation.emit("movement-air", "jump", false)
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
 	_jump_timer_restore.start()
@@ -41,29 +45,38 @@ func handle_key_input(event: InputEvent) -> void:
 			change_animation.emit("movement-air", "jump")
 		else:
 			jump_buffer.start()
-
+	elif event.is_action_pressed("gc_walk"):
+		player.is_walking = not player.is_walking
+	elif event.is_action_pressed("gc_crouch"):
+		player.is_crouching = not player.is_crouching
 
 func handle_physics(delta : float) -> void:
 	if not player:
 		return
 	
 	if current_terrain == GameProperties.TerrainState.GROUND:
+		player.air_jump_count = 0
 		if 0 < jump_buffer.time_left:
 			jump_buffer.stop()
-			if player.can_actor_jump(false):
+			if player.can_actor_jump(true):
 				if Input.is_action_pressed("gc_jump"):
-					player.jump(false)
+					player.jump(true)
 				else:
-					player.jump(false, player.jump_velocity / 2)
-				change_animation.emit("movement-air", "jump")
+					player.jump(true, player.jump_velocity / 2)
+				change_animation.emit("movement-air", "jump", false)
 	elif current_terrain == GameProperties.TerrainState.LIQUID:
 		change_behaviour.emit("movement", "swim-idle")
 
 	if 0 <= player.velocity.y:
 		_go_to_fall()
 	
+	player.update_input_axis(true, false)
+	
+	if player.axis_strenght.x != 0.0:
+		player.set_facing_right(0 < player.axis_strenght.x)
+	
 	player.apply_gravity(delta)
-	player.change_actor_speed(Input.get_axis("gc_left", "gc_right"), delta)
+	player.change_actor_speed(player.axis_strenght.x, delta)
 	player.move_and_slide()
 
 

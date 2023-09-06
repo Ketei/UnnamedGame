@@ -4,7 +4,6 @@ var player: Player
 var terrain_tracker: ModuleTerrainTracker
 var jump_buffer: TimerForModule
 
-
 func setup_behaviour() -> void:
 	behaviour_id = "fall"
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
@@ -12,7 +11,9 @@ func setup_behaviour() -> void:
 
 
 func enter(_args:= {}):
-	change_animation.emit("movement-air", "fall")
+	if not player.is_on_air:
+		player.is_on_air = true
+	change_animation.emit("movement-air", "fall", false)
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 
 
@@ -35,8 +36,12 @@ func handle_physics(delta : float) -> void:
 	if not player:
 		return
 	
+	player.update_input_axis(true, false)
+	
+	if player.axis_strenght.x != 0:
+		player.set_facing_right(0 < player.axis_strenght.x)
 	player.apply_gravity(delta)
-	player.change_actor_speed(Input.get_axis("gc_left", "gc_right"), delta)
+	player.change_actor_speed(player.axis_strenght.x, delta)
 	player.move_and_slide()
 
 
@@ -47,6 +52,8 @@ func set_target_node(NewTargetNode) -> void:
 
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 	if NewState == GameProperties.TerrainState.GROUND:
+		player.air_jump_count = 0
+		player.is_on_air = false
 		if jump_buffer.time_left <= 0 or not player.can_actor_jump(true):
 			change_behaviour.emit("movement", "idle")
 			return
@@ -56,7 +63,7 @@ func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 		player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
 		change_behaviour.emit("movement", "jump")
 
-
 	elif NewState == GameProperties.TerrainState.LIQUID:
+		player.is_on_air = false
 		change_behaviour.emit("movement", "swim-idle")
 

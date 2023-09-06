@@ -1,7 +1,6 @@
 extends Behaviour
 
 var player: Player
-var _axis_direction: float
 var terrain_tracker: ModuleTerrainTracker
 
 
@@ -9,10 +8,10 @@ func enter(_args:= {}):
 	if not player:
 		return
 	
-	if player.movement_status == player.MovementSpeed.CROUCH:
-		change_animation.emit("movement-ground", "walk-crouch")
-	elif player.movement_status == player.MovementSpeed.WALK:
-		change_animation.emit("movement-ground", "walk")
+	if player.is_crouching:
+		change_animation.emit("movement-ground", "walk-crouch", false)
+	else:
+		change_animation.emit("movement-ground", "walk", false)
 	
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 
@@ -53,15 +52,17 @@ func handle_physics(delta : float) -> void:
 	if not player:
 		return
 	
-	_axis_direction = Input.get_axis("gc_left", "gc_right")
+	player.update_input_axis(true, false)
 	
-	if _axis_direction == 0 and player.velocity.x == 0:
+	if player.axis_strenght.x == 0 and player.velocity.x == 0:
 		change_behaviour.emit("movement", "idle")
 		return
 	
+	if player.axis_strenght.x != 0:
+		player.set_facing_right(0 < player.axis_strenght.x)
+	
 	player.apply_gravity(delta)
-	set_facing_direction()
-	player.change_actor_speed(_axis_direction, delta)
+	player.change_actor_speed(player.axis_strenght.x, delta)
 	player.move_and_slide()
 
 
@@ -73,11 +74,6 @@ func setup_behaviour() -> void:
 func set_target_node(NewTargetNode) -> void:
 	if NewTargetNode is Player:
 		player = NewTargetNode
-
-
-func set_facing_direction():
-	if _axis_direction != 0:
-		player.set_facing_right(0 < player.velocity.x)
 
 
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
