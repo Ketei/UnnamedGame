@@ -22,6 +22,9 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 @export var acceleration: float = 0.0 : 
 	set(value) :
 		acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
+@export var air_acceleration: float = 0.0:
+	set(value):
+		air_acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
 @export var friction: float = 0.0 : 
 	set(value) :
 		friction = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
@@ -50,6 +53,7 @@ var is_walking: bool = false
 var is_crouching: bool = false
 var can_jump: bool = true
 var is_swimming: bool = false
+var is_on_air: bool = false
 
 # Horizontal Movement
 var speed_mod: float = 0.0:
@@ -106,7 +110,13 @@ func change_actor_speed(AxisDirection: float, Delta: float) -> void:
 
 
 func _get_accel_change(AxisValue: float, SpeedValue: float):
-	if SpeedValue == 0.0 or (0 < AxisValue) == (0 < SpeedValue): # If going from non-moving to moving or control direction == moving direction
+	if is_on_air:
+		return air_acceleration
+#		if AxisValue != 0.0:
+#			return air_acceleration
+#		else:
+#			return 0.025 * GameProperties.grid_size * GameProperties.target_framerate
+	elif SpeedValue == 0.0 or (0 < AxisValue) == (0 < SpeedValue): # If going from non-moving to moving or control direction == moving direction
 		return acceleration
 	elif AxisValue == 0.0: # If going from moving to non-moving
 		return friction
@@ -155,12 +165,17 @@ func jump(JumpFromGround: bool, JumpForce: float = jump_velocity) -> void:
 		velocity.y = JumpForce
 		gravity_mode = GravityMode.JUMP
 	else:
-		if velocity.y < JumpForce:
+		if JumpForce < velocity.y:
 			velocity.y = JumpForce
 		else:
 			velocity.y += JumpForce
 		gravity_mode = GravityMode.JUMP
 		air_jump_count += 1
+	if not JumpFromGround:
+		if QuickMath.are_numbers_same_poles(Input.get_axis("gc_left", "gc_right"), velocity.x):
+			velocity.x += (_get_speed() * Input.get_axis("gc_left", "gc_right")) * 0.6
+		else:
+			velocity.x += (_get_speed() * Input.get_axis("gc_left", "gc_right")) * 0.35
 
 
 func can_air_jump() -> bool:
