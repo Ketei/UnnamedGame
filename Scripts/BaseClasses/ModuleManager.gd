@@ -6,7 +6,7 @@ signal change_animation(AnimPack: String, AnimAction: String)
 @export var parent_node: Node
 # ModuleTypeName: ModuleID: ModuleNode
 var _loaded_modules: Dictionary = {}
-var _loaded_modules_array: Array = []
+var _modules_references: Array = []
 var _module_init: Dictionary = {}
 
 func _ready():
@@ -34,7 +34,9 @@ func _ready():
 				module.change_animation.connect(_change_animation)
 		_module_init.erase(str(loading_prio))
 	
-	_loaded_modules_array = _loaded_modules.keys()
+	for reference in _loaded_modules:
+		_modules_references.append(_loaded_modules[reference])
+	#_modules_references.make_read_only() # Should I make the reference array read only?
 
 
 func _is_object_a_valid_module(ObjectToCheck) -> bool:
@@ -56,16 +58,6 @@ func get_module(ModuleName: String):
 		return _loaded_modules[ModuleName]
 	else:
 		return null
-
-
-func register_module(NewModule: Module) -> void:
-	if has_module(NewModule.module_type):
-		print_debug("The module you're trying to register already exist")
-		return
-	NewModule.module_manager = self
-	NewModule.set_up_module()
-	_loaded_modules[NewModule.module_type] = NewModule
-	_loaded_modules_array.append(NewModule.module_type)
 
 
 func warn_if_repeated_modules(ModuleType: String) -> void:
@@ -107,16 +99,22 @@ func get_terrain_state() -> GameProperties.TerrainState:
 	
 
 func _physics_process(delta):
-	for module in _loaded_modules_array:
-		_loaded_modules[module].module_physics_process(delta)
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_physics_process(delta)
 
 
-func _unhandled_input(event):
-	for module in _loaded_modules_array:
-		_loaded_modules[module].module_handle_input(event)
+func _unhandled_input(event):	
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_handle_input(event)
 
 
 func _unhandled_key_input(event):
-	for module in _loaded_modules_array:
-		_loaded_modules[module].module_handle_key_input(event)
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_handle_key_input(event)
 
