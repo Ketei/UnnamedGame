@@ -30,15 +30,16 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 	
 	var _behaviour_preload: Behaviour = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
 	var _old_behaviour: String = loaded_behaviour.behaviour_id
-
+	
+	current_pack = TargetPack
+	
 	loaded_behaviour.exit()
 	disconnect_behaviour_signals()
 	loaded_behaviour = _behaviour_preload
 	connect_behaviour_signals()
-	current_pack = TargetPack
-	loaded_behaviour.enter()
 	behaviour_changed.emit(_old_behaviour, loaded_behaviour.behaviour_id)
-	
+	loaded_behaviour.enter()
+
 	if _debug_print_on_change:
 		print_debug("Changed behaviour from " + _old_behaviour + " to " + loaded_behaviour.behaviour_id)
 
@@ -65,7 +66,7 @@ func check_for_pack_and_behaviour(PackToCheck: String, BehaviourToCheck: String 
 	
 	if _return_bool and BehaviourToCheck != "":
 		_return_bool = loaded_packs[PackToCheck].available_behaviours.has(BehaviourToCheck)
-	
+
 	return _return_bool
 
 
@@ -178,6 +179,8 @@ func module_physics_process(delta):
 
 
 func set_up_module() -> void:
+	
+	is_module_enabled = true
 	target_node = module_manager.parent_node
 
 	for child in self.get_children():
@@ -188,18 +191,18 @@ func set_up_module() -> void:
 		child.set_up_pack(target_node, self)
 	
 	if default_pack:
+		
+		current_pack = default_pack.behaviour_pack_id
+		
 		if default_pack.default_behaviour:
 			loaded_behaviour = default_pack.default_behaviour
-			current_pack = default_pack.behaviour_pack_id
 			connect_behaviour_signals()
-			loaded_behaviour.enter()
 			behaviour_changed.emit("null", loaded_behaviour.behaviour_id)
+			loaded_behaviour.enter()
 		else:
 			print_debug("Error: No default behaviour loaded on pack: " + str(default_pack.get_path()))
 	else:
 		print_debug("Error: No default behaviour pack loaded on module: " + str(self.get_path()))
-	
-	is_module_enabled = true
 
 
 func _change_anim_signal(Pack: String, Action: String, Random: bool) -> void:
