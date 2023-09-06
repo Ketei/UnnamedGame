@@ -19,7 +19,7 @@ var current_pack: String = ""
 
 ## Called by the module manager when setting up. Register animations here.
 func set_up_module() -> void:
-	pass
+	print(animation_list)
 
 
 func _module_enabled_override(Value: bool) -> void:
@@ -116,7 +116,7 @@ func anim_data_validation(PackName: String, ActionName: String) -> void:
 ## a pack and action.
 func custom_play(PackName: String, ActionName: String, RandomAnim: bool = false, CustomBlend: float = -1, CustomSpeed: float = 1.0, FromEnd: bool = false) -> void:
 	var _anim_to_play: String = get_anim_in_action_pack(PackName, ActionName, RandomAnim)
-
 	if _anim_to_play != "":
+		current_pack = PackName
 		play(_anim_to_play, CustomBlend, CustomSpeed, FromEnd)
 
