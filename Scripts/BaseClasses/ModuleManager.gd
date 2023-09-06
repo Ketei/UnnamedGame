@@ -23,6 +23,9 @@ func _ready():
 		var loading_prio: int = QuickMath.array_get_lowest_numberi(_module_init.keys())
 		
 		for module in _module_init[str(loading_prio)]:
+			if module is ModuleBehaviour:
+				module.change_animation.connect(_change_animation)
+			
 			module.module_manager = self
 			module.set_up_module()
 		
@@ -30,8 +33,6 @@ func _ready():
 		
 			_loaded_modules[module.module_type] = module
 
-			if module is ModuleBehaviour:
-				module.change_animation.connect(_change_animation)
 		_module_init.erase(str(loading_prio))
 	
 	for reference in _loaded_modules:
@@ -69,7 +70,6 @@ func warn_if_repeated_modules(ModuleType: String) -> void:
 func _change_animation(Pack: String, Action: String, PlayRandom: bool) -> void:
 	if not has_module("animation-player"):
 		return
-	
 	get_module("animation-player").custom_play(Pack, Action, PlayRandom)
 
 
