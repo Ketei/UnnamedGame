@@ -10,8 +10,9 @@
 resource_name = "PlayerBehaviourPack-Movement"
 script/source = "extends BehaviourPack
 
-func pre_set_up(TargetNode: Node, BehaviourModule: ModuleBehaviour) -> void:
+func pre_set_up(_TargetNode: Node, BehaviourModule: ModuleBehaviour) -> void:
 	BehaviourModule.module_manager.get_module(\"timers-manager\").create_timer(\"jump-buffer\", 0.1, true, true)
+	BehaviourModule.module_manager.get_module(\"timers-manager\").create_timer(\"coyote-timer\", 0.10, true, true)
 "
 
 [node name="BehaviourPack-Movement" type="Node"]
