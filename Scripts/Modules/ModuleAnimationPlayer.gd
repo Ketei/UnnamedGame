@@ -19,7 +19,7 @@ var current_pack: String = ""
 
 ## Called by the module manager when setting up. Register animations here.
 func set_up_module() -> void:
-	print(animation_list)
+	pass
 
 
 func _module_enabled_override(Value: bool) -> void:
