@@ -43,6 +43,8 @@ func handle_key_input(event : InputEvent) -> void:
 			change_behaviour.emit("movement", "jump")
 		else:
 			jump_buffer.start()
+	elif event.is_action_pressed("gc_walk"):
+		player.is_walking = not player.is_walking
 
 
 func handle_physics(delta : float) -> void:
