@@ -6,29 +6,45 @@ signal change_animation(AnimPack: String, AnimAction: String)
 @export var parent_node: Node
 # ModuleTypeName: ModuleID: ModuleNode
 var _loaded_modules: Dictionary = {}
-
+var _modules_references: Array = []
+var _module_init: Dictionary = {}
 
 func _ready():
 	for child in self.get_children():
 		if not _is_object_a_valid_module(child):
 			continue
 		
-		warn_if_repeated_modules(child.module_type)
+		if not _module_init.has(str(child.module_priority)):
+			_module_init[str(child.module_priority)] = []
 		
-		_loaded_modules[child.module_type] = child
-		child.module_manager = self
-		child.set_up_module()
+		_module_init[str(child.module_priority)].append(child)
+	
+	for prio in range(_module_init.size()):
+		var loading_prio: int = QuickMath.array_get_lowest_numberi(_module_init.keys())
 		
-		if child is ModuleBehaviour:
-			child.change_animation.connect(_change_animation)
+		for module in _module_init[str(loading_prio)]:
+			if module is ModuleBehaviour:
+				module.change_animation.connect(_change_animation)
+			
+			module.module_manager = self
+			module.set_up_module()
+		
+			warn_if_repeated_modules(module.module_type)
+		
+			_loaded_modules[module.module_type] = module
+
+		_module_init.erase(str(loading_prio))
+	
+	for reference in _loaded_modules:
+		_modules_references.append(_loaded_modules[reference])
+	#_modules_references.make_read_only() # Should I make the reference array read only?
 
 
 func _is_object_a_valid_module(ObjectToCheck) -> bool:
-	if ObjectToCheck is Module:
-		return true
-	elif ObjectToCheck is ModuleAnimationPlayer:
+	if ObjectToCheck is Module or ObjectToCheck is ModuleAnimationPlayer:
 		return true
 	else:
+		print_debug(str(ObjectToCheck) + " is not a valid module")
 		return false
 
 
@@ -51,9 +67,54 @@ func warn_if_repeated_modules(ModuleType: String) -> void:
 		print_debug(ModuleType + " will be replaced")		
 
 
-func _change_animation(Pack: String, Action: String, PlayRandom: bool):
+func _change_animation(Pack: String, Action: String, PlayRandom: bool) -> void:
 	if not has_module("animation-player"):
 		return
-	
 	get_module("animation-player").custom_play(Pack, Action, PlayRandom)
+
+
+func actor_submerged(IsActorSubmerged: bool) -> void:
+	if not parent_node is Actor:
+		return
+	
+	if parent_node.is_swimming != IsActorSubmerged:
+		parent_node.is_swimming = IsActorSubmerged
+
+
+func apply_effect(EffectToApply: Effect) -> void:
+	if has_module("effect-applier"):
+		get_module("effect-applier").add_effect(EffectToApply)
+
+
+func remove_effect(EffectID: String) -> void:
+	if has_module("effect-applier"):
+		get_module("effect-applier").remove_effect(EffectID)
+
+
+func get_terrain_state() -> GameProperties.TerrainState:
+	if not has_module("terrain-tracker"):
+		return GameProperties.TerrainState.GROUND
+	
+	return get_module("terrain-tracker").terrain_state
+	
+
+func _physics_process(delta):
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_physics_process(delta)
+
+
+func _unhandled_input(event):	
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_handle_input(event)
+
+
+func _unhandled_key_input(event):
+	for module in _modules_references:
+		if module is ModuleAnimationPlayer:
+			continue
+		module.module_handle_key_input(event)
 

@@ -1,5 +1,6 @@
-extends Node
-class_name TerrainArea
+extends Area2D
+class_name TerrainType
 
-@export var TerrainType: GameProperties.TerrainState
-
+var speed_mod: int = 0
+var speed_mult_change: float = 0.0
+var terrain_effect: Effect

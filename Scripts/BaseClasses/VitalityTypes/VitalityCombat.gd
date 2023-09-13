@@ -16,34 +16,34 @@ var affinities: Dictionary = {}
 # A dictionary that holds all the types of damage that the actor will deal along with the values.
 var attack_types: Dictionary = {} #Ex. "blunt": 10, "fire": 5 
 
-var mod_damage_physical: int = 0 :
+var mod_damage_physical: float = 0 :
 	set(value):
 		if enabled:
 			mod_damage_physical = value
-var skill_damage_physical: int = 0
+var skill_damage_physical: float = 0
 var mult_damage_physical: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_damage_physical = maxf(value, 0.0)
 
-var mod_damage_magical: int = 0 :
+var mod_damage_magical: float = 0 :
 	set(value):
 		if enabled:
 			mod_damage_magical = value
-var skill_damage_magical: int = 0
+var skill_damage_magical: float = 0
 var mult_damage_magical: float = 1.0 :
 	set(value):
 		if enabled:
 			mult_damage_magical = maxf(value, 0.0)
 
 ## Reduces physical damage received
-var base_defense_physical: int = 0 :
+var base_defense_physical: float = 0 :
 	set(value):
 		if enabled:
-			base_defense_physical = maxi(value, 0)
+			base_defense_physical = maxf(value, 0)
 			defense_physical = ActorLibs.calculate_stati(base_defense_physical + skill_defense_physical, mod_defense_physical, mult_defense_physical)
-var skill_defense_physical: int = 0
-var mod_defense_physical: int = 0 :
+var skill_defense_physical: float = 0
+var mod_defense_physical: float = 0 :
 	set(value):
 		if enabled:
 			mod_defense_physical = value
@@ -59,13 +59,13 @@ var defense_physical: int = 0 :
 			defense_physical = maxi(value, 0)
 
 ## Reduces magical damage received
-var base_defense_magical: int = 0 :
+var base_defense_magical: float = 0 :
 	set(value):
 		if enabled:
-			base_defense_magical = maxi(value, 0)
+			base_defense_magical = maxf(value, 0)
 			defense_magical = ActorLibs.calculate_stati(base_defense_magical + skill_defense_magical, mod_defense_magical, mult_defense_magical)
-var skill_defense_magical: int = 0
-var mod_defense_magical: int = 0 :
+var skill_defense_magical: float = 0
+var mod_defense_magical: float = 0 :
 	set(value):
 		if enabled:
 			mod_defense_magical = value
@@ -82,16 +82,16 @@ var defense_magical: int = 0 :
 
 
 func trigger_lust_stats_change(CurrentLust, PreviousLust) -> void:
-	mod_damage_physical += SexLibs.get_stat_with_lusti("damage-physical", CurrentLust, PreviousLust)
+	mod_damage_physical += SexLibs.get_stat_with_lustf("damage-physical", CurrentLust, PreviousLust)
 	mult_damage_physical += SexLibs.get_stat_with_lustf("mult-damage-physical", CurrentLust, PreviousLust)
 	
-	mod_damage_magical += SexLibs.get_stat_with_lusti("damage-magical", CurrentLust, PreviousLust)
+	mod_damage_magical += SexLibs.get_stat_with_lustf("damage-magical", CurrentLust, PreviousLust)
 	mult_damage_magical += SexLibs.get_stat_with_lustf("mult-damage-magical", CurrentLust, PreviousLust)
 	
-	mod_defense_magical += SexLibs.get_stat_with_lusti("defense-magical", CurrentLust, PreviousLust)
+	mod_defense_magical += SexLibs.get_stat_with_lustf("defense-magical", CurrentLust, PreviousLust)
 	mult_defense_magical += SexLibs.get_stat_with_lustf("mult-defense-magical", CurrentLust, PreviousLust)
 	
-	mod_defense_physical += SexLibs.get_stat_with_lusti("defense-physical", CurrentLust, PreviousLust)
+	mod_defense_physical += SexLibs.get_stat_with_lustf("defense-physical", CurrentLust, PreviousLust)
 	mult_defense_physical += SexLibs.get_stat_with_lustf("mult-defense-physical", CurrentLust, PreviousLust)
 
 

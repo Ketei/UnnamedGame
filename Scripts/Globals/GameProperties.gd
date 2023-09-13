@@ -3,10 +3,11 @@ extends Node
 # Possible difficulties for the game.
 enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
-enum TerrainState {GROUND, AIR, WATER}
+enum TerrainState {GROUND, AIR, LIQUID}
 
 # Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
-const grid_size: int = 16
+const grid_size: int = 32
+const target_framerate: int = 60
 
 # Types of damage in game
 const AttackTypes: Dictionary = {
@@ -114,7 +115,7 @@ func remove_lust_effect(LustAmount: int, StatChange: String):
 		lust_effects.erase(str(LustAmount))
 
 
-func get_skill_effects(SkillName: String, SkillLevel: int, PrevSkillLevel: int) -> Dictionary:
+func get_skill_effects(SkillName: String, PrevSkillLevel: int, SkillLevel: int) -> Dictionary:
 	var _return_dict: Dictionary = {}
 	
 	if not skill_effects.has(SkillName):
