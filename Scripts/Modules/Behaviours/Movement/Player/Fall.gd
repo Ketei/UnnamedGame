@@ -51,10 +51,10 @@ func handle_physics(delta : float) -> void:
 	
 	player.update_input_axis(true, false)
 	
-	if player.axis_strenght.x != 0:
-		player.set_facing_right(0 < player.axis_strenght.x)
+	if player.axis_strength.x != 0:
+		player.set_facing_right(0 < player.axis_strength.x)
 	player.apply_gravity(delta)
-	player.change_actor_speed(player.axis_strenght.x, delta)
+	player.change_actor_speed(player.axis_strength.x, delta)
 	player.move_and_slide()
 
 

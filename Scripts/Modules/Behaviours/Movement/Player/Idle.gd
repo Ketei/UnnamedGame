@@ -72,7 +72,7 @@ func handle_physics(delta : float) -> void:
 	
 	player.update_input_axis(true, false)
 	
-	if player.axis_strenght.x != 0.0:
+	if player.axis_strength.x != 0.0:
 		if player.is_walking:
 			change_behaviour.emit("movement", "walk")
 		else:
