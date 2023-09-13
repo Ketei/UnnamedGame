@@ -12,6 +12,9 @@ func _ready():
 
 ## Returns a timer if it exist, if not returns null
 func get_timer(TimerName: String) -> TimerForModule:
+	if not has_timer(TimerName):
+		print_debug("No such timer exists: " + TimerName)
+		return null
 	return  timers_dict[TimerName]
 
 
