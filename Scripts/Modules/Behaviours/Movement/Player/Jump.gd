@@ -42,7 +42,7 @@ func handle_key_input(event: InputEvent) -> void:
 		if player.can_actor_jump(false):
 			player.jump(false)
 			terrain_tracker.temp_disable_ground_raycast(0.2)
-			change_animation.emit("movement-air", "jump")
+			change_animation.emit("movement-air", "jump", false)
 		else:
 			jump_buffer.start()
 	elif event.is_action_pressed("gc_walk"):

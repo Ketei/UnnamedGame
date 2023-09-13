@@ -88,6 +88,7 @@ func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 	if NewState == GameProperties.TerrainState.AIR:
 		if 0 < player.velocity.y:
 			change_behaviour.emit("movement", "fall")
+			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
 			change_behaviour.emit("movement", "jump")
 	elif NewState == GameProperties.TerrainState.LIQUID:
