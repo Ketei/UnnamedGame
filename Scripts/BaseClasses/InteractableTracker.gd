@@ -43,7 +43,7 @@ func get_object_list_of_prio(PrioSearch: int) -> Array:
 func get_priority_level(GetHighPrio: bool = true) -> int:
 	var prio_key: int = -1
 	if not _tracked_objects.is_empty():
-		var number_array: Array = []
+		var number_array: Array
 		
 		for priority in _tracked_objects.keys():
 			number_array.append(int(priority))

@@ -102,10 +102,3 @@ func array_get_lowest_numberi(ArrayToCheck: Array) -> int:
 			lowest_number = int(number)
 	
 	return lowest_number
-
-
-func are_numbers_same_poles(NumberA: float, NumberB: float) -> bool:
-	if NumberA == 0.0 or NumberB == 0:
-		return true
-
-	return (0 < NumberA) == (0 < NumberB)
