@@ -2,7 +2,7 @@ extends Area2D
 class_name TerrainCollider
 
 signal area_update
- 
+
 # TerrainName(str) : TerrainCount(int)
 var colliding_terrains: Dictionary = {}
 
