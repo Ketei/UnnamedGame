@@ -1,17 +1,21 @@
 extends CharacterBody2D
 class_name Actor
 
+# Double # comments are for the UI tooltip OR the documentation. That's how godot
+# builds documentation on CUSTOM CLASSES. This explanation is because
+# SOMEONE keeps nagging me that comments in code should be avoided.
+
 # enums
 enum GravityMode {NORMAL, JUMP, ZERO}
 
-# General
 @export_category("Actor Properties")
 @export var actor_name: String = ""
 @export var actor_type: ActorProperties.ActorType
 @export var actor_gender: ActorProperties.Gender
 @export var actor_sprite: Sprite2D = null
 
-@export_category("Movement")
+@export_category("Ground Movement")
+## Any terrain change will be checked here first, then on GameProperties.
 @export var self_terrain_move_mod: Dictionary = {}
 @export var run_speed: float = 0.0: 
 	set(value) :
@@ -22,9 +26,6 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 @export var acceleration: float = 0.0 : 
 	set(value) :
 		acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
-@export var air_acceleration: float = 0.0:
-	set(value):
-		air_acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
 @export var friction: float = 0.0 : 
 	set(value) :
 		friction = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
@@ -35,16 +36,32 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 	set(value):
 		crouch_speed = maxf(value, 0.0)
 @export var swim_speed: float = 0.0
+
+@export_category("Air Movement")
 @export var air_jumps: int = 0 :
 	set(value):
 		air_jumps = maxi(value, 0)
+@export var air_acceleration: float = 0.0:
+	set(value):
+		air_acceleration = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
+@export var air_friction = 0.0:
+	set(value):
+		air_friction = maxf(value, 0.0) * GameProperties.grid_size * GameProperties.target_framerate
+
+@export_category("Water Movement")
 
 @export_category("Gravity")
-@export var max_gravity: float = 0.0 : 
+## How fast, in blocks (check grid size on GameProperties) is the actor allowed
+## to fall.
+@export var terminal_velocity: float = 0.0 : 
 	set(value) :
-		max_gravity = maxf(value, 0.0) * GameProperties.grid_size
-@export var _jump_time_to_floor: float
-@export var _jump_time_to_peak: float
+		terminal_velocity = maxf(value, 0.0) * GameProperties.grid_size
+## How fast in seconds should you reach the floor after a jump.
+@export var _time_to_floor: float
+## How fast in seconds should you reach the peak of a jump
+@export var _time_to_peak: float
+## How far in blocks (check grid size on GameProperties)
+## should the actor be able to jump
 @export var _jump_height: float
 
 # Toggles
@@ -72,9 +89,9 @@ var gravity_mode: GravityMode = GravityMode.NORMAL
 # Tracker
 var air_jump_count: int = 0
 
-@onready var jump_velocity = QuickMath.get_jump_velocity(_jump_height, _jump_time_to_peak)
-@onready var jump_gravity = QuickMath.get_jump_gravity(_jump_height, _jump_time_to_peak)
-@onready var normal_gravity = QuickMath.get_normal_gravity(_jump_height, _jump_time_to_floor)
+@onready var jump_velocity = QuickMath.get_jump_velocity(_jump_height, _time_to_peak)
+@onready var jump_gravity = QuickMath.get_jump_gravity(_jump_height, _time_to_peak)
+@onready var normal_gravity = QuickMath.get_normal_gravity(_jump_height, _time_to_floor)
 
 
 func get_gravity() -> float:
@@ -93,10 +110,10 @@ func apply_gravity(delta: float) -> void:
 		return
 
 	if gravity_mode != GravityMode.ZERO:
-		velocity.y = minf(velocity.y + (get_gravity() * delta), max_gravity)
+		velocity.y = minf(velocity.y + (get_gravity() * delta), terminal_velocity)
 	else:
 		if velocity.y != 0:
-			velocity.y = move_toward(velocity.y, 0, 10)
+			velocity.y = move_toward(velocity.y, 0, air_acceleration * 2.0)
 
 
 func change_actor_speed(AxisDirection: float, Delta: float) -> void:
@@ -104,25 +121,24 @@ func change_actor_speed(AxisDirection: float, Delta: float) -> void:
 		return
 
 	if gravity_mode != GravityMode.ZERO:
-		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x) * Delta)
+		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x, _get_speed()) * Delta)
 	else:
-		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, swim_speed / 3)
+		velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, swim_speed / 3.0)
 
 
-func _get_accel_change(AxisValue: float, SpeedValue: float):
-	if is_on_air:
-		return air_acceleration
-#		if AxisValue != 0.0:
-#			return air_acceleration
-#		else:
-#			return 0.025 * GameProperties.grid_size * GameProperties.target_framerate
-	elif SpeedValue == 0.0 or QuickMath.are_numbers_same_poles(AxisValue, SpeedValue): # If going from non-moving to moving or control direction == moving direction
-		return acceleration
-	elif AxisValue == 0.0: # If going from moving to non-moving
-		return friction
-	else: # If going from moving to 1 direction to the opposite
-		return (acceleration / 3) + friction
-		return friction / 2.0
+func _get_accel_change(AxisValue: float, CurrentSpeed: float, MaxSpeed: float):
+	if abs(CurrentSpeed) < MaxSpeed: # return acceleration values
+		if is_on_air:
+			return air_acceleration
+		elif not QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed):
+			return friction
+		else:
+			return acceleration
+	else: # return friction values
+		if is_on_air:
+			return air_friction
+		else:
+			return friction
 
 
 func _get_speed() -> float:
@@ -162,25 +178,21 @@ func set_facing_right(FacingRight: bool = true) -> void:
 
 
 func jump(JumpFromGround: bool, JumpForce: float = jump_velocity) -> void:
-	if JumpFromGround:
+	if JumpFromGround or JumpForce < velocity.y:
 		velocity.y = JumpForce
-		gravity_mode = GravityMode.JUMP
 	else:
-		if JumpForce < velocity.y:
-			velocity.y = JumpForce
-		else:
-			velocity.y += JumpForce
-		gravity_mode = GravityMode.JUMP
+		velocity.y += JumpForce
 		air_jump_count += 1
+	
+	gravity_mode = GravityMode.JUMP
+	
+	# This part is experimental. It gives a boost on air jumps to give more air control
+	# Might remain, might go. Who knows? Me not yet.
 	if not JumpFromGround:
 		if QuickMath.are_numbers_same_poles(Input.get_axis("gc_left", "gc_right"), velocity.x):
 			velocity.x += (_get_speed() * Input.get_axis("gc_left", "gc_right")) * 0.6
 		else:
 			velocity.x += (_get_speed() * Input.get_axis("gc_left", "gc_right")) * 0.35
-
-
-func can_air_jump() -> bool:
-	return (air_jump_count < air_jumps)
 
 
 func can_actor_jump(IsOnGround := true) -> bool:
@@ -190,5 +202,8 @@ func can_actor_jump(IsOnGround := true) -> bool:
 	if IsOnGround:
 		return true
 	
-	return can_air_jump()
+	return (air_jump_count < air_jumps) # Does actor have remaining air jumps?
 
+
+func toggle_walk() -> void:
+	is_walking = not is_walking
