@@ -27,7 +27,7 @@ func handle_key_input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(true):
-			player.jump(true)
+			player.jump(true, player.jump_velocity * 0.75)
 			terrain_tracker.temp_disable_ground_raycast(0.1)
 			change_behaviour.emit("movement", "jump")
 	
