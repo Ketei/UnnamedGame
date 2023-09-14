@@ -1,6 +1,0 @@
-res://Nodes/Actors/player.tscn
-res://Scripts/BaseClasses/MiniModule/Vitality/MM_EffectHealth.gd
-res://Test/test_world.tscn
-res://Test/TestPlayer.tscn
-res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn
-res://Scripts/CommLib/QuickMath.gd
