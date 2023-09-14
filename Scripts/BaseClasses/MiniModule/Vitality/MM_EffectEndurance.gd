@@ -1,5 +1,5 @@
 ## This mini-module is used by effects to alter change_base_value-related values.
-extends MiniModuleEffect
+extends EffectComponent
 class_name EffectEndurance
 
 ## Change base value by this amount. Per second if apply_once is disabled.
@@ -32,7 +32,7 @@ func _start_effect() -> void:
 	if apply_custom_effect_first:
 		on_start_effect()
 	
-	if apply_once and not apply_custom_effects_only:
+	if not apply_custom_effects_only:
 		if change_base_value != 0:
 				target_vitality.base_endurance += change_base_value
 				if revert_on_end:
@@ -64,8 +64,7 @@ func _start_effect() -> void:
 				
 				if revert_on_end:
 					_tracker_max_value += floori(_calc_variable)
-	
-	if not apply_custom_effects_only:
+
 		if change_max_value_by_multiplier < 1.0:
 			target_vitality.mult_endurance.append(change_max_value_by_multiplier)
 			target_vitality.update_max_endurance()
@@ -78,10 +77,10 @@ func _start_effect() -> void:
 
 
 func _apply_effect(Delta: float):
-	if apply_custom_effect_first and not apply_once:
+	if apply_custom_effect_first:
 		on_apply_effect(Delta)
 		
-	if not apply_once and not apply_custom_effects_only:
+	if not apply_custom_effects_only:
 		if change_base_value != 0:
 			_calc_variable = float(change_base_value) * Delta
 			target_vitality.base_endurance += floori(_calc_variable)
@@ -116,8 +115,8 @@ func _apply_effect(Delta: float):
 			if revert_on_end:
 				_tracker_max_value += floori(_calc_variable)
 		
-		if not apply_custom_effect_first:
-			on_apply_effect(Delta)
+	if not apply_custom_effect_first:
+		on_apply_effect(Delta)
 
 
 func _end_effect():

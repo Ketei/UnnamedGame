@@ -12,6 +12,7 @@ func set_object_collision_bit(BitsToSet: Array[int], ObjectToSet: CollisionObjec
 
 func disable_object_collision_bits(ObjectToSet: CollisionObject2D, IsLayer := true) -> void:
 	for number in range(32):
+	for number in range(1, 33):
 		if IsLayer:
 			if ObjectToSet.get_collision_layer_value(number):
 				ObjectToSet.set_collision_layer_value(number, false)
@@ -28,5 +29,6 @@ func set_raycast_collision_mask(LayersToSet: Array[int], RaycastToSet: RayCast2D
 
 func disable_raycast_collision_mask(RaycastToDisable: RayCast2D) -> void:
 	for layer in range(32):
+	for layer in range(1, 33):
 		if RaycastToDisable.get_collision_mask_value(layer):
 			RaycastToDisable.set_collision_mask_value(layer, false)
