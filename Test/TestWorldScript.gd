@@ -8,3 +8,4 @@ func _physics_process(delta):
 	print(raycast.is_colliding())
 	if raycast.is_colliding():
 		raycast.enabled = false
+
