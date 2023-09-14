@@ -32,9 +32,12 @@ func handle_key_input(event: InputEvent) -> void:
 	if not player:
 		return
 	
-	
 	if event.is_action_released("gc_jump") and player.velocity.y < 0:
-		player.velocity.y -= (player.jump_velocity * 0.7) * (_jump_timer_restore.time_left / player._jump_time_to_peak)
+		# In this line it's handled the "minimum jump height". 
+		# 1.0 - the number(the one multiplying jump_velocity) = % of the 
+		# minimum jump height (arpox).
+		player.velocity.y -= (player.jump_velocity * 0.5) * (_jump_timer_restore.time_left / player._time_to_peak)
+		
 		if player.gravity_mode == Actor.GravityMode.JUMP:
 			player.gravity_mode = Actor.GravityMode.NORMAL
 	
@@ -46,9 +49,13 @@ func handle_key_input(event: InputEvent) -> void:
 		else:
 			jump_buffer.start()
 	elif event.is_action_pressed("gc_walk"):
-		player.is_walking = not player.is_walking
+		player.toggle_walk()
+	elif event.is_action_released("gc_walk") and player.walk_hold:
+		player.toggle_walk()
+		
 	elif event.is_action_pressed("gc_crouch"):
-		player.is_crouching = not player.is_crouching
+		player.toggle_walk()
+
 
 func handle_physics(delta : float) -> void:
 	if not player:
@@ -85,7 +92,7 @@ func setup_behaviour() -> void:
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 	jump_buffer = behaviour_module.module_manager.get_module("timers-manager").get_timer("jump-buffer")
 	_jump_timer_restore = Timer.new()
-	_jump_timer_restore.wait_time = player._jump_time_to_peak
+	_jump_timer_restore.wait_time = player._time_to_peak
 	_jump_timer_restore.one_shot = true
 	_jump_timer_restore.autostart = false
 	_jump_timer_restore.timeout.connect(_restor_grav)
