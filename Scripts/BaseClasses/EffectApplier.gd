@@ -39,7 +39,7 @@ func _timer_module_enabled(IsEnabled: bool) -> void:
 func add_effect(NewEffect: Effect, HasTimer := false, EffectTime := 1.0):
 	var effect_id: String = _get_next_id()
 	current_effects[effect_id] = NewEffect
-	NewEffect.start_effect(_vitality_module, effect_id)
+	NewEffect.start_effect()
 	
 	_effect_keys = current_effects.keys()
 	

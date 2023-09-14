@@ -34,3 +34,4 @@ func remove_interact_tracker(TrackerKey: String):
 func _unhandled_key_input(event):
 	if event.is_action_pressed("ui_accept"):
 		walk_hold = not walk_hold
+

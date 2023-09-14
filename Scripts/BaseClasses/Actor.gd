@@ -127,7 +127,7 @@ func change_actor_speed(AxisDirection: float, Delta: float) -> void:
 
 
 func _get_accel_change(AxisValue: float, CurrentSpeed: float, MaxSpeed: float):
-	if abs(CurrentSpeed) < MaxSpeed: # return acceleration values
+	if abs(CurrentSpeed) <= MaxSpeed * int(AxisValue != 0): # return acceleration values
 		if is_on_air:
 			return air_acceleration
 		elif not QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed):
