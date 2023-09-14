@@ -9,8 +9,6 @@ var available_behaviours: Dictionary = {}
 
 func set_up_pack(TargetNode: Node, ManagerNode: Node) -> void:
 
-func set_up_pack(TargetNode: Node, ManagerNode: ModuleBehaviour) -> void:
-	pre_set_up(TargetNode, ManagerNode)
 	for child in get_children():
 		if not child is Behaviour:
 			continue
@@ -24,7 +22,6 @@ func set_up_pack(TargetNode: Node, ManagerNode: ModuleBehaviour) -> void:
 		available_behaviours[child.behaviour_id] = child
 		if child.is_default:
 			default_behaviour = child
-	post_set_up(TargetNode, ManagerNode)
 
 
 func warn_if_duplicate_behaviour(BehaviourToCheck: Behaviour) -> void:
@@ -33,10 +30,3 @@ func warn_if_duplicate_behaviour(BehaviourToCheck: Behaviour) -> void:
 		print_debug("Bevahiour node: " + str(BehaviourToCheck.get_path()))
 		print_debug("Previous behaviour will be replaced.")
 
-
-func pre_set_up(_TargetNode: Node, _BehaviourModule: ModuleBehaviour) -> void:
-	pass
-
-
-func post_set_up(_TargetNode: Node, _BehaviourModule: ModuleBehaviour) -> void:
-	pass

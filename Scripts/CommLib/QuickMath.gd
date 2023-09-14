@@ -63,13 +63,6 @@ func erase_array_element(ElementToErase, TargetArray: Array):
 ## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
 ## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
 ## then replace that element with the new one. The position to be inserted at must be valid one or nothing will happen.
-=======
-
-
-## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
-## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
-## then replace that element with the new one. The position to be inserted at must be a valid one.
->>>>>>> Stashed changes
 ## This is a lot faster but will not preserve the array order. If you want to keep the array's order 
 ## use Array.insert() instead.
 func insert_in_array(PositionToInsertAt: int, ElementToInsert, TargetArray: Array):
@@ -103,17 +96,9 @@ func array_get_lowest_numberi(ArrayToCheck: Array) -> int:
 		return 0
 	
 	var lowest_number: int = ArrayToCheck.front()
-	var lowest_number: int = int(ArrayToCheck.front())
 	
 	for number in ArrayToCheck:
 		if int(number) < lowest_number:
 			lowest_number = int(number)
 	
 	return lowest_number
-
-
-func are_numbers_same_poles(NumberA: float, NumberB: float) -> bool:
-	if NumberA == 0.0 or NumberB == 0:
-		return true
-
-	return (0 < NumberA) == (0 < NumberB)

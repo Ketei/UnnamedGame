@@ -1,5 +1,5 @@
 ## This mini-module is used by effects to alter change_current_value-related values.
-extends EffectComponent
+extends MiniModuleEffect
 class_name EffectHealth
 
 ## Change current value by this amount. Per second if apply_once is disabled.
@@ -33,15 +33,12 @@ var _tracker_value_multiplier: float = 1.0
 # used to calculate values by delta. Prevents several multiplications.
 var _calc_variable: float = 0.0
 
-var _max_allowed: int
-var _total_change: int
-
 
 func _start_effect() -> void:
 	if apply_custom_effect_first:
 		on_start_effect()
 	
-	if not apply_custom_effects_only:
+	if apply_once and not apply_custom_effects_only:
 		if change_current_value != 0:
 				target_vitality.health += change_current_value
 				if revert_on_end:
@@ -55,14 +52,10 @@ func _start_effect() -> void:
 				_tracker_current_value += floori(_calc_variable)
 		
 		if change_base_value != 0:
-			_max_allowed = target_vitality.health_module.base_health - 1
-			_total_change = maxi(change_base_value, -_max_allowed)
-			
-
-			target_vitality.health_module.base_health += _max_allowed
+			target_vitality.base_health += change_base_value
 
 			if revert_on_end:
-				_tracker_base_value += _max_allowed
+				_tracker_base_value += change_base_value
 		
 		if change_base_value_by_percentage != 0.0:
 			_calc_variable = float(target_vitality.base_health) * change_base_value_by_percentage
@@ -90,6 +83,8 @@ func _start_effect() -> void:
 			if revert_on_end:
 				_tracker_max_value += floori(_calc_variable)
 		
+	if not apply_custom_effects_only:
+		
 		if change_max_value_by_multiplier < 1.0:
 			target_vitality.mult_health.append(change_max_value_by_multiplier)
 			target_vitality.update_max_health()
@@ -102,10 +97,10 @@ func _start_effect() -> void:
 
 
 func _apply_effect(Delta: float):
-	if apply_custom_effect_first:
+	if apply_custom_effect_first and not apply_once:
 			on_apply_effect(Delta)
 
-	if not apply_custom_effects_only:
+	if not apply_once and not apply_custom_effects_only:
 
 		if change_current_value != 0:
 			_calc_variable = float(change_current_value) * Delta
@@ -156,7 +151,7 @@ func _apply_effect(Delta: float):
 			if revert_on_end:
 				_tracker_max_value += floori(_calc_variable)
 		
-	if not apply_custom_effect_first:
+	if not apply_custom_effect_first and not apply_once:
 		on_apply_effect(Delta)
 
 

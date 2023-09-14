@@ -41,5 +41,4 @@ func calculate_statf(BaseStat: float, ModStat: float, MultStat: float) -> float:
 
 
 func calculate_stati(BaseStat: int, ModStat: int, MultStat: float) -> int:
-func calculate_stati(BaseStat: float, ModStat: float, MultStat: float) -> int:
 	return floori(float(BaseStat + ModStat) * MultStat)

@@ -117,13 +117,11 @@ func _get_accel_change(AxisValue: float, SpeedValue: float):
 #		else:
 #			return 0.025 * GameProperties.grid_size * GameProperties.target_framerate
 	elif SpeedValue == 0.0 or (0 < AxisValue) == (0 < SpeedValue): # If going from non-moving to moving or control direction == moving direction
-	elif SpeedValue == 0.0 or QuickMath.are_numbers_same_poles(AxisValue, SpeedValue): # If going from non-moving to moving or control direction == moving direction
 		return acceleration
 	elif AxisValue == 0.0: # If going from moving to non-moving
 		return friction
 	else: # If going from moving to 1 direction to the opposite
 		return (acceleration / 3) + friction
-		return friction / 2.0
 
 
 func _get_speed() -> float:
