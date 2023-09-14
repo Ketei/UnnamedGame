@@ -59,7 +59,7 @@ func erase_array_element(ElementToErase, TargetArray: Array):
 	
 	TargetArray.resize(maxi(TargetArray.size() - 1, 0))
 		
-
+    
 ## Unlike the array method of insert() which will reindex all elements to the right of the inseted element
 ## to (PreviousIndex + 1), this function will move the element in the insert position to the back and
 ## then replace that element with the new one. The position to be inserted at must be a valid one.
