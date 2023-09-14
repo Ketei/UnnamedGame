@@ -6,6 +6,12 @@ class_name Player
 var interact_tracker: Dictionary = {}
 var axis_strength: Vector2 = Vector2(0, 0)
 
+# Toggles
+
+# This will give the option to switch between walk & run with hold or a press.
+# This is to be moved to settings once it's fully implemented
+var walk_hold: bool = true
+
 
 func update_input_axis(UpdateAxisX: bool = true, UpdateAxisY: bool = true) -> void:
 	if UpdateAxisX:
@@ -24,3 +30,7 @@ func remove_interact_tracker(TrackerKey: String):
 	else:
 		print_debug(TrackerKey + " doesn't exist.")
 
+
+func _unhandled_key_input(event):
+	if event.is_action_pressed("ui_accept"):
+		walk_hold = not walk_hold

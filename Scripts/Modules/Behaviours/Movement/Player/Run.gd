@@ -29,16 +29,15 @@ func handle_key_input(event : InputEvent) -> void:
 	if event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(true):
 			player.jump(true)
-			terrain_tracker.temp_disable_ground_raycast(0.2)
+			terrain_tracker.temp_disable_ground_raycast(0.1)
 			change_behaviour.emit("movement", "jump")
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
 		if player.is_crouching:
 			change_behaviour.emit("movement", "walk")
 	elif event.is_action_pressed("gc_walk"):
-		player.is_walking = not player.is_walking
-		if player.is_walking:
-			change_behaviour.emit("movement", "walk")
+		player.is_walking = true
+		change_behaviour.emit("movement", "walk")
 
 
 func handle_physics(delta : float) -> void:

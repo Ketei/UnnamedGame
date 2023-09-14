@@ -141,13 +141,10 @@ actor_sprite = NodePath("Sprite")
 run_speed = 5.0
 walk_speed = 1.0
 acceleration = 0.9
-air_acceleration = 0.18
 friction = 1.2
 climb_base_speed = 1.0
 crouch_speed = 2.0
-max_gravity = 10.0
-_jump_time_to_floor = 0.3
-_jump_time_to_peak = 0.35
+air_acceleration = 0.18
 _jump_height = 1.0
 
 [node name="Sprite" type="Sprite2D" parent="."]
