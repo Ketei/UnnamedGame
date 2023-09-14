@@ -1,12 +1,27 @@
-[gd_scene load_steps=3 format=3 uid="uid://be3hg4kik0buf"]
+[gd_scene load_steps=4 format=3 uid="uid://be3hg4kik0buf"]
 
+[ext_resource type="Script" path="res://Test/TestWorldScript.gd" id="1_40pvt"]
 [ext_resource type="Texture2D" uid="uid://87buhp2h0ief" path="res://icon.svg" id="2_dy6nt"]
-[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="2_yh10n"]
 
-[node name="Player" type="CharacterBody2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_472gi"]
+size = Vector2(124, 124)
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Node2D" type="Node2D"]
+position = Vector2(253, 45)
+
+[node name="CharacterBody2D" type="CharacterBody2D" parent="."]
+script = ExtResource("1_40pvt")
+
+[node name="RayCast2D" type="RayCast2D" parent="CharacterBody2D"]
+exclude_parent = false
+collide_with_areas = true
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(0, 99)
+metadata/_edit_group_ = true
+
+[node name="Sprite2D" type="Sprite2D" parent="StaticBody2D"]
 texture = ExtResource("2_dy6nt")
 
-[node name="ModuleManager" type="Node" parent="."]
-script = ExtResource("2_yh10n")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_472gi")
