@@ -10,7 +10,7 @@ var axis_strength: Vector2 = Vector2(0, 0)
 
 # This will give the option to switch between walk & run with hold or a press.
 # This is to be moved to settings once it's fully implemented
-var walk_hold: bool = true
+var walk_hold: bool = false
 
 
 func update_input_axis(UpdateAxisX: bool = true, UpdateAxisY: bool = true) -> void:
