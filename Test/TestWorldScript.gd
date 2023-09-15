@@ -8,7 +8,7 @@ func _ready():
 # This is set-up to see if I can fix jitter on 60hz+ screens.
 # Apparently this works good enough.
 func update_physics_rate() -> void:
-	if Settings._refresh_rate < 0:
+	if Settings._refresh_rate <= 0:
 		Settings._refresh_rate = int(DisplayServer.screen_get_refresh_rate())
 
 	if Settings._refresh_rate == -1:
