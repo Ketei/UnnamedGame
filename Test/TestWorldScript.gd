@@ -1,31 +1,20 @@
 extends Node2D
 
 
-var modify_physics: bool = true
-
 func _ready():
 	update_physics_rate()
 
 
 # This is set-up to see if I can fix jitter on 60hz+ screens.
+# Apparently this works good enough.
 func update_physics_rate() -> void:
-	if not modify_physics:
+	if Settings._refresh_rate < 0:
+		Settings._refresh_rate = int(DisplayServer.screen_get_refresh_rate())
+
+	if Settings._refresh_rate == -1:
+		print_debug("Couldn't automatically detect the monitor refresh rate")
 		return
 	
-	var refresh_rate: int = int(DisplayServer.screen_get_refresh_rate())
-	print_debug("Your screen refresh rate is: " + str(refresh_rate))
-	print_debug("Max fps & physics ticks will be set to this number.")
-	if refresh_rate == -1:
-		pass
-	
-	Engine.physics_ticks_per_second = refresh_rate
-	Engine.max_fps = refresh_rate
+	Engine.physics_ticks_per_second = Settings._refresh_rate
+	Engine.max_fps = Settings._refresh_rate
 
-
-func _unhandled_key_input(event):
-	if event.is_action_pressed("ui_end"):
-		if not modify_physics:
-			return
-		
-		print_debug("Updating refresh rate.")
-		update_physics_rate()
