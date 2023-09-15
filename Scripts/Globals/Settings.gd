@@ -1,6 +1,7 @@
 extends Node
 
 var game_difficulty = GameProperties.Difficulty.NORMAL
+var _monitor_refresh_rate: int = 0
 
 var min_sex_damage_percent: float = 0.01 :
 	set(value):
