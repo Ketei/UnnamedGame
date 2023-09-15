@@ -138,14 +138,18 @@ script = ExtResource("1_ohcsv")
 actor_name = "Ketei"
 actor_type = 1
 actor_sprite = NodePath("Sprite")
-run_speed = 5.0
-walk_speed = 1.0
-acceleration = 0.9
-friction = 1.2
+run_speed = 6.0
+walk_speed = 2.5
+acceleration = 0.6
+friction = 0.65
 climb_base_speed = 1.0
 crouch_speed = 2.0
-air_acceleration = 0.18
-_jump_height = 1.0
+air_acceleration = 0.26
+air_friction = 0.1
+terminal_velocity = 10.0
+_time_to_floor = 0.35
+_time_to_peak = 0.4
+_jump_height = 2.5
 
 [node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -16)

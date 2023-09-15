@@ -207,3 +207,4 @@ func can_actor_jump(IsOnGround := true) -> bool:
 
 func toggle_walk() -> void:
 	is_walking = not is_walking
+
