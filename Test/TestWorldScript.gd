@@ -1,11 +1,20 @@
-extends CharacterBody2D
-@onready var raycast : RayCast2D = $RayCast2D
+extends Node2D
+
+
 func _ready():
-	pass
+	update_physics_rate()
 
 
-func _physics_process(delta):
-	print(raycast.is_colliding())
-	if raycast.is_colliding():
-		raycast.enabled = false
+# This is set-up to see if I can fix jitter on 60hz+ screens.
+# Apparently this works good enough.
+func update_physics_rate() -> void:
+	if Settings._refresh_rate < 0:
+		Settings._refresh_rate = int(DisplayServer.screen_get_refresh_rate())
+
+	if Settings._refresh_rate == -1:
+		print_debug("Couldn't automatically detect the monitor refresh rate")
+		return
+	
+	Engine.physics_ticks_per_second = Settings._refresh_rate
+	Engine.max_fps = Settings._refresh_rate
 

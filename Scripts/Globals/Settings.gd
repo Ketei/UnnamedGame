@@ -1,7 +1,12 @@
 extends Node
 
-var game_difficulty = GameProperties.Difficulty.NORMAL
+# I'll eventually convert all of this to a json
 
+var game_difficulty = GameProperties.Difficulty.NORMAL
+var _refresh_rate: int = 0
+
+
+# This belongs in GameProperties
 var min_sex_damage_percent: float = 0.01 :
 	set(value):
 		min_sex_damage_percent = clampf(value, 0.0, 1.0)

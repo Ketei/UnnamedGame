@@ -1,19 +1,20 @@
-[gd_scene load_steps=18 format=3 uid="uid://cc6f2xlfiaufv"]
+[gd_scene load_steps=19 format=3 uid="uid://kxwmyrmhxcui"]
 
-[ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_ohcsv"]
-[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_faxiu"]
-[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="2_rvg6n"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleBehaviour.gd" id="4_2ke8w"]
-[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="4_l6sh5"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_pe4l6"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_dxiyj"]
+[ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_fmthl"]
+[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_dhtfl"]
+[ext_resource type="Script" path="res://addons/smoothing/smoothing_2d.gd" id="2_k0vcm"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_28hag"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleBehaviour.gd" id="4_cvcar"]
+[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_heyrn"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_dtsc8"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_lf8t2"]
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -29,7 +30,7 @@ length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -45,7 +46,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -61,7 +62,7 @@ length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -78,7 +79,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -95,7 +96,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../Smoothing2D/Sprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -132,28 +133,28 @@ size = Vector2(16, 8)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
 size = Vector2(16, 4)
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
+[node name="PlayerSmooth" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
 collision_layer = 4
-script = ExtResource("1_ohcsv")
+script = ExtResource("1_fmthl")
 actor_name = "Ketei"
 actor_type = 1
-actor_sprite = NodePath("Sprite")
-run_speed = 6.0
-walk_speed = 2.5
-acceleration = 0.6
-friction = 0.65
+actor_sprite = NodePath("Smoothing2D/Sprite")
+run_speed = 5.0
+walk_speed = 1.0
+acceleration = 0.9
+friction = 1.2
 climb_base_speed = 1.0
 crouch_speed = 2.0
-air_acceleration = 0.26
-air_friction = 0.1
-terminal_velocity = 10.0
-_time_to_floor = 0.35
-_time_to_peak = 0.4
-_jump_height = 2.5
+air_acceleration = 0.18
+_jump_height = 1.0
 
-[node name="Sprite" type="Sprite2D" parent="."]
+[node name="Smoothing2D" type="Node2D" parent="."]
+script = ExtResource("2_k0vcm")
+target = NodePath("..")
+
+[node name="Sprite" type="Sprite2D" parent="Smoothing2D"]
 position = Vector2(0, -16)
-texture = ExtResource("2_faxiu")
+texture = ExtResource("2_dhtfl")
 hframes = 6
 vframes = 5
 
@@ -161,17 +162,17 @@ vframes = 5
 polygon = PackedVector2Array(0, 0, 5, -1, 6, -3, 6, -24, 4, -28, 0, -29, -4, -28, -6, -24, -6, -3, -5, -1)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
-script = ExtResource("2_rvg6n")
+script = ExtResource("3_28hag")
 parent_node = NodePath("..")
 
 [node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
-script = ExtResource("4_2ke8w")
+script = ExtResource("4_cvcar")
 default_pack = NodePath("BehaviourPack-Movement")
 
-[node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("4_l6sh5")]
+[node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("5_heyrn")]
 
 [node name="ModuleTerrainTracker" type="Node" parent="ModuleManager" node_paths=PackedStringArray("raycast_left", "raycast_center", "raycast_right", "ground_collision", "middle_collision")]
-script = ExtResource("6_pe4l6")
+script = ExtResource("6_dtsc8")
 raycast_left = NodePath("../../RayCastLeft")
 raycast_center = NodePath("../../RayCastCenter")
 raycast_right = NodePath("../../RayCastRight")
@@ -179,7 +180,7 @@ ground_collision = NodePath("../../GroundTerrain")
 middle_collision = NodePath("../../MiddleTerrain")
 
 [node name="ModuleTimersManager" type="Node" parent="ModuleManager"]
-script = ExtResource("7_dxiyj")
+script = ExtResource("7_lf8t2")
 
 [node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager"]
 autoplay = "idle"

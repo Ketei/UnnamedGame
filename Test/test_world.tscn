@@ -1,22 +1,14 @@
-[gd_scene load_steps=3 format=3 uid="uid://dgxsvunvej7wg"]
+[gd_scene load_steps=4 format=3 uid="uid://dgxsvunvej7wg"]
 
-[ext_resource type="PackedScene" uid="uid://cc6f2xlfiaufv" path="res://Nodes/Actors/player.tscn" id="1_f3lkw"]
+[ext_resource type="Script" path="res://Test/TestWorldScript.gd" id="1_sqj8f"]
 [ext_resource type="PackedScene" uid="uid://dc6geygfrfms8" path="res://Nodes/TileMaps/GrassyTerrain.tscn" id="2_3ryrg"]
+[ext_resource type="PackedScene" uid="uid://cc6f2xlfiaufv" path="res://Nodes/Actors/player.tscn" id="3_oqqnk"]
 
 [node name="TestWorld" type="Node2D"]
+script = ExtResource("1_sqj8f")
 
 [node name="TileMap" parent="." instance=ExtResource("2_3ryrg")]
 metadata/_edit_group_ = true
 
-[node name="Player" parent="." instance=ExtResource("1_f3lkw")]
-position = Vector2(-416, -24)
-run_speed = 6.0
-walk_speed = 2.5
-acceleration = 0.6
-friction = 0.65
-air_acceleration = 0.26
-air_friction = 0.1
-terminal_velocity = 10.0
-_time_to_floor = 0.35
-_time_to_peak = 0.4
-_jump_height = 2.6
+[node name="Player" parent="." instance=ExtResource("3_oqqnk")]
+position = Vector2(-241, -11)
