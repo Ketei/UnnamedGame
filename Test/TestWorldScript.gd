@@ -1,7 +1,7 @@
 extends Node2D
 
 
-var modify_physics: bool = false
+var modify_physics: bool = true
 
 func _ready():
 	update_physics_rate()

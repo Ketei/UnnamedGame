@@ -133,7 +133,7 @@ size = Vector2(16, 8)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
 size = Vector2(16, 4)
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
+[node name="PlayerSmooth" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
 collision_layer = 4
 script = ExtResource("1_fmthl")
 actor_name = "Ketei"
@@ -150,6 +150,7 @@ _jump_height = 1.0
 
 [node name="Smoothing2D" type="Node2D" parent="."]
 script = ExtResource("2_k0vcm")
+target = NodePath("..")
 
 [node name="Sprite" type="Sprite2D" parent="Smoothing2D"]
 position = Vector2(0, -16)
