@@ -4,12 +4,16 @@ class_name ModuleManager
 signal change_animation(AnimPack: String, AnimAction: String)
 
 @export var parent_node: Node
+@export var move_and_slide: bool = false
 # ModuleTypeName: ModuleID: ModuleNode
 var _loaded_modules: Dictionary = {}
 var _modules_references: Array = []
 var _module_init: Dictionary = {}
 
 func _ready():
+	if parent_node:
+		parent_node.module_manager = self
+	
 	for child in self.get_children():
 		if not _is_object_a_valid_module(child):
 			continue
@@ -103,7 +107,10 @@ func _physics_process(delta):
 		if module is ModuleAnimationPlayer:
 			continue
 		module.module_physics_process(delta)
-
+	
+	if move_and_slide and parent_node is CharacterBody2D:
+		parent_node.move_and_slide()
+		
 
 func _unhandled_input(event):	
 	for module in _modules_references:
