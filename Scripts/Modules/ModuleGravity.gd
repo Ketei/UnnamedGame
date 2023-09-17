@@ -22,7 +22,7 @@ var normal_gravity: float = 0.0
 
 func _ready():
 	module_type = "gravity-manager"
-	module_priority = 0
+	module_priority = 100
 
 
 func get_gravity() -> float:
