@@ -12,3 +12,8 @@ metadata/_edit_group_ = true
 
 [node name="Player" parent="." instance=ExtResource("3_oqqnk")]
 position = Vector2(-241, -11)
+run_speed = 13.0
+walk_speed = 6.5
+friction = 0.15
+air_acceleration = 0.35
+air_friction = 0.4
