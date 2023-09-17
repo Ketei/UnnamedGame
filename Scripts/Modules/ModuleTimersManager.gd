@@ -25,7 +25,7 @@ func has_timer(TimerName: String) -> bool:
 		return false
 
 
-func create_timer(TimerName: String, TimerTime: float, TimerOneShot := true, IsPersistent := false) -> void:
+func create_timer(TimerName: String, TimerTime: float, TimerStart: bool = false, TimerOneShot := true, IsPersistent := false) -> void:
 	if not is_module_enabled or has_timer(TimerName):
 		return
 	
@@ -35,10 +35,12 @@ func create_timer(TimerName: String, TimerTime: float, TimerOneShot := true, IsP
 	new_timer.is_persistent = IsPersistent
 	new_timer.name = TimerName
 	new_timer.reference_count += 1
+	new_timer.autostart = false
 	self.add_child(new_timer)
 	timers_dict[new_timer.name] = new_timer
 	new_timer.connect("timer_timeout", _on_timer_timeout)
-	new_timer.start()
+	if TimerStart:
+		new_timer.start()
 
 
 func timer_remove_reference(TimerName: String) -> void:
