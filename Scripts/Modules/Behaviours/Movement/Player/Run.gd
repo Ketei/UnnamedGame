@@ -50,18 +50,13 @@ func handle_physics(delta : float) -> void:
 		change_behaviour.emit("movement", "idle")
 		return
 	
-	if player.axis_strength.x != 0:
-		player.set_facing_right(0 < player.axis_strength.x)
-	
-	player.apply_gravity(delta)
+	player.update_facing_right()
 	player.change_actor_speed(player.axis_strength.x, delta)
-	player.move_and_slide()
 
 
 func set_target_node(NewTargetNode) -> void:
 	if NewTargetNode is Player:
 		player = NewTargetNode
-
 
 
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
@@ -73,3 +68,4 @@ func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 			change_behaviour.emit("movement", "jump")
 	elif NewState == GameProperties.TerrainState.LIQUID:
 		change_behaviour.emit("movement", "swim-idle")
+

@@ -55,11 +55,8 @@ func handle_physics(delta : float) -> void:
 	
 	player.update_input_axis(true, false)
 	
-	if player.axis_strength.x != 0:
-		player.set_facing_right(0 < player.axis_strength.x)
-	player.apply_gravity(delta)
+	player.update_facing_right()
 	player.change_actor_speed(player.axis_strength.x, delta)
-	player.move_and_slide()
 
 
 func set_target_node(NewTargetNode) -> void:

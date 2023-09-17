@@ -83,8 +83,6 @@ func handle_physics(delta : float) -> void:
 		return
 	
 	player.change_actor_speed(0.0, delta)
-	player.apply_gravity(delta)
-	player.move_and_slide()
 
 
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
