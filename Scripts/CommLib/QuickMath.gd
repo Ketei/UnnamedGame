@@ -8,7 +8,7 @@ func get_jump_velocity(JumpInTiles: float, JumpTimeToPeak: float) -> float:
 		return 0.0
 	else:
 		# The +1 comes from the single pixel that is eaten by the floor before jump
-		return -((2.0 * ((JumpInTiles * GameProperties.grid_size) + 1)) / JumpTimeToPeak)
+		return -((2.0 * JumpInTiles + 1) / JumpTimeToPeak)
 
 
 func get_jump_gravity(JumpInTiles:float, JumpTimeToPeak:float) -> float:
@@ -17,7 +17,7 @@ func get_jump_gravity(JumpInTiles:float, JumpTimeToPeak:float) -> float:
 		print_debug("Warning: get_jump_gravity() cannot be performed successfully. Returning 0.0 instead")
 		return 0.0
 	else:
-		return -((-2.0 * (JumpInTiles * GameProperties.grid_size)) / pow(JumpTimeToPeak, 2))
+		return -((-2.0 * JumpInTiles) / pow(JumpTimeToPeak, 2))
 
 
 func get_normal_gravity(JumpInTiles:float, JumpTimeToFloor:float) -> float:
@@ -26,7 +26,7 @@ func get_normal_gravity(JumpInTiles:float, JumpTimeToFloor:float) -> float:
 		print_debug("Warning: get_normal_gravity() cannot be performed successfully. Returning 0.0 instead")
 		return 0.0
 	else:
-		return -((-2.0 * (JumpInTiles * GameProperties.grid_size)) / pow(JumpTimeToFloor, 2))
+		return -((-2.0 * JumpInTiles) / pow(JumpTimeToFloor, 2))
 
 ## Checks if the first value is between the two values given. If it is returns true else returns false
 func is_between(Value : float, From : float, To : float) -> bool:
@@ -109,3 +109,10 @@ func are_numbers_same_poles(NumberA: float, NumberB: float) -> bool:
 		return true
 
 	return (0 < NumberA) == (0 < NumberB)
+
+
+func get_acceleration(TimeToAccel: float, MaxSpeed: float) -> float:
+	if TimeToAccel == 0:
+		return MaxSpeed * Engine.max_fps
+	
+	return MaxSpeed / TimeToAccel
