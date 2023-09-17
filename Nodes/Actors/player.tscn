@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cc6f2xlfiaufv"]
+[gd_scene load_steps=19 format=3 uid="uid://cc6f2xlfiaufv"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_ohcsv"]
 [ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_faxiu"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="4_l6sh5"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_pe4l6"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_dxiyj"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleGravity.gd" id="8_j6i8j"]
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
@@ -138,18 +139,17 @@ script = ExtResource("1_ohcsv")
 actor_name = "Ketei"
 actor_type = 1
 actor_sprite = NodePath("Sprite")
-run_speed = 6.0
+run_speed = 12.0
 walk_speed = 2.5
-acceleration = 0.6
-friction = 0.65
+acceleration = 0.3
+friction = 0.25
 climb_base_speed = 1.0
 crouch_speed = 2.0
-air_acceleration = 0.26
-air_friction = 0.1
-terminal_velocity = 10.0
-_time_to_floor = 0.35
-_time_to_peak = 0.4
-_jump_height = 2.5
+jump_height = 5.6
+time_to_floor = 0.35
+time_to_peak = 0.4
+air_acceleration = 0.6
+air_friction = 0.9
 
 [node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -16)
@@ -163,10 +163,12 @@ polygon = PackedVector2Array(0, 0, 5, -1, 6, -3, 6, -24, 4, -28, 0, -29, -4, -28
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
 script = ExtResource("2_rvg6n")
 parent_node = NodePath("..")
+move_and_slide = true
 
 [node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
 script = ExtResource("4_2ke8w")
 default_pack = NodePath("BehaviourPack-Movement")
+_debug_print_on_change = true
 
 [node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("4_l6sh5")]
 
@@ -187,6 +189,12 @@ libraries = {
 "": SubResource("AnimationLibrary_xp0ma")
 }
 script = SubResource("GDScript_vj7mh")
+
+[node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
+script = ExtResource("8_j6i8j")
+target_actor = NodePath("../..")
+terminal_velocity = 30.0
+low_grav_slowdown = 1.0
 
 [node name="RayCastCenter" type="RayCast2D" parent="."]
 position = Vector2(0, -16)
