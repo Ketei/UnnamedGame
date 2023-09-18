@@ -5,6 +5,8 @@ enum Difficulty {EASY, NORMAL, HARD, NIGHTMARE}
 enum DamageTypes {PHYSICAL, MAGICAL, TRUE}
 enum TerrainState {GROUND, AIR, LIQUID}
 
+const TerrainNames: Array = ["ground", "air", "liquid"]
+
 # Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
 const grid_size: int = 16
 const target_framerate: int = 60
