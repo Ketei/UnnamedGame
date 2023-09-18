@@ -68,10 +68,7 @@ func erase_array_element(ElementToErase, TargetArray: Array):
 func insert_in_array(PositionToInsertAt: int, ElementToInsert, TargetArray: Array):
 	var _array_size: int = TargetArray.size()
 	
-	if _array_size < PositionToInsertAt:
-		return
-	
-	if _array_size <= 1 or PositionToInsertAt == _array_size:
+	if _array_size <= PositionToInsertAt:
 		TargetArray.append(ElementToInsert)
 	else:
 		TargetArray.append(TargetArray[PositionToInsertAt])
