@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://ergcsbjtx8h5"]
+
+[ext_resource type="Script" path="res://Scripts/BaseClasses/StateMachine.gd" id="1_v4236"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/Animation/AnimationList.gd" id="2_ccu30"]
+
+[node name="Root" type="Node" node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_v4236")
+initial_state = NodePath("Ground")
+
+[node name="Ground" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_v4236")
+initial_state = NodePath("Movement")
+
+[node name="Movement" type="Node" parent="Ground" node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_v4236")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+
+[node name="Walk" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+
+[node name="Run" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+
+[node name="Air" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_v4236")
+initial_state = NodePath("Movement")
+
+[node name="Movement" type="Node" parent="Air" node_paths=PackedStringArray("initial_state")]
+script = ExtResource("1_v4236")
+initial_state = NodePath("Fall")
+
+[node name="Jump" type="Node" parent="Air/Movement"]
+script = ExtResource("2_ccu30")
+
+[node name="Fall" type="Node" parent="Air/Movement"]
+script = ExtResource("2_ccu30")
+
+[node name="Liquid" type="Node" parent="."]
+script = ExtResource("1_v4236")

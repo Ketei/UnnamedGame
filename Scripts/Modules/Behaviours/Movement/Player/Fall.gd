@@ -21,7 +21,7 @@ func enter(_args:= {}):
 	
 	if not player.is_on_air:
 		player.is_on_air = true
-	change_animation.emit("movement-air", "fall", false)
+	fsm_animation_state.emit("root/air/movement", "fall")
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 
 
@@ -44,9 +44,9 @@ func handle_key_input(event : InputEvent) -> void:
 		else:
 			jump_buffer.start()
 	elif event.is_action_pressed("gc_walk"):
-		player.toggle_walk()
+		player.is_walking = not player.is_walking
 	elif event.is_action_released("gc_walk") and player.walk_hold:
-		player.toggle_walk()
+		player.is_walking = false
 
 
 func handle_physics(delta : float) -> void:

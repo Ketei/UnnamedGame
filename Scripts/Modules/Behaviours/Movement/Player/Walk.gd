@@ -8,12 +8,8 @@ func enter(_args:= {}):
 	if not player:
 		return
 	
-	if player.is_crouching:
-		change_animation.emit("movement-ground", "walk-crouch", false)
-	else:
-		change_animation.emit("movement-ground", "walk", false)
-	
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
+	fsm_animation_state.emit("root/ground/movement", "walk")
 
 
 func exit():
@@ -30,20 +26,11 @@ func handle_key_input(event: InputEvent) -> void:
 			player.jump(true)
 			terrain_tracker.temp_disable_ground_raycast(0.1)
 			change_behaviour.emit("movement", "jump")
-	
-	elif event.is_action_pressed("gc_crouch"):
-		player.is_crouching = not player.is_crouching
 
-		if player.is_crouching:
-			change_animation.emit("movement-ground", "crouch")
-		elif player.is_walking:
-			change_animation.emit("movement-ground", "walk")
-		else:
-			change_behaviour.emit("movement", "run")
-	
 	elif event.is_action_pressed("gc_walk"):
-		player.is_walking = false
-		change_behaviour.emit("movement", "run")
+		player.is_walking = not player.is_walking
+		if not player.is_walking:
+			change_behaviour.emit("movement", "run")
 	
 	elif event.is_action_released("gc_walk") and player.walk_hold:
 		player.is_walking = false

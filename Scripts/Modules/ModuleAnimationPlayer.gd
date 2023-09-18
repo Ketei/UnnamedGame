@@ -2,10 +2,12 @@
 extends AnimationPlayer
 class_name ModuleAnimationPlayer
 
-# PackName(String):ActionName(String):AnimationName(Array[String]) <- AnimationName(String)
-## A dictionary that stores the string names of the actions inside their respective
-## packs. Naming pattern is all lowercase with _ instead of whitespace.
-var animation_list = {}
+## If true custom_play will play random animations unless the argument is
+## overriden in the function
+@export var play_random: bool = false
+
+var animation_state_machine: StateMachine
+var current_anim_list: AnimationList
 
 # Required for the manager to track them.
 var module_type: String = "animation-player"
@@ -14,109 +16,82 @@ var module_priority = 0
 var is_module_enabled: bool = true : set = _module_enabled_override
 var module_manager : ModuleManager
 
-var current_pack: String = ""
+
+## Registers a single animation to an ActionKey
+func register_animation(AnimationPath: String, AnimationKey: String) -> void:
+	if not is_module_enabled or not has_animation(AnimationKey):
+		return
+	
+	var _target_fsm : AnimationList = animation_state_machine.travel_down(AnimationPath)
+	if not _target_fsm:
+		return
+	
+	_target_fsm.add_animation(AnimationKey)
+
+
+## Registers a whole array of animations to an ActionKey
+func register_animations(AnimationPath: String, ActionKey: String, AnimationKeys: Array[String]) -> void:
+	if not is_module_enabled:
+		return
+		
+	var _verified_animations: Array = []
+	
+	for anim_name in AnimationKeys:
+		if not has_animation(anim_name):
+			continue
+		_verified_animations.append(anim_name)
+
+	var _target_fsm: AnimationList = animation_state_machine.travel_down(AnimationPath)
+	
+	if not _target_fsm:
+		return
+	
+	_target_fsm.add_animations(_verified_animations)
 
 
 ## Called by the module manager when setting up. Register animations here.
 func set_up_module() -> void:
-	pass
+	is_module_enabled = true
 
 
 func _module_enabled_override(Value: bool) -> void:
 	is_module_enabled = Value
 
 
-## Gets the first registered animation of the pack[action] unless play random is true,
-## if so, it'll get a random animation in the array.
-func get_anim_in_action_pack(PackName: String, ActionName: String, GetRandom := false) -> String:
-	if not anims_available(PackName, ActionName):
-		return ""
-	
-	if GetRandom:
-		return animation_list[PackName][ActionName].pick_random()
-	else:
-		return animation_list[PackName][ActionName].front()
-
-
-func anims_available(PackName: String, ActionName: String) -> bool:
-	if not is_anim_in_list(PackName, ActionName):
-		return false
-	
-	return !animation_list[PackName][ActionName].is_empty()
-
-
-func is_anim_in_list(PackName: String, ActionName: String = "", AnimationName: String = "") -> bool:
-	var _return_bool: bool = false
-	
-	if animation_list.has(PackName):
-		_return_bool = true
-	
-	if ActionName == "" or not _return_bool:
-		return _return_bool
-	
-	if not animation_list[PackName].has(ActionName):
-		_return_bool = false
-	
-	if AnimationName == "" or not _return_bool:
-		return _return_bool
-
-	if not animation_list[PackName][ActionName].has(AnimationName):
-		_return_bool = false
-	
-	return _return_bool
-
-
-## Registers an animation in the action name of the specified animation pack. If you want the animation to be
-## the default of the action in the pack then it'll be inserted at the start of the array. It's reccomended
-## to NOT preserve the order if registering as default, since this means ALL registered animations
-# will have to be reindexed.
-func register_animation(TargetPack: String, ActionName: String, AnimationKey: String, RegisterAsDefault := false,  PreserveOrder := false) -> void:
-	if not is_module_enabled or not has_animation(AnimationKey):
+func set_default_animation(StatePath: String, AnimationKey: String) -> void:
+	var _fsm: AnimationList = animation_state_machine.travel_down(StatePath)
+	if not _fsm:
 		return
-		
-	anim_data_validation(TargetPack, ActionName)
-	
-	if RegisterAsDefault:
-		if PreserveOrder:
-			animation_list[TargetPack][ActionName].insert(0, AnimationKey)
-		else:
-			QuickMath.insert_in_array(0, AnimationKey, animation_list[TargetPack][ActionName])
-	else:
-		animation_list[TargetPack][ActionName].append(AnimationKey)
+	_fsm.set_default_animation(AnimationKey)
+	if _fsm == current_anim_list:
+		custom_play()
 
 
-## Unregisters an animation in the action name of the specified animation pack. It's reccomended
-## NOT to preserve the order since this means all registered animations to the right will have to be reindexed.
-func unregister_animation(TargetPack: String, TargetAction: String, AnimationKey: String, PreserveOrder := false) -> void:
-	if is_anim_in_list(TargetPack, TargetAction, AnimationKey) or not is_module_enabled:
+func set_anim_state(AnimationPath: String, NewState: String) -> void:
+	var _fsm: StateMachine = animation_state_machine.travel_down(AnimationPath)
+	if not _fsm:
 		return
+	_fsm.set_state(NewState)
 	
-	if PreserveOrder:
-		animation_list[TargetPack][TargetAction].erase(AnimationKey)
-	else:
-		QuickMath.erase_array_element(AnimationKey, animation_list[TargetPack][TargetAction])
+	custom_play()
 
 
-func set_default_animation(TargetPack: String, ActionName: String, AnimationKey: String) -> void:
-	if not is_anim_in_list(TargetPack, ActionName, AnimationKey):
+func set_alternate_animations(AnimationPath: String, AlternateSet: String) -> void:
+	var _fsm: AnimationList = animation_state_machine.travel_down(AnimationPath)
+	if not _fsm:
 		return
-	
-	QuickMath.array_bring_to_front(AnimationKey, animation_list[TargetPack][ActionName])
+	if _fsm == current_anim_list and _fsm.set_animation_override(AlternateSet):
+		custom_play()
 
 
-func anim_data_validation(PackName: String, ActionName: String) -> void:
-	if not animation_list.has(PackName):
-		animation_list[PackName] = {}
-	
-	if not animation_list[PackName].has(ActionName):
-		animation_list[PackName][ActionName] = []
+## Custom function for the module. Does exactly the same as play() but picks
+## the animation from the state machine.
+func custom_play(PlayRandom: bool = play_random, CustomBlend: float = -1, CustomSpeed: float = 1.0, FromEnd: bool = false) -> void:
+	var _preload_list = animation_state_machine.get_state()
+	if _preload_list != current_anim_list:
+		current_anim_list = _preload_list
+		play(current_anim_list.get_animation(PlayRandom), CustomBlend, CustomSpeed, FromEnd)
 
 
-## Custom function for the module. Does exactly the same as play() but picks the animation by giving it
-## a pack and action.
-func custom_play(PackName: String, ActionName: String, RandomAnim: bool = false, CustomBlend: float = -1, CustomSpeed: float = 1.0, FromEnd: bool = false) -> void:
-	var _anim_to_play: String = get_anim_in_action_pack(PackName, ActionName, RandomAnim)
-	if _anim_to_play != "":
-		current_pack = PackName
-		play(_anim_to_play, CustomBlend, CustomSpeed, FromEnd)
-
+func replay_animation(PlayRandom: bool = play_random) -> void:
+	play(current_anim_list.get_animation(PlayRandom))

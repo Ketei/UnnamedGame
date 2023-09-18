@@ -18,7 +18,7 @@ func enter(_args:= {}):
 		player.is_on_air = true
 	
 	current_terrain = terrain_tracker.terrain_state
-	change_animation.emit("movement-air", "jump", false)
+	fsm_animation_state.emit("root/air/movement", "jump")
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
 	_jump_timer_restore.start()
@@ -45,13 +45,13 @@ func handle_key_input(event: InputEvent) -> void:
 		if player.can_actor_jump(false):
 			player.jump(false)
 			terrain_tracker.temp_disable_ground_raycast(0.1)
-			change_animation.emit("movement-air", "jump", false)
+			fsm_animation_replay.emit(false)
 		else:
 			jump_buffer.start()
 	elif event.is_action_pressed("gc_walk"):
-		player.toggle_walk()
+		toggle_walk(!player.is_walking)
 	elif event.is_action_released("gc_walk") and player.walk_hold:
-		player.toggle_walk()
+		toggle_walk(false)
 		
 	elif event.is_action_pressed("gc_crouch"):
 		player.toggle_walk()
@@ -97,7 +97,12 @@ func _terrain_update() -> void:
 		if 0 < jump_buffer.time_left and player.can_actor_jump(true):
 			jump_buffer.stop()
 			player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
-			change_animation.emit("movement-air", "jump", false)
-	elif current_terrain == GameProperties.TerrainState.LIQUID:
-		change_behaviour.emit("movement", "swim-idle")
+			fsm_animation_replay.emit(false)
 
+
+func toggle_walk(IsWalking: bool) -> void:
+	player.is_walking = IsWalking
+	if player.is_walking:
+		fsm_animation_state.emit("root/ground/movement", "walk")
+	else:
+		fsm_animation_state.emit("root/ground/movement", "run")

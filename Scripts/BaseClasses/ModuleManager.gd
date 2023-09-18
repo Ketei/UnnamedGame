@@ -1,7 +1,6 @@
 extends Node
 class_name ModuleManager
 
-signal change_animation(AnimPack: String, AnimAction: String)
 
 @export var parent_node: Node
 @export var move_and_slide: bool = false
@@ -9,6 +8,7 @@ signal change_animation(AnimPack: String, AnimAction: String)
 var _loaded_modules: Dictionary = {}
 var _modules_references: Array = []
 var _module_init: Dictionary = {}
+
 
 func _ready():
 	if parent_node:
@@ -27,8 +27,6 @@ func _ready():
 		var loading_prio: int = QuickMath.array_get_lowest_numberi(_module_init.keys())
 		
 		for module in _module_init[str(loading_prio)]:
-			if module is ModuleBehaviour:
-				module.change_animation.connect(_change_animation)
 			
 			module.module_manager = self
 			module.set_up_module()
@@ -71,10 +69,20 @@ func warn_if_repeated_modules(ModuleType: String) -> void:
 		print_debug(ModuleType + " will be replaced")		
 
 
-func _change_animation(Pack: String, Action: String, PlayRandom: bool) -> void:
+func _set_animation_action(ActionName: String) -> void:
 	if not has_module("animation-player"):
 		return
-	get_module("animation-player").custom_play(Pack, Action, PlayRandom)
+	var animation_module: ModuleAnimationPlayer = get_module("animation-player")
+	animation_module.set_action(ActionName)
+	animation_module.play_animation()
+
+
+func _set_animation_pack(PackName: String) -> void:
+	if not has_module("animation-player"):
+		return
+	var animation_module: ModuleAnimationPlayer = get_module("animation-player")
+	animation_module.set_pack(PackName)
+	animation_module.play_animation()
 
 
 func actor_submerged(IsActorSubmerged: bool) -> void:
@@ -101,6 +109,30 @@ func get_terrain_state() -> GameProperties.TerrainState:
 	
 	return get_module("terrain-tracker").terrain_state
 	
+	
+# ModuleAnimation Functions
+## Changes a state of the animation state machine inside the animation module.
+func change_animation_state(Path: String, NewState: String) -> void:
+	if not has_module("animation-player"):
+		return
+	
+	get_module("animation-player").set_anim_state(Path, NewState)
+
+
+## Uses an alternate animation set. 
+func change_animation_set(Path: String, AltSet: String) -> void:
+	if not has_module("animation-player"):
+		return
+	
+	get_module("animation-player").use_alternate_animations(Path, AltSet)
+	
+
+func replay_animation(PlayRandom: bool) -> void:
+	if not has_module("animation-player"):
+		return
+	
+	get_module("animation-player").replay_animation(PlayRandom)
+
 
 func _physics_process(delta):
 	for module in _modules_references:

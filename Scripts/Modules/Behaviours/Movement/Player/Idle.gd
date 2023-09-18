@@ -9,6 +9,7 @@ func _ready():
 	behaviour_id = "idle"
 	is_default = true
 
+
 func setup_behaviour() -> void:
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
@@ -16,7 +17,7 @@ func setup_behaviour() -> void:
 func enter(_args:= {}):
 	if not player:
 		return
-		#return
+
 	if terrain_tracker.terrain_state == GameProperties.TerrainState.AIR:
 		if player.velocity.y < 0:
 			change_behaviour.emit("movement", "jump")
@@ -24,16 +25,21 @@ func enter(_args:= {}):
 			change_behaviour.emit("movement", "fall")
 		return
 	
+	player.update_input_axis(true, false)
+	
+	if player.axis_strength.x != 0:
+		if player.is_walking:
+			change_behaviour.emit("movement", "walk")
+		else:
+			change_behaviour.emit("movenet", "run")
+	
 	if player.air_jump_count != 0:
 		player.air_jump_count = 0
-
+	
 	terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
-	if player.is_crouching:
-		change_animation.emit("movement-ground", "idle-crouch", false)
-	else:
-		change_animation.emit("movement-ground", "idle", false)
-	
+	fsm_animation_state.emit("root/ground/movement", "idle")
+
 
 func exit():
 	if terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
@@ -52,16 +58,10 @@ func handle_key_input(event : InputEvent) -> void:
 	
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
-		
-		if player.is_crouching:
-			change_animation.emit("movement-ground", "idle-crouch", false)
-		else:
-			change_animation.emit("movement-ground", "idle", false)
-
 	elif event.is_action_pressed("gc_walk"):
-		player.toggle_walk()
+		player.is_walking = not player.is_walking
 	elif event.is_action_released("gc_walk") and player.walk_hold:
-		player.toggle_walk()
+		player.is_walking = false
 
 
 func set_target_node(NewTargetNode) -> void:

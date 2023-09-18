@@ -1,8 +1,13 @@
 extends Node
 class_name Behaviour
 
+# Behaviour Module
 signal change_behaviour(BehaviourPackTarget: String, BehaviourTarget: String)
-signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
+
+# Animation Nodes
+signal fsm_animation_state(StatePath: String, NewState: String)
+signal fsm_animation_replay(PlayRandom: bool)
+signal use_alternate_animation_set(StatePath: String, AlternateSet: String)
 
 # Set to true if the behaviour is to be loaded as default. This is only relevant for packs that
 # are loaded as default/initial.
