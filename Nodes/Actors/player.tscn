@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://cc6f2xlfiaufv"]
+[gd_scene load_steps=20 format=3 uid="uid://cc6f2xlfiaufv"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_ohcsv"]
 [ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_faxiu"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_pe4l6"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_dxiyj"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleGravity.gd" id="8_j6i8j"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="9_http1"]
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
@@ -120,11 +121,21 @@ _data = {
 script/source = "extends ModuleAnimationPlayer
 
 func _ready():
-	register_animation(\"movement-ground\", \"idle\", \"idle\")
-	register_animation(\"movement-ground\", \"walk\", \"walk\")
-	register_animation(\"movement-ground\", \"run\", \"run\")
-	register_animation(\"movement-air\", \"jump\", \"jump\")
-	register_animation(\"movement-air\", \"fall\", \"fall\")
+	var _preload_state = preload(\"res://Nodes/StateMachines/player_anim_fsm.tscn\")
+	animation_state_machine = _preload_state.instantiate()
+	animation_state_machine.load_state_machine()
+	
+	register_animation(\"root/ground/movement/idle\", \"idle\")
+	register_animation(\"root/ground/movement/walk\", \"walk\")
+	register_animation(\"root/ground/movement/run\", \"run\")
+	register_animation(\"root/air/movement/jump\", \"jump\")
+	register_animation(\"root/air/movement/fall\", \"fall\")
+	
+#	register_animation(\"ground\", \"idle-stand\", \"idle\")
+#	register_animation(\"ground\", \"walk\", \"walk\")
+#	register_animation(\"ground\", \"run\", \"run\")
+#	register_animation(\"air\", \"jump\", \"jump\")
+#	register_animation(\"air\", \"fall\", \"fall\")
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
@@ -139,10 +150,10 @@ script = ExtResource("1_ohcsv")
 actor_name = "Ketei"
 actor_type = 1
 actor_sprite = NodePath("Sprite")
-run_speed = 12.0
-walk_speed = 2.5
+run_speed = 13.0
+walk_speed = 6.5
 acceleration = 0.3
-friction = 0.25
+friction = 0.15
 climb_base_speed = 1.0
 crouch_speed = 2.0
 jump_height = 5.6
@@ -168,7 +179,6 @@ move_and_slide = true
 [node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
 script = ExtResource("4_2ke8w")
 default_pack = NodePath("BehaviourPack-Movement")
-_debug_print_on_change = true
 
 [node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("4_l6sh5")]
 
@@ -193,8 +203,13 @@ script = SubResource("GDScript_vj7mh")
 [node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
 script = ExtResource("8_j6i8j")
 target_actor = NodePath("../..")
-terminal_velocity = 30.0
+terminal_velocity = 27.0
 low_grav_slowdown = 1.0
+
+[node name="ModuleInteract" type="Node" parent="ModuleManager" node_paths=PackedStringArray("animation_player", "terrain_tracker")]
+script = ExtResource("9_http1")
+animation_player = NodePath("../ModuleAnimationPlayer")
+terrain_tracker = NodePath("../ModuleTerrainTracker")
 
 [node name="RayCastCenter" type="RayCast2D" parent="."]
 position = Vector2(0, -16)
