@@ -1,8 +1,8 @@
 extends Module
 class_name ModuleBehaviour
 
-signal behaviour_changed(OldBehaviour: String, NewBehaviour: String)
-signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
+signal behaviour_changed(OldPackAndBehaviour: String, NewPackAndBehaviour: String)
+
 
 ## This is the behaviour pack that will be loaded initially when the node enters the scene.
 ## The pack should have a default behaviour to be loaded successfully, otherwise an error
@@ -13,6 +13,7 @@ signal change_animation(AnimPack: String, AnimAction: String, PlayRandom: bool)
 var loaded_packs: Dictionary = {}
 
 var _original_behaviours: Dictionary = {} # Used to store replaced behaviours. One per ID
+
 var loaded_behaviour: Behaviour = null
 var current_pack: String = ""
 
@@ -29,7 +30,7 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 		return
 	
 	var _behaviour_preload: Behaviour = loaded_packs[TargetPack].available_behaviours[NewBehaviour]
-	var _old_behaviour: String = loaded_behaviour.behaviour_id
+	var _old_behaviour: String = current_pack + "/" + loaded_behaviour.behaviour_id
 	
 	current_pack = TargetPack
 	
@@ -37,7 +38,7 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 	disconnect_behaviour_signals()
 	loaded_behaviour = _behaviour_preload
 	connect_behaviour_signals()
-	behaviour_changed.emit(_old_behaviour, loaded_behaviour.behaviour_id)
+	behaviour_changed.emit(_old_behaviour, current_pack + "/" + loaded_behaviour.behaviour_id)
 	loaded_behaviour.enter()
 
 	if _debug_print_on_change:
@@ -45,18 +46,21 @@ func change_behaviour(TargetPack: String, NewBehaviour: String) -> void:
 
 
 func connect_behaviour_signals() -> void:
-	if not loaded_behaviour.change_animation.is_connected(_change_anim_signal):
-		loaded_behaviour.change_animation.connect(_change_anim_signal)
 	if not loaded_behaviour.change_behaviour.is_connected(change_behaviour):
 		loaded_behaviour.change_behaviour.connect(change_behaviour)
+	if not loaded_behaviour.fsm_animation_state.is_connected(_animation_fsm_set_state):
+		loaded_behaviour.fsm_animation_state.connect(_animation_fsm_set_state)
+	if not loaded_behaviour.fsm_animation_replay.is_connected(_animation_replay):
+		loaded_behaviour.fsm_animation_replay.connect(_animation_replay)
 
 
 func disconnect_behaviour_signals() -> void:
-	if loaded_behaviour.change_animation.is_connected(_change_anim_signal):
-		loaded_behaviour.change_animation.disconnect(_change_anim_signal)
 	if loaded_behaviour.change_behaviour.is_connected(change_behaviour):
 		loaded_behaviour.change_behaviour.disconnect(change_behaviour)
-
+	if loaded_behaviour.fsm_animation_state.is_connected(_animation_fsm_set_state):
+		loaded_behaviour.fsm_animation_state.disconnect(_animation_fsm_set_state)
+	if loaded_behaviour.fsm_animation_replay.is_connected(_animation_replay):
+		loaded_behaviour.fsm_animation_replay.disconnect(_animation_replay)
 
 func check_for_pack_and_behaviour(PackToCheck: String, BehaviourToCheck: String = "") -> bool:
 	var _return_bool: bool = false
@@ -197,7 +201,6 @@ func set_up_module() -> void:
 		if default_pack.default_behaviour:
 			loaded_behaviour = default_pack.default_behaviour
 			connect_behaviour_signals()
-			behaviour_changed.emit("null", loaded_behaviour.behaviour_id)
 			loaded_behaviour.enter()
 		else:
 			print_debug("Error: No default behaviour loaded on pack: " + str(default_pack.get_path()))
@@ -205,6 +208,13 @@ func set_up_module() -> void:
 		print_debug("Error: No default behaviour pack loaded on module: " + str(self.get_path()))
 
 
-func _change_anim_signal(Pack: String, Action: String, Random: bool) -> void:
-	change_animation.emit(Pack, Action, Random)
+func _animation_fsm_set_state(Path: String, TargetState: String) -> void:
+	module_manager.change_animation_state(Path, TargetState)
 
+
+func _animation_use_alt_set(Path: String, AlternateSet: String) -> void:
+	module_manager.change_animation_set(Path, AlternateSet)
+
+
+func _animation_replay(PlayRandom: bool) -> void:
+	module_manager.replay_animation(PlayRandom)

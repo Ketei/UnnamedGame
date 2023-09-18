@@ -15,6 +15,8 @@ signal terrain_changed(NewState)
 ## Used to track if actor is swimming.
 @export var middle_collision: Area2D = null
 
+var animation_player: ModuleAnimationPlayer = null
+
 var is_on_ground: bool = true
 var is_submerged: bool = false
 
@@ -122,3 +124,4 @@ func module_physics_process(_delta: float) -> void:
 func temp_disable_ground_raycast(TimeToDisable: float) -> void:
 	change_floor_raycast_status(false)
 	_array_off_timer.start(TimeToDisable)
+
