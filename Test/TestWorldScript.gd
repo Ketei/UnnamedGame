@@ -1,5 +1,10 @@
 extends Node2D
 
+var dict_test = {
+	"0": 0,
+	"1": 1,
+	"2": 2
+}
 
 func _init():
 	update_physics_rate()
