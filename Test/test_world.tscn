@@ -11,4 +11,15 @@ script = ExtResource("1_sqj8f")
 metadata/_edit_group_ = true
 
 [node name="Player" parent="." instance=ExtResource("3_oqqnk")]
-position = Vector2(-241, -11)
+position = Vector2(-256, -13)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_right = 52.0
+offset_bottom = 26.0
+text = "Move: Left & Right arrows
+Jump: \"A\"
+Toggle walk: Left Shift
+
+Hide/Show controls: Enter"
