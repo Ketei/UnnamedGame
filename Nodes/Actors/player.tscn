@@ -157,10 +157,10 @@ friction = 0.15
 climb_base_speed = 1.0
 crouch_speed = 2.0
 jump_height = 5.6
-time_to_floor = 0.35
-time_to_peak = 0.4
-air_acceleration = 0.6
-air_friction = 0.9
+time_to_floor = 0.38
+time_to_peak = 0.45
+air_acceleration = 0.45
+air_friction = 1.0
 
 [node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -16)
@@ -169,7 +169,7 @@ hframes = 6
 vframes = 5
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(0, 0, 5, -1, 6, -3, 6, -24, 4, -28, 0, -29, -4, -28, -6, -24, -6, -3, -5, -1)
+polygon = PackedVector2Array(0, 0, 6, 0, 6, -3, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -3, -6, 0)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
 script = ExtResource("2_rvg6n")
@@ -216,20 +216,22 @@ position = Vector2(0, -16)
 target_position = Vector2(0, 18)
 
 [node name="RayCastLeft" type="RayCast2D" parent="."]
-position = Vector2(-6, -16)
-target_position = Vector2(0, 18)
+position = Vector2(-5, -16)
+target_position = Vector2(0, 17)
 
 [node name="RayCastRight" type="RayCast2D" parent="."]
-position = Vector2(6, -16)
-target_position = Vector2(0, 18)
+position = Vector2(5, -16)
+target_position = Vector2(0, 17)
 
 [node name="GroundTerrain" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GroundTerrain"]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_3l8r1")
 
 [node name="MiddleTerrain" type="Area2D" parent="."]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleTerrain"]
 position = Vector2(0, -18)
