@@ -26,7 +26,6 @@ func load_state_machine():
 		if 0 <= _value_index:
 			current_state = initial_state
 			current_state_id = _possible_states.keys()[_value_index]
-	print(_possible_states)
 
 
 ## Gets the state machine current state. It also returns the path as string
