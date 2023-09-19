@@ -1,10 +1,5 @@
 extends Node2D
 
-var dict_test = {
-	"0": 0,
-	"1": 1,
-	"2": 2
-}
 
 func _init():
 	update_physics_rate()
@@ -23,3 +18,8 @@ func update_physics_rate() -> void:
 	Engine.physics_ticks_per_second = Settings._refresh_rate
 	Engine.max_fps = Settings._refresh_rate
 
+
+func _unhandled_key_input(event):
+	if event.is_action_pressed("ui_accept"):
+		#$Camera2D/CanvasLayer/Label.visible = not $Camera2D/CanvasLayer/Label.visible
+		$CanvasLayer/Label.visible = not $CanvasLayer/Label.visible
