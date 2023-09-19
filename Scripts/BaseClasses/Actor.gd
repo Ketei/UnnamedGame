@@ -104,16 +104,24 @@ func change_actor_speed(AxisDirection: float, Delta: float) -> void:
 	velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x, _get_speed()) * Delta )
 
 
+## I need to do something for air control
 func _get_accel_change(AxisValue: float, CurrentSpeed: float, MaxSpeed: float) -> float:
-	var _is_accelerating: bool = abs(CurrentSpeed) <= MaxSpeed * int(AxisValue != 0)
+	var _is_accelerating: bool = (AxisValue != 0) and (QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed))
 	var _speed_change: float = 0.0
 	
-	if _is_accelerating and QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed):
-		_speed_change = get_acceleration()
+	if not is_on_air:
+		if _is_accelerating:
+			_speed_change = acceleration
+			if MaxSpeed < abs(CurrentSpeed):
+				_speed_change *= 1.5
+		else:
+			_speed_change = friction
 	else:
-		_speed_change = get_friction()
-		if MaxSpeed < abs(CurrentSpeed) and AxisValue != 0 and QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed):
-			_speed_change /= 2.0
+		if AxisValue == 0:
+			_speed_change = air_friction
+		else:
+			_speed_change = air_acceleration
+	
 	return QuickMath.get_acceleration(_speed_change, MaxSpeed)
 
 
