@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Test/TestWorldScript.gd" id="1_sqj8f"]
 [ext_resource type="PackedScene" uid="uid://dc6geygfrfms8" path="res://Nodes/TileMaps/GrassyTerrain.tscn" id="2_3ryrg"]
-[ext_resource type="PackedScene" uid="uid://cc6f2xlfiaufv" path="res://Nodes/Actors/player.tscn" id="3_oqqnk"]
+[ext_resource type="PackedScene" uid="uid://dw2ki46t73efm" path="res://Nodes/Actors/player.tscn" id="3_oqqnk"]
 
 [node name="TestWorld" type="Node2D"]
 script = ExtResource("1_sqj8f")
