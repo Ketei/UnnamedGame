@@ -8,11 +8,10 @@ enum TerrainState {GROUND, AIR, LIQUID}
 const TerrainNames: Array = ["ground", "air", "liquid"]
 
 # Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
-const grid_size: int = 16
-const target_framerate: int = 60
+const GRID_SIZE: int = 16
 
 # Types of damage in game
-const AttackTypes: Dictionary = {
+const ATTACK_TYPES: Dictionary = {
 	"blunt": DamageTypes.PHYSICAL,
 	"slashing": DamageTypes.PHYSICAL,
 	"piercing": DamageTypes.PHYSICAL,
@@ -25,7 +24,7 @@ const AttackTypes: Dictionary = {
 
 # A movement mutiplier. If the key of this dict matches one of terrain names
 # the actor movement will be multiplied by the amount stated.
-const TerrainMoveMult : Dictionary = {
+const TERRAIN_MOVEMENT_MOD : Dictionary = {
 	"water": 0.85
 }
 
@@ -42,25 +41,8 @@ const Arousal_Clearing_Penalty_Tops : int = 8
 # Effects need to be called by the relevant module in order to be applied. Methods to calculate
 # how much can be found on SexLibs
 var lust_effects: Dictionary = {
-	"per-level": {
-		"sex-damage-dealt": -0.75,
-		"sex-damage-received": 0.02
-	},
-	"20": {
-		"arousal": 2
-	},
-	"40": {
-		"arousal": 3
-	},
-	"60": {
-		"arousal": 5
-	},
-	"80": {
-		"arousal": 10
-	},
-	"100": {
-		"arousal": 25
-	}
+	"sex-damage-dealt": -0.75,
+	"sex-damage-received": 0.02
 }
 # ---------------------------
 
@@ -88,42 +70,51 @@ var skill_effects: Dictionary = {
 }
 
 
-# Switch to control lib when it exists
-func change_keybind(EventName: String, NewKeybindKeyCode: int):
-	if InputMap.has_action(EventName):
-		InputMap.action_erase_events(EventName)
+# Switch to control lib when/id it exists
+func change_keybind(event_name: String, new_keybind_key_code: int):
+	if InputMap.has_action(event_name):
+		InputMap.action_erase_events(event_name)
 		var _new_keybind = InputEventKey.new()
-		_new_keybind.keycode = NewKeybindKeyCode
-		InputMap.action_add_event(EventName, _new_keybind)
+		_new_keybind.keycode = new_keybind_key_code
+		InputMap.action_add_event(event_name, _new_keybind)
 
 
-func add_lust_effect(LustAmount: int, StatChange: String, ValueChange: float) -> void:
-	if str(LustAmount) not in lust_effects:
-		lust_effects[str(LustAmount)] = {}
+func add_lust_effect(lust_amount: int, stat_change: String, value_change: float) -> void:
+	if str(lust_amount) not in lust_effects:
+		lust_effects[str(lust_amount)] = {}
 	
-	if StatChange not in lust_effects[str(LustAmount)]:
-		lust_effects[str(LustAmount)][StatChange] = 0
+	if stat_change not in lust_effects[str(lust_amount)]:
+		lust_effects[str(lust_amount)][stat_change] = 0
 	
-	lust_effects[str(LustAmount)][StatChange] += ValueChange
+	lust_effects[str(lust_amount)][stat_change] += value_change
 
 
-func remove_lust_effect(LustAmount: int, StatChange: String):
-	if str(LustAmount) not in lust_effects:
+func remove_lust_effect(lust_amount: int, stat_change: String):
+	if str(lust_amount) not in lust_effects:
 		return
 	
-	lust_effects[str(LustAmount)].erase(StatChange)
+	lust_effects[str(lust_amount)].erase(stat_change)
 		
-	if lust_effects[str(LustAmount)].is_empty():
-		lust_effects.erase(str(LustAmount))
+	if lust_effects[str(lust_amount)].is_empty():
+		lust_effects.erase(str(lust_amount))
 
 
-func get_skill_effects(SkillName: String, PrevSkillLevel: int, SkillLevel: int) -> Dictionary:
-	var _return_dict: Dictionary = {}
+func get_skill_effects(skill_name: String, current_level: float, previous_level: float) -> Dictionary:
+	var _return_dict := {}
 	
-	if not skill_effects.has(SkillName):
+	if not skill_effects.has(skill_name):
 		return _return_dict
 
-	for skill_change in skill_effects[SkillName].keys():
-		_return_dict[skill_change] = skill_effects[SkillName][skill_change] * (SkillLevel - PrevSkillLevel)
+	for skill_change in skill_effects[skill_name].keys():
+		_return_dict[skill_change] = skill_effects[skill_name][skill_change] * (current_level - previous_level)
 	
 	return _return_dict
+
+
+func get_lust_effects(stat_name: String, current_level: float, previous_level: float) -> float:
+	
+	if not lust_effects.has(stat_name):
+		return 0.0
+	
+	return lust_effects[stat_name] * (current_level - previous_level)
+

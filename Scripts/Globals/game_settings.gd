@@ -3,7 +3,7 @@ extends Node
 # I'll eventually convert all of this to a json
 
 var game_difficulty = GameProperties.Difficulty.NORMAL
-var _refresh_rate: int = 0
+var refresh_rate: int = 0
 
 
 # This belongs in GameProperties
