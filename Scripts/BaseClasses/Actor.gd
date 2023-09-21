@@ -1,9 +1,6 @@
-extends CharacterBody2D
 class_name Actor
+extends CharacterBody2D
 
-# Double # comments are for the UI tooltip OR the documentation. That's how godot
-# builds documentation on CUSTOM CLASSES. This explanation is because
-# SOMEONE keeps nagging me that comments in code should be avoided.
 
 # enums
 enum GravityMode {NORMAL, JUMP, ZERO}
@@ -19,10 +16,10 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 @export var self_terrain_move_mod: Dictionary = {}
 @export var run_speed: float = 0.0: 
 	set(value) :
-		run_speed = maxf(value, 0.0) * GameProperties.grid_size
+		run_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
 @export var walk_speed: float = 0.0 : 
 	set(value) :
-		walk_speed = maxf(value, 0.0) * GameProperties.grid_size
+		walk_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
 ## How much time in seconds will it take the actor to reach max speed
 @export var acceleration: float = 0.0 : 
 	set(value) :
@@ -33,7 +30,7 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 		friction = maxf(value, 0.0)
 @export var climb_base_speed: float = 0.0 : 
 	set(value) :
-		climb_base_speed = maxf(value, 0.0) * GameProperties.grid_size
+		climb_base_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
 @export var crouch_speed: float = 0.0 :
 	set(value):
 		crouch_speed = maxf(value, 0.0)
@@ -43,22 +40,22 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 ## If this value is updated and have a gravity module, be sure to update it too.
 @export var jump_height: float = 0.0:
 	set(value):
-		jump_height = value * GameProperties.grid_size
+		jump_height = value * GameProperties.GRID_SIZE
 		jump_velocity = QuickMath.get_jump_velocity(jump_height, time_to_peak)
-		_update_gravity()
+		__update_gravity()
 ## How fast in seconds should you reach the floor after jumping. If this value
 ## is updated and have a gravity module, be sure to update it too.
 @export var time_to_floor: float = 0.0:
 	set(value):
 		time_to_floor = maxf(value, 0.0)
-		_update_gravity()
+		__update_gravity()
 ## How fast in seconds should you reach the peak of a jump. If this value
 ## is updated and have a gravity module, be sure to update it too.
 @export var time_to_peak: float = 0.0:
 	set(value):
 		time_to_peak = maxf(value, 0.0)
 		jump_velocity = QuickMath.get_jump_velocity(jump_height, time_to_peak)
-		_update_gravity()
+		__update_gravity()
 @export var air_jumps: int = 0 :
 	set(value):
 		air_jumps = maxi(value, 0)
@@ -84,9 +81,9 @@ var speed_mod: float = 0.0:
 var speed_mult: float = 1.0 :
 		set(value):
 			speed_mult = maxf(value, 0.0)
-var _terrain_mod: float = 1.0:
+var terrain_mod: float = 1.0:
 	set(value):
-		_terrain_mod = maxf(value, 0.0)
+		terrain_mod = maxf(value, 0.0)
 
 # Tracker
 var air_jump_count: int = 0
@@ -94,52 +91,38 @@ var air_jump_count: int = 0
 # References
 var module_manager: ModuleManager
 
-@onready var jump_velocity: float = QuickMath.get_jump_velocity(jump_height, time_to_peak)
+@onready var jump_velocity: float = QuickMath.get_jump_velocity(jump_height,
+		time_to_peak)
 
 
-func change_actor_speed(AxisDirection: float, Delta: float) -> void:
-	if AxisDirection == 0.0 and velocity.x == 0.0:
+func change_actor_speed(axis_direction: float, delta: float) -> void:
+	if axis_direction == 0.0 and velocity.x == 0.0:
 		return
 
-	velocity.x = move_toward(velocity.x, _get_speed() * AxisDirection, _get_accel_change(AxisDirection, velocity.x, _get_speed()) * Delta )
+	velocity.x = move_toward(velocity.x, get_speed() * axis_direction, get_acceleration(axis_direction, velocity.x, get_speed()) * delta )
 
 
-## I need to do something for air control
-func _get_accel_change(AxisValue: float, CurrentSpeed: float, MaxSpeed: float) -> float:
-	var _is_accelerating: bool = (AxisValue != 0) and (QuickMath.are_numbers_same_poles(AxisValue, CurrentSpeed))
-	var _speed_change: float = 0.0
+func get_acceleration(axis_value: float, current_speed: float, max_speed: float) -> float:
+	var __is_accelerating: bool = (axis_value != 0) and QuickMath.are_numbers_same_poles(axis_value, current_speed)
+	var __speed_change: float = 0.0
 	
 	if not is_on_air:
-		if _is_accelerating:
-			_speed_change = acceleration
-			if MaxSpeed < abs(CurrentSpeed):
-				_speed_change *= 1.5
+		if __is_accelerating:
+			__speed_change = acceleration
+			if max_speed < abs(current_speed):
+				__speed_change *= 1.5
 		else:
-			_speed_change = friction
+			__speed_change = friction
 	else:
-		if AxisValue == 0:
-			_speed_change = air_friction
+		if axis_value == 0:
+			__speed_change = air_friction
 		else:
-			_speed_change = air_acceleration
+			__speed_change = air_acceleration
 	
-	return QuickMath.get_acceleration(_speed_change, MaxSpeed)
+	return QuickMath.get_acceleration(__speed_change, max_speed)
 
 
-func get_acceleration() -> float:
-	if is_on_air:
-		return air_acceleration
-	else:
-		return acceleration
-
-
-func get_friction() -> float:
-	if is_on_air:
-		return air_friction
-	else:
-		return friction
-
-
-func _get_speed() -> float:
+func get_speed() -> float:
 	var base_speed: float
 	
 	if is_swimming:
@@ -151,25 +134,18 @@ func _get_speed() -> float:
 	else:
 		base_speed = run_speed
 	
-	return maxf(((base_speed + speed_mod) * speed_mult) * _terrain_mod, 0.0)
+	return maxf(((base_speed + speed_mod) * speed_mult) * terrain_mod, 0.0)
 
 
-func set_terrain_mult_by_name(TerrainName: String):
-	if TerrainName in self_terrain_move_mod:
-		_terrain_mod = self_terrain_move_mod[TerrainName]
-	elif TerrainName in GameProperties.TerrainMoveMult:
-		_terrain_mod = GameProperties.TerrainMoveMult[TerrainName]
+func set_terrain_mult_by_name(terrain_name: String):
+	if terrain_name in self_terrain_move_mod:
+		terrain_mod = self_terrain_move_mod[terrain_name]
+	elif terrain_name in GameProperties.TerrainMoveMult:
+		terrain_mod = GameProperties.TerrainMoveMult[terrain_name]
 
 
-func add_terrain_modifier(TerrainName: String, TerrainModifier: float) -> void:
-	self_terrain_move_mod[TerrainName] = maxf(TerrainModifier, 0.0)
-
-
-func set_facing_right(FacingRight: bool = true) -> void:
-	if FacingRight and actor_sprite.flip_h:
-		actor_sprite.flip_h = false
-	elif not FacingRight and not actor_sprite.flip_h:
-		actor_sprite.flip_h = true
+func add_terrain_modifier(terrain_name: String, terrain_modifier: float) -> void:
+	self_terrain_move_mod[terrain_name] = maxf(terrain_modifier, 0.0)
 
 
 func update_facing_right() -> void:
@@ -182,37 +158,30 @@ func update_facing_right() -> void:
 		actor_sprite.flip_h = false
 
 
-func jump(JumpFromGround: bool, JumpForce: float = jump_velocity) -> void:
-	if not JumpFromGround:
+func jump(jump_from_ground: bool, jump_force: float = jump_velocity) -> void:
+	if not jump_from_ground:
 		air_jump_count += 1
 	
-	if JumpForce < velocity.y:
-		velocity.y = JumpForce
-	
-	# This part is experimental. It gives a boost on air jumps to give more air control
-	# Might remain, might go. Who knows? Me not yet.
+	if jump_force < velocity.y:
+		velocity.y = jump_force
 
 
-func can_actor_jump(IsOnGround := true) -> bool:
+func can_actor_jump(is_on_ground := true) -> bool:
 	if not can_jump:
 		return false
 	
-	if IsOnGround:
+	if is_on_ground:
 		return true
 	
 	return (air_jump_count < air_jumps) # Does actor have remaining air jumps?
 
 
-func toggle_walk() -> void:
-	is_walking = not is_walking
-
-
-func _update_gravity() -> void:
+func __update_gravity() -> void:
 	if not module_manager:
 		return
 	
-	if not module_manager.has_module("gravity-manager"):
+	if not module_manager.has_module("gravity"):
 		return
 	
-	module_manager.get_module("gravity-manager").update_gravity_settings()
+	module_manager.get_module("gravity").update_gravity_settings()
 

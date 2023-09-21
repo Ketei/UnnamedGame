@@ -1,9 +1,7 @@
-extends Actor
 class_name Player
+extends Actor
 
-# TrackerName(str): InteractTracker
-# Add proper keys once finished: up, down, left, etc.
-var interact_tracker: Dictionary = {}
+
 var axis_strength: Vector2 = Vector2(0, 0)
 
 # Toggles
@@ -13,20 +11,9 @@ var axis_strength: Vector2 = Vector2(0, 0)
 var walk_hold: bool = false
 
 
-func update_input_axis(UpdateAxisX: bool = true, UpdateAxisY: bool = true) -> void:
-	if UpdateAxisX:
+func update_input_axis(update_x_axis := true, update_y_axis := true) -> void:
+	if update_x_axis:
 		axis_strength.x = Input.get_axis("gc_left","gc_right")
-	if UpdateAxisY:
+	if update_y_axis:
 		axis_strength.y = Input.get_axis("gc_up", "gc_down")
-
-
-func add_interact_tracker(TrackerKey: String):
-	interact_tracker[TrackerKey.to_lower()] = InteractTracker.new()
-
-
-func remove_interact_tracker(TrackerKey: String):
-	if interact_tracker.erase(TrackerKey.to_lower()):
-		print_debug(TrackerKey + " removed")
-	else:
-		print_debug(TrackerKey + " doesn't exist.")
 
