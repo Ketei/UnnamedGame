@@ -17,13 +17,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-QuickConfig="*res://Scripts/CommLib/QuickConfig.gd"
-QuickMath="*res://Scripts/CommLib/QuickMath.gd"
+QuickConfig="*res://Scripts/CommLib/quick_config.gd"
+QuickMath="*res://Scripts/CommLib/quick_math.gd"
 ActorLibs="*res://Scripts/CommLib/ActorLibs.gd"
-GameProperties="*res://Scripts/Globals/GameProperties.gd"
-ActorProperties="*res://Scripts/Globals/ActorProperties.gd"
+GameProperties="*res://Scripts/Globals/game_properties.gd"
+ActorProperties="*res://Scripts/Globals/actor_properties.gd"
 ObjectInteractions="*res://Scripts/CommLib/ObjectInteractions.gd"
-Settings="*res://Scripts/Globals/Settings.gd"
+Settings="*res://Scripts/Globals/game_settings.gd"
 SexLibs="*res://Scripts/CommLib/SexLibs.gd"
 
 [display]
