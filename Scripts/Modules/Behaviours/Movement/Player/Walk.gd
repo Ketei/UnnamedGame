@@ -24,17 +24,17 @@ func handle_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(true):
 			player.jump(true)
-			terrain_tracker.temp_disable_ground_raycast(0.1)
-			change_behaviour.emit("movement", "jump")
+			terrain_tracker.disable_raycast_on_timer(0.1)
+			change_behaviour.emit("/jump")
 
 	elif event.is_action_pressed("gc_walk"):
 		player.is_walking = not player.is_walking
 		if not player.is_walking:
-			change_behaviour.emit("movement", "run")
+			change_behaviour.emit("/run")
 	
 	elif event.is_action_released("gc_walk") and player.walk_hold:
 		player.is_walking = false
-		change_behaviour.emit("movement", "run")
+		change_behaviour.emit("/run")
 
 
 func handle_physics(delta : float) -> void:
@@ -44,7 +44,7 @@ func handle_physics(delta : float) -> void:
 	player.update_input_axis(true, false)
 	
 	if player.axis_strength.x == 0 and player.velocity.x == 0:
-		change_behaviour.emit("movement", "idle")
+		change_behaviour.emit("/idle")
 		return
 	
 	if player.axis_strength.x != 0:
@@ -66,10 +66,10 @@ func set_target_node(NewTargetNode) -> void:
 func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 	if NewState == GameProperties.TerrainState.AIR:
 		if 0 < player.velocity.y:
-			change_behaviour.emit("movement", "fall")
+			change_behaviour.emit("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
-			change_behaviour.emit("movement", "jump")
+			change_behaviour.emit("/jump")
 	elif NewState == GameProperties.TerrainState.LIQUID:
-		change_behaviour.emit("movement", "swim-idle")
+		change_behaviour.emit("/swim-idle")
 

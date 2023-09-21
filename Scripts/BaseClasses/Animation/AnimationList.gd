@@ -1,7 +1,7 @@
 extends Node
 class_name AnimationList
 
-@export var animation_list: Array = []
+@export var animation_list: Array[String] = []
 ## Alternate animations. To use them instead of main list animation_override
 ## must be a valid key and not be empty.
 @export var alternate_animations: Dictionary = {}

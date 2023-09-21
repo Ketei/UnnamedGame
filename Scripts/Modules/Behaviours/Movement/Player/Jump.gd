@@ -44,7 +44,7 @@ func handle_key_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(false):
 			player.jump(false)
-			terrain_tracker.temp_disable_ground_raycast(0.1)
+			terrain_tracker.disable_raycast_on_timer(0.1)
 			fsm_animation_replay.emit(false)
 		else:
 			jump_buffer.start()
@@ -62,7 +62,7 @@ func handle_physics(delta : float) -> void:
 		return
 
 	if 0 <= player.velocity.y:
-		change_behaviour.emit("movement", "fall")
+		change_behaviour.emit("/fall")
 	
 	player.update_input_axis(true, false)
 

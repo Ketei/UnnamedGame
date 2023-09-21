@@ -2,12 +2,15 @@ extends Node
 class_name Behaviour
 
 # Behaviour Module
-signal change_behaviour(BehaviourPackTarget: String, BehaviourTarget: String)
+signal change_behaviour(behaviour_path: String)
 
 # Animation Nodes
-signal fsm_animation_state(StatePath: String, NewState: String)
-signal fsm_animation_replay(PlayRandom: bool)
-signal use_alternate_animation_set(StatePath: String, AlternateSet: String)
+signal fsm_animation_state(state_path: String, new_state: String)
+signal fsm_animation_replay(play_random: bool)
+signal use_alternate_animation_set(state_path: String, alternate_set: String)
+
+# References
+var behaviour_module: ModuleBehaviour
 
 # Set to true if the behaviour is to be loaded as default. This is only relevant for packs that
 # are loaded as default/initial.
@@ -16,12 +19,11 @@ var is_default: bool = false
 # This is the type of behaviour this is, it's unique inside each ModuleBehaviour.
 # Some common behaviours id's are: "movement", "action", "weapon"
 var behaviour_id: String = ""
-var behaviour_module: ModuleBehaviour
 
 # When a behaviour is connected it can transition to other behaviours. Disconnecting the
 # behaviour means that this behaviour will ignore all transition signals. Useful if you
 # want to force a state no matter what.
-var behaviour_connected: bool = true
+var is_connected: bool = true
 
 # Use a variable of a specific class to target all changes to an object and retain predictions. 
 # Override the function set_target_node to set up your target node of the desired type.
@@ -52,5 +54,5 @@ func setup_behaviour() -> void:
 	pass
 
 
-func set_target_node(_NewTargetNode) -> void:
+func set_target_node(_new_target_node) -> void:
 	pass
