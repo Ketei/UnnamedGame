@@ -1,14 +1,18 @@
-[gd_scene load_steps=20 format=3 uid="uid://cc6f2xlfiaufv"]
+[gd_scene load_steps=23 format=3 uid="uid://dw2ki46t73efm"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_ohcsv"]
 [ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_faxiu"]
 [ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="2_rvg6n"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleBehaviour.gd" id="4_2ke8w"]
 [ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="4_l6sh5"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_pe4l6"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_dxiyj"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleGravity.gd" id="8_j6i8j"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_rdfv3"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_terrain_tracker.gd" id="6_nn7a5"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_timers_manager.gd" id="7_qgtcs"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_animation_player.gd" id="8_lx74x"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="8_m8pm7"]
+[ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Nodes/StateMachines/player_anim_fsm.tscn" id="9_bjjyc"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="9_http1"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_stats.gd" id="10_hqic8"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/component_stat.gd" id="13_dh3op"]
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
@@ -117,27 +121,6 @@ _data = {
 "walk": SubResource("Animation_t05fn")
 }
 
-[sub_resource type="GDScript" id="GDScript_vj7mh"]
-script/source = "extends ModuleAnimationPlayer
-
-func _ready():
-	var _preload_state = preload(\"res://Nodes/StateMachines/player_anim_fsm.tscn\")
-	animation_state_machine = _preload_state.instantiate()
-	animation_state_machine.load_state_machine()
-	
-	register_animation(\"root/ground/movement/idle\", \"idle\")
-	register_animation(\"root/ground/movement/walk\", \"walk\")
-	register_animation(\"root/ground/movement/run\", \"run\")
-	register_animation(\"root/air/movement/jump\", \"jump\")
-	register_animation(\"root/air/movement/fall\", \"fall\")
-	
-#	register_animation(\"ground\", \"idle-stand\", \"idle\")
-#	register_animation(\"ground\", \"walk\", \"walk\")
-#	register_animation(\"ground\", \"run\", \"run\")
-#	register_animation(\"air\", \"jump\", \"jump\")
-#	register_animation(\"air\", \"fall\", \"fall\")
-"
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
 size = Vector2(16, 8)
 
@@ -169,7 +152,7 @@ hframes = 6
 vframes = 5
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(0, 0, 6, 0, 6, -3, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -3, -6, 0)
+polygon = PackedVector2Array(0, 0, 5, 0, 6, -1, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -1, -5, 0)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
 script = ExtResource("2_rvg6n")
@@ -177,13 +160,13 @@ parent_node = NodePath("..")
 move_and_slide = true
 
 [node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
-script = ExtResource("4_2ke8w")
+script = ExtResource("4_rdfv3")
 default_pack = NodePath("BehaviourPack-Movement")
 
 [node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("4_l6sh5")]
 
 [node name="ModuleTerrainTracker" type="Node" parent="ModuleManager" node_paths=PackedStringArray("raycast_left", "raycast_center", "raycast_right", "ground_collision", "middle_collision")]
-script = ExtResource("6_pe4l6")
+script = ExtResource("6_nn7a5")
 raycast_left = NodePath("../../RayCastLeft")
 raycast_center = NodePath("../../RayCastCenter")
 raycast_right = NodePath("../../RayCastRight")
@@ -191,17 +174,20 @@ ground_collision = NodePath("../../GroundTerrain")
 middle_collision = NodePath("../../MiddleTerrain")
 
 [node name="ModuleTimersManager" type="Node" parent="ModuleManager"]
-script = ExtResource("7_dxiyj")
+script = ExtResource("7_qgtcs")
 
-[node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager"]
+[node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager" node_paths=PackedStringArray("state_machine")]
 autoplay = "idle"
 libraries = {
 "": SubResource("AnimationLibrary_xp0ma")
 }
-script = SubResource("GDScript_vj7mh")
+script = ExtResource("8_lx74x")
+state_machine = NodePath("Root")
+
+[node name="Root" parent="ModuleManager/ModuleAnimationPlayer" instance=ExtResource("9_bjjyc")]
 
 [node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
-script = ExtResource("8_j6i8j")
+script = ExtResource("8_m8pm7")
 target_actor = NodePath("../..")
 terminal_velocity = 27.0
 low_grav_slowdown = 1.0
@@ -211,27 +197,35 @@ script = ExtResource("9_http1")
 animation_player = NodePath("../ModuleAnimationPlayer")
 terrain_tracker = NodePath("../ModuleTerrainTracker")
 
+[node name="ModuleStats" type="Node" parent="ModuleManager"]
+script = ExtResource("10_hqic8")
+
+[node name="Health" type="Node" parent="ModuleManager/ModuleStats"]
+script = ExtResource("13_dh3op")
+stat_name = "health"
+_max_value = 100.0
+cancel_decimals = true
+value_rounding = 1
+
 [node name="RayCastCenter" type="RayCast2D" parent="."]
 position = Vector2(0, -16)
 target_position = Vector2(0, 18)
 
 [node name="RayCastLeft" type="RayCast2D" parent="."]
 position = Vector2(-5, -16)
-target_position = Vector2(0, 17)
+target_position = Vector2(0, 18)
 
 [node name="RayCastRight" type="RayCast2D" parent="."]
 position = Vector2(5, -16)
-target_position = Vector2(0, 17)
+target_position = Vector2(0, 18)
 
 [node name="GroundTerrain" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GroundTerrain"]
 position = Vector2(0, -4)
 shape = SubResource("RectangleShape2D_3l8r1")
 
 [node name="MiddleTerrain" type="Area2D" parent="."]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleTerrain"]
 position = Vector2(0, -18)
