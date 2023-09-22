@@ -64,6 +64,11 @@ var previous_max_value: float = 0.0
 var previous_min_value: float = 0.0
 
 
+func _ready():
+	min_value = get_rounded(_min_value)
+	max_value = get_rounded(_max_value)
+
+
 ## Sets the current stat to the max value
 func restore_stat() -> void:
 	current_value = max_value
@@ -78,7 +83,10 @@ func change_current(amount_to_change: float) -> void:
 	if (is_protected and amount_to_change < 0) or is_unchanging:
 		return
 	
-	current_value += get_rounded(amount_to_change)
+	current_value = clampf(
+			current_value + get_rounded(amount_to_change), 
+			min_value, 
+			max_value)
 	__current_value_update()
 
 
