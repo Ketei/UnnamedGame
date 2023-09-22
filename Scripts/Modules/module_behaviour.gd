@@ -90,6 +90,7 @@ func change_behaviour(behaviour_path: String) -> void:
 	loaded_behaviour = _behaviour_preload
 	connect_behaviour_signals()
 	behaviour_changed.emit(_old_behaviour, _pack + "/" + _behaviour)
+	loaded_behaviour._change_signal_sent = false
 	loaded_behaviour.enter()
 
 	if print_changes_in_debug:
@@ -97,8 +98,8 @@ func change_behaviour(behaviour_path: String) -> void:
 
 
 func connect_behaviour_signals() -> void:
-	if not loaded_behaviour.change_behaviour.is_connected(change_behaviour):
-		loaded_behaviour.change_behaviour.connect(change_behaviour)
+	if not loaded_behaviour.behaviour_changed.is_connected(change_behaviour):
+		loaded_behaviour.behaviour_changed.connect(change_behaviour)
 	if not loaded_behaviour.fsm_animation_state.is_connected(__animation_fsm_set_state):
 		loaded_behaviour.fsm_animation_state.connect(__animation_fsm_set_state)
 	if not loaded_behaviour.fsm_animation_replay.is_connected(__animation_replay):
@@ -106,8 +107,8 @@ func connect_behaviour_signals() -> void:
 
 
 func disconnect_behaviour_signals() -> void:
-	if loaded_behaviour.change_behaviour.is_connected(change_behaviour):
-		loaded_behaviour.change_behaviour.disconnect(change_behaviour)
+	if loaded_behaviour.behaviour_changed.is_connected(change_behaviour):
+		loaded_behaviour.behaviour_changed.disconnect(change_behaviour)
 	if loaded_behaviour.fsm_animation_state.is_connected(__animation_fsm_set_state):
 		loaded_behaviour.fsm_animation_state.disconnect(__animation_fsm_set_state)
 	if loaded_behaviour.fsm_animation_replay.is_connected(__animation_replay):
