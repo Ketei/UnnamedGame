@@ -1,13 +1,14 @@
 [gd_scene load_steps=19 format=3 uid="uid://kxwmyrmhxcui"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_fmthl"]
-[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_dhtfl"]
+[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Assets/Textures/Actors/Player/Character_Idle_48x48.png" id="2_dhtfl"]
 [ext_resource type="Script" path="res://addons/smoothing/smoothing_2d.gd" id="2_k0vcm"]
 [ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_28hag"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleBehaviour.gd" id="4_cvcar"]
-[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_heyrn"]
+[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_heyrn"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTerrainTracker.gd" id="6_dtsc8"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleTimersManager.gd" id="7_lf8t2"]
+
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001

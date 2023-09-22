@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ckfai8eew3qkg"
-path="res://.godot/imported/Village_Props.png-6014aee31dc5fc50a137401dca5b5fff.ctex"
+uid="uid://b8s5athuxem6n"
+path="res://.godot/imported/bar_fill.png-bc81f7ad7103e4428ec5fac7a62d96a3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/TileSets/Props/Village_Props.png"
-dest_files=["res://.godot/imported/Village_Props.png-6014aee31dc5fc50a137401dca5b5fff.ctex"]
+source_file="res://Assets/Textures/UI/bar_fill.png"
+dest_files=["res://.godot/imported/bar_fill.png-bc81f7ad7103e4428ec5fac7a62d96a3.ctex"]
 
 [params]
 

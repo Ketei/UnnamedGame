@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bj76fclypopfk"
-path="res://.godot/imported/Character_Idle_48x48.png-5d05adc4ddc5c418a29610e685496250.ctex"
+uid="uid://djk7aht017mdr"
+path="res://.godot/imported/bar_over.png-eb78b80310006cb68f0bdc8537b27d7c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/Actors/Player/Character_Idle_48x48.png"
-dest_files=["res://.godot/imported/Character_Idle_48x48.png-5d05adc4ddc5c418a29610e685496250.ctex"]
+source_file="res://Assets/Textures/UI/bar_over.png"
+dest_files=["res://.godot/imported/bar_over.png-eb78b80310006cb68f0bdc8537b27d7c.ctex"]
 
 [params]
 

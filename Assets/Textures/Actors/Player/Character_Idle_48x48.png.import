@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c7qgn8f25rqp8"
-path="res://.godot/imported/Grass_Tileset_Ground.png-ff321c073afbcd7b22727f37fb6679d1.ctex"
+uid="uid://bj76fclypopfk"
+path="res://.godot/imported/Character_Idle_48x48.png-5e663f9815e26ba4f0ec4b7897fdc4a2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/TileSets/Grounds/Grass_Tileset_Ground.png"
-dest_files=["res://.godot/imported/Grass_Tileset_Ground.png-ff321c073afbcd7b22727f37fb6679d1.ctex"]
+source_file="res://Assets/Textures/Actors/Player/Character_Idle_48x48.png"
+dest_files=["res://.godot/imported/Character_Idle_48x48.png-5e663f9815e26ba4f0ec4b7897fdc4a2.ctex"]
 
 [params]
 

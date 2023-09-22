@@ -1,18 +1,21 @@
-[gd_scene load_steps=23 format=3 uid="uid://dw2ki46t73efm"]
+[gd_scene load_steps=27 format=3 uid="uid://df5dftulja42v"]
 
-[ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_ohcsv"]
-[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Textures/Actors/Player/Character_Idle_48x48.png" id="2_faxiu"]
-[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="2_rvg6n"]
-[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Nodes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="4_l6sh5"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_rdfv3"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_terrain_tracker.gd" id="6_nn7a5"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_timers_manager.gd" id="7_qgtcs"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_animation_player.gd" id="8_lx74x"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="8_m8pm7"]
-[ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Nodes/StateMachines/player_anim_fsm.tscn" id="9_bjjyc"]
-[ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="9_http1"]
-[ext_resource type="Script" path="res://Scripts/Modules/module_stats.gd" id="10_hqic8"]
-[ext_resource type="Script" path="res://Scripts/BaseClasses/component_stat.gd" id="13_dh3op"]
+[ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_pwxxx"]
+[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Assets/Textures/Actors/Player/Character_Idle_48x48.png" id="2_a80ui"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_ieijs"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_4kw1u"]
+[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_sx5gr"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_terrain_tracker.gd" id="6_sbij3"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_timers_manager.gd" id="7_d17gd"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_animation_player.gd" id="8_gt0kb"]
+[ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Scenes/StateMachines/player_anim_fsm.tscn" id="9_q6u2g"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="10_1o7wi"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="11_051nj"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_stats.gd" id="12_utxm4"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/component_stat.gd" id="13_x20mx"]
+[ext_resource type="PackedScene" uid="uid://cjv5l3hbwnlp1" path="res://Scenes/UI/texture_progress_bar.tscn" id="14_4kikl"]
+[ext_resource type="Script" path="res://Scripts/Components/stat_progress_bar.gd" id="15_p2nnr"]
+[ext_resource type="Script" path="res://Test/TestPlayerScript.gd" id="16_b1cnf"]
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
@@ -122,14 +125,18 @@ _data = {
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
-size = Vector2(16, 8)
+size = Vector2(12, 8)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
-size = Vector2(16, 4)
+size = Vector2(12, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mrg70"]
+size = Vector2(12, 27)
 
 [node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
-collision_layer = 4
-script = ExtResource("1_ohcsv")
+collision_layer = 0
+collision_mask = 5
+script = ExtResource("1_pwxxx")
 actor_name = "Ketei"
 actor_type = 1
 actor_sprite = NodePath("Sprite")
@@ -147,7 +154,7 @@ air_friction = 1.0
 
 [node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -16)
-texture = ExtResource("2_faxiu")
+texture = ExtResource("2_a80ui")
 hframes = 6
 vframes = 5
 
@@ -155,18 +162,18 @@ vframes = 5
 polygon = PackedVector2Array(0, 0, 5, 0, 6, -1, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -1, -5, 0)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
-script = ExtResource("2_rvg6n")
+script = ExtResource("3_ieijs")
 parent_node = NodePath("..")
 move_and_slide = true
 
 [node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
-script = ExtResource("4_rdfv3")
+script = ExtResource("4_4kw1u")
 default_pack = NodePath("BehaviourPack-Movement")
 
-[node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("4_l6sh5")]
+[node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("5_sx5gr")]
 
 [node name="ModuleTerrainTracker" type="Node" parent="ModuleManager" node_paths=PackedStringArray("raycast_left", "raycast_center", "raycast_right", "ground_collision", "middle_collision")]
-script = ExtResource("6_nn7a5")
+script = ExtResource("6_sbij3")
 raycast_left = NodePath("../../RayCastLeft")
 raycast_center = NodePath("../../RayCastCenter")
 raycast_right = NodePath("../../RayCastRight")
@@ -174,35 +181,36 @@ ground_collision = NodePath("../../GroundTerrain")
 middle_collision = NodePath("../../MiddleTerrain")
 
 [node name="ModuleTimersManager" type="Node" parent="ModuleManager"]
-script = ExtResource("7_qgtcs")
+script = ExtResource("7_d17gd")
 
 [node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager" node_paths=PackedStringArray("state_machine")]
 autoplay = "idle"
 libraries = {
 "": SubResource("AnimationLibrary_xp0ma")
 }
-script = ExtResource("8_lx74x")
+script = ExtResource("8_gt0kb")
 state_machine = NodePath("Root")
 
-[node name="Root" parent="ModuleManager/ModuleAnimationPlayer" instance=ExtResource("9_bjjyc")]
+[node name="Root" parent="ModuleManager/ModuleAnimationPlayer" instance=ExtResource("9_q6u2g")]
 
 [node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
-script = ExtResource("8_m8pm7")
+script = ExtResource("10_1o7wi")
 target_actor = NodePath("../..")
 terminal_velocity = 27.0
 low_grav_slowdown = 1.0
 
 [node name="ModuleInteract" type="Node" parent="ModuleManager" node_paths=PackedStringArray("animation_player", "terrain_tracker")]
-script = ExtResource("9_http1")
+script = ExtResource("11_051nj")
 animation_player = NodePath("../ModuleAnimationPlayer")
 terrain_tracker = NodePath("../ModuleTerrainTracker")
 
 [node name="ModuleStats" type="Node" parent="ModuleManager"]
-script = ExtResource("10_hqic8")
+script = ExtResource("12_utxm4")
 
 [node name="Health" type="Node" parent="ModuleManager/ModuleStats"]
-script = ExtResource("13_dh3op")
+script = ExtResource("13_x20mx")
 stat_name = "health"
+current_value = 100.0
 _max_value = 100.0
 cancel_decimals = true
 value_rounding = 1
@@ -235,3 +243,39 @@ shape = SubResource("RectangleShape2D_2le28")
 position = Vector2(0, -32)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureProgressBar" parent="UI/Control" node_paths=PackedStringArray("measured_stat") instance=ExtResource("14_4kikl")]
+layout_mode = 2
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 96.0
+offset_bottom = 16.0
+script = ExtResource("15_p2nnr")
+measured_stat = NodePath("../../../ModuleManager/ModuleStats/Health")
+show_numbers = true
+enable_tweening = true
+tween_transition = 8
+tween_ease = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 64
+monitorable = false
+script = ExtResource("16_b1cnf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, -13.5)
+shape = SubResource("RectangleShape2D_mrg70")
+debug_color = Color(0, 0.584314, 0.235294, 0.419608)
+
+[connection signal="area_entered" from="HurtBox" to="HurtBox" method="_on_area_entered"]
