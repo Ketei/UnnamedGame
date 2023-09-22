@@ -32,6 +32,7 @@ func _ready():
 	_array_off_timer.one_shot = true
 	_array_off_timer.timeout.connect(set_raycast_enabled.bind(true))
 	self.add_child(_array_off_timer)
+	__update_terrain_state()
 
 
 func set_up_module() -> void:
@@ -76,6 +77,7 @@ func set_raycast_enabled(is_enabled: bool) -> void:
 	raycast_left.enabled = is_enabled
 	raycast_center.enabled = is_enabled
 	raycast_right.enabled = is_enabled
+	__update_terrain_state()
 
 
 func __ground_terrain_changed(area, IsEntering: bool):
