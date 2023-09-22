@@ -1,0 +1,281 @@
+[gd_scene load_steps=27 format=3 uid="uid://df5dftulja42v"]
+
+[ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_pwxxx"]
+[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Assets/Textures/Actors/Player/Character_Idle_48x48.png" id="2_a80ui"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_ieijs"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_4kw1u"]
+[ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_sx5gr"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_terrain_tracker.gd" id="6_sbij3"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_timers_manager.gd" id="7_d17gd"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_animation_player.gd" id="8_gt0kb"]
+[ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Scenes/StateMachines/player_anim_fsm.tscn" id="9_q6u2g"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="10_1o7wi"]
+[ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="11_051nj"]
+[ext_resource type="Script" path="res://Scripts/Modules/module_stats.gd" id="12_utxm4"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/component_stat.gd" id="13_x20mx"]
+[ext_resource type="PackedScene" uid="uid://cjv5l3hbwnlp1" path="res://Scenes/UI/texture_progress_bar.tscn" id="14_4kikl"]
+[ext_resource type="Script" path="res://Scripts/Components/stat_progress_bar.gd" id="15_p2nnr"]
+[ext_resource type="Script" path="res://Test/TestPlayerScript.gd" id="16_b1cnf"]
+
+[sub_resource type="Animation" id="Animation_lkhnf"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_jelgw"]
+resource_name = "fall"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [28]
+}
+
+[sub_resource type="Animation" id="Animation_ym4cv"]
+resource_name = "idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+}
+
+[sub_resource type="Animation" id="Animation_05th0"]
+resource_name = "jump"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [26, 27]
+}
+
+[sub_resource type="Animation" id="Animation_3c5ef"]
+resource_name = "run"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [18, 19, 20, 21, 22, 23, 24, 25]
+}
+
+[sub_resource type="Animation" id="Animation_t05fn"]
+resource_name = "walk"
+length = 0.8
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [10, 11, 12, 13, 14, 15, 16, 17]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_xp0ma"]
+_data = {
+"RESET": SubResource("Animation_lkhnf"),
+"fall": SubResource("Animation_jelgw"),
+"idle": SubResource("Animation_ym4cv"),
+"jump": SubResource("Animation_05th0"),
+"run": SubResource("Animation_3c5ef"),
+"walk": SubResource("Animation_t05fn")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
+size = Vector2(12, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
+size = Vector2(12, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mrg70"]
+size = Vector2(12, 27)
+
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
+collision_layer = 0
+collision_mask = 5
+script = ExtResource("1_pwxxx")
+actor_name = "Ketei"
+actor_type = 1
+actor_sprite = NodePath("Sprite")
+run_speed = 13.0
+walk_speed = 6.5
+acceleration = 0.3
+friction = 0.15
+climb_base_speed = 1.0
+crouch_speed = 2.0
+jump_height = 5.6
+time_to_floor = 0.38
+time_to_peak = 0.45
+air_acceleration = 0.45
+air_friction = 1.0
+
+[node name="Sprite" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
+texture = ExtResource("2_a80ui")
+hframes = 6
+vframes = 5
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(0, 0, 5, 0, 6, -1, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -1, -5, 0)
+
+[node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
+script = ExtResource("3_ieijs")
+parent_node = NodePath("..")
+move_and_slide = true
+
+[node name="ModuleBehaviour" type="Node" parent="ModuleManager" node_paths=PackedStringArray("default_pack")]
+script = ExtResource("4_4kw1u")
+default_pack = NodePath("BehaviourPack-Movement")
+
+[node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("5_sx5gr")]
+
+[node name="ModuleTerrainTracker" type="Node" parent="ModuleManager" node_paths=PackedStringArray("raycast_left", "raycast_center", "raycast_right", "ground_collision", "middle_collision")]
+script = ExtResource("6_sbij3")
+raycast_left = NodePath("../../RayCastLeft")
+raycast_center = NodePath("../../RayCastCenter")
+raycast_right = NodePath("../../RayCastRight")
+ground_collision = NodePath("../../GroundTerrain")
+middle_collision = NodePath("../../MiddleTerrain")
+
+[node name="ModuleTimersManager" type="Node" parent="ModuleManager"]
+script = ExtResource("7_d17gd")
+
+[node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager" node_paths=PackedStringArray("state_machine")]
+autoplay = "idle"
+libraries = {
+"": SubResource("AnimationLibrary_xp0ma")
+}
+script = ExtResource("8_gt0kb")
+state_machine = NodePath("Root")
+
+[node name="Root" parent="ModuleManager/ModuleAnimationPlayer" instance=ExtResource("9_q6u2g")]
+
+[node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
+script = ExtResource("10_1o7wi")
+target_actor = NodePath("../..")
+terminal_velocity = 27.0
+low_grav_slowdown = 1.0
+
+[node name="ModuleInteract" type="Node" parent="ModuleManager" node_paths=PackedStringArray("animation_player", "terrain_tracker")]
+script = ExtResource("11_051nj")
+animation_player = NodePath("../ModuleAnimationPlayer")
+terrain_tracker = NodePath("../ModuleTerrainTracker")
+
+[node name="ModuleStats" type="Node" parent="ModuleManager"]
+script = ExtResource("12_utxm4")
+
+[node name="Health" type="Node" parent="ModuleManager/ModuleStats"]
+script = ExtResource("13_x20mx")
+stat_name = "health"
+current_value = 100.0
+_max_value = 100.0
+cancel_decimals = true
+value_rounding = 1
+
+[node name="RayCastCenter" type="RayCast2D" parent="."]
+position = Vector2(0, -16)
+target_position = Vector2(0, 18)
+
+[node name="RayCastLeft" type="RayCast2D" parent="."]
+position = Vector2(-5, -16)
+target_position = Vector2(0, 18)
+
+[node name="RayCastRight" type="RayCast2D" parent="."]
+position = Vector2(5, -16)
+target_position = Vector2(0, 18)
+
+[node name="GroundTerrain" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundTerrain"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_3l8r1")
+
+[node name="MiddleTerrain" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleTerrain"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_2le28")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, -32)
+position_smoothing_enabled = true
+position_smoothing_speed = 10.0
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureProgressBar" parent="UI/Control" node_paths=PackedStringArray("measured_stat") instance=ExtResource("14_4kikl")]
+layout_mode = 2
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 96.0
+offset_bottom = 16.0
+script = ExtResource("15_p2nnr")
+measured_stat = NodePath("../../../ModuleManager/ModuleStats/Health")
+show_numbers = true
+enable_tweening = true
+tween_transition = 8
+tween_ease = 1
+
+[node name="HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 64
+monitorable = false
+script = ExtResource("16_b1cnf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
+position = Vector2(0, -13.5)
+shape = SubResource("RectangleShape2D_mrg70")
+debug_color = Color(0, 0.584314, 0.235294, 0.419608)
+
+[connection signal="area_entered" from="HurtBox" to="HurtBox" method="_on_area_entered"]

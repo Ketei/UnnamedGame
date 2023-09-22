@@ -52,7 +52,7 @@ func get_lust_effect_steps(CurrentLust: int, PreviousLust: int) -> Dictionary:
 	return _return_steps
 
 
-func get_stat_with_lustf(StatType: String, CurrentLust: int, PrevLust: int) -> float:
+func get_lust_stat_changef(StatType: String, CurrentLust: int, PrevLust: int) -> float:
 	var _return_value: float = 0
 	
 	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
@@ -67,7 +67,7 @@ func get_stat_with_lustf(StatType: String, CurrentLust: int, PrevLust: int) -> f
 	return _return_value
 
 
-func get_stat_with_lusti(StatType: String, CurrentLust: int, PrevLust: int) -> int:
+func get_lust_stat_changei(StatType: String, CurrentLust: int, PrevLust: int) -> int:
 	var _return_value: int = 0
 	
 	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
@@ -80,3 +80,4 @@ func get_stat_with_lusti(StatType: String, CurrentLust: int, PrevLust: int) -> i
 		_return_value += GameProperties.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
 
 	return _return_value
+

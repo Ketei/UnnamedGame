@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=3 uid="uid://ergcsbjtx8h5"]
+
+[ext_resource type="Script" path="res://Scripts/BaseClasses/state_machine.gd" id="1_cxiaa"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/Animation/AnimationList.gd" id="2_ccu30"]
+
+[node name="Root" type="Node"]
+script = ExtResource("1_cxiaa")
+initial_state_key = "ground"
+
+[node name="Ground" type="Node" parent="."]
+script = ExtResource("1_cxiaa")
+initial_state_key = "movement"
+
+[node name="Movement" type="Node" parent="Ground"]
+script = ExtResource("1_cxiaa")
+initial_state_key = "idle"
+
+[node name="Idle" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["idle"])
+
+[node name="Walk" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["walk"])
+
+[node name="Run" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["run"])
+
+[node name="Air" type="Node" parent="."]
+script = ExtResource("1_cxiaa")
+initial_state_key = "movement"
+
+[node name="Movement" type="Node" parent="Air"]
+script = ExtResource("1_cxiaa")
+initial_state_key = "fall"
+
+[node name="Jump" type="Node" parent="Air/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["jump"])
+
+[node name="Fall" type="Node" parent="Air/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["fall"])
+
+[node name="Liquid" type="Node" parent="."]
+script = ExtResource("1_cxiaa")

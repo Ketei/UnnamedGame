@@ -15,4 +15,4 @@ func _ready():
 
 
 func _on_timer_timeout():
-	timer_timeout.emit(self.name)
+	timer_timeout.emit(self)

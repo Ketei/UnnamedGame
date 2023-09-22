@@ -9,6 +9,7 @@ func _ready():
 	behaviour_id = "idle"
 	is_default = true
 
+
 func setup_behaviour() -> void:
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
@@ -16,28 +17,34 @@ func setup_behaviour() -> void:
 func enter(_args:= {}):
 	if not player:
 		return
-		#return
+
 	if terrain_tracker.terrain_state == GameProperties.TerrainState.AIR:
 		if player.velocity.y < 0:
-			change_behaviour.emit("movement", "jump")
+			change_behaviour.emit("/jump")
 		else:
-			change_behaviour.emit("movement", "fall")
+			change_behaviour.emit("/fall")
 		return
+	
+	player.update_input_axis(true, false)
+	
+	if player.axis_strength.x != 0:
+		if player.is_walking:
+			change_behaviour.emit("/walk")
+		else:
+			change_behaviour.emit("/run")
 	
 	if player.air_jump_count != 0:
 		player.air_jump_count = 0
+	
+	if not terrain_tracker.terrain_changed.is_connected(__change_terrain_state):
+		terrain_tracker.terrain_changed.connect(__change_terrain_state)
+	
+	fsm_animation_state.emit("root/ground/movement", "idle")
 
-	terrain_tracker.terrain_changed.connect(_change_terrain_state)
-	
-	if player.is_crouching:
-		change_animation.emit("movement-ground", "idle-crouch", false)
-	else:
-		change_animation.emit("movement-ground", "idle", false)
-	
 
 func exit():
-	if terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
-		terrain_tracker.terrain_changed.disconnect(_change_terrain_state)
+	if terrain_tracker.terrain_changed.is_connected(__change_terrain_state):
+		terrain_tracker.terrain_changed.disconnect(__change_terrain_state)
 
 
 func handle_key_input(event : InputEvent) -> void:
@@ -47,21 +54,15 @@ func handle_key_input(event : InputEvent) -> void:
 	if event.is_action_pressed("gc_jump"):
 		if player.can_actor_jump(true):
 			player.jump(true)
-			terrain_tracker.temp_disable_ground_raycast(0.1)
-			change_behaviour.emit("movement", "jump")
+			terrain_tracker.disable_raycast_on_timer(0.1)
+			change_behaviour.emit("/jump")
 	
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
-		
-		if player.is_crouching:
-			change_animation.emit("movement-ground", "idle-crouch", false)
-		else:
-			change_animation.emit("movement-ground", "idle", false)
-
 	elif event.is_action_pressed("gc_walk"):
-		player.toggle_walk()
+		player.is_walking = not player.is_walking
 	elif event.is_action_released("gc_walk") and player.walk_hold:
-		player.toggle_walk()
+		player.is_walking = false
 
 
 func set_target_node(NewTargetNode) -> void:
@@ -77,23 +78,21 @@ func handle_physics(delta : float) -> void:
 	
 	if player.axis_strength.x != 0.0:
 		if player.is_walking:
-			change_behaviour.emit("movement", "walk")
+			change_behaviour.emit("/walk")
 		else:
-			change_behaviour.emit("movement", "run")
+			change_behaviour.emit("/run")
 		return
 	
 	player.change_actor_speed(0.0, delta)
-	player.apply_gravity(delta)
-	player.move_and_slide()
 
 
-func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
+func __change_terrain_state(NewState: GameProperties.TerrainState) -> void:
 	if NewState == GameProperties.TerrainState.AIR:
 		if 0 < player.velocity.y:
-			change_behaviour.emit("movement", "fall")
+			change_behaviour.emit("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
-			change_behaviour.emit("movement", "jump")
+			change_behaviour.emit("/jump")
 	elif NewState == GameProperties.TerrainState.LIQUID:
-		change_behaviour.emit("movement", "swim-idle")
+		change_behaviour.emit("/swim-idle")
 
