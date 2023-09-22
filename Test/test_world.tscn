@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://dgxsvunvej7wg"]
 
 [ext_resource type="Script" path="res://Test/TestWorldScript.gd" id="1_sqj8f"]
-[ext_resource type="PackedScene" uid="uid://dc6geygfrfms8" path="res://Nodes/TileMaps/GrassyTerrain.tscn" id="2_3ryrg"]
-[ext_resource type="PackedScene" uid="uid://dw2ki46t73efm" path="res://Nodes/Actors/player.tscn" id="3_oqqnk"]
+[ext_resource type="PackedScene" uid="uid://dc6geygfrfms8" path="res://Scenes/TileMaps/GrassyTerrain.tscn" id="2_3ryrg"]
+[ext_resource type="PackedScene" uid="uid://df5dftulja42v" path="res://Scenes/Actors/player.tscn" id="3_oqqnk"]
 
 [node name="TestWorld" type="Node2D"]
 script = ExtResource("1_sqj8f")
@@ -16,10 +16,13 @@ position = Vector2(-256, -13)
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Label" type="Label" parent="CanvasLayer"]
-offset_right = 52.0
-offset_bottom = 26.0
+offset_left = 274.0
+offset_top = 2.0
+offset_right = 476.0
+offset_bottom = 132.0
 text = "Move: Left & Right arrows
 Jump: \"A\"
 Toggle walk: Left Shift
+Heal: Backspace
 
 Hide/Show controls: Enter"

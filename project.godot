@@ -99,8 +99,9 @@ gc_crouch={
 2d_physics/layer_4="player"
 2d_physics/layer_5="actors"
 2d_physics/layer_6="hurtbox"
-2d_physics/layer_7="interaction_box"
-2d_physics/layer_8="interactable"
+2d_physics/layer_7="hitbox"
+2d_physics/layer_8="interaction_box"
+2d_physics/layer_9="interactable"
 
 [rendering]
 
