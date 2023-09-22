@@ -2,7 +2,7 @@ extends Node
 class_name Behaviour
 
 # Behaviour Module
-signal change_behaviour(behaviour_path: String)
+signal behaviour_changed(behaviour_path: String)
 
 # Animation Nodes
 signal fsm_animation_state(state_path: String, new_state: String)
@@ -25,10 +25,7 @@ var behaviour_id: String = ""
 # want to force a state no matter what.
 var is_connected: bool = true
 
-# Use a variable of a specific class to target all changes to an object and retain predictions. 
-# Override the function set_target_node to set up your target node of the desired type.
-# Example: If your object variable object is of type Player, then override with:
-# if NewTargetNode is Player -> target_node = NewTargetNode.
+var _change_signal_sent: bool = false
 
 func enter(_args:= {}):
 	pass
@@ -56,3 +53,11 @@ func setup_behaviour() -> void:
 
 func set_target_node(_new_target_node) -> void:
 	pass
+
+
+func change_behaviour(behaviour_path: String) -> void:
+	if _change_signal_sent:
+		return
+	behaviour_changed.emit(behaviour_path)
+	
+	

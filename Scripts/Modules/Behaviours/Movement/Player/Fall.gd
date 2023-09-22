@@ -14,7 +14,7 @@ func setup_behaviour() -> void:
 
 func enter(_args:= {}):
 	if terrain_tracker.terrain_state == GameProperties.TerrainState.GROUND:
-		change_behaviour.emit("/idle")
+		change_behaviour(__get_target_ground_state())
 		if player.is_on_air:
 			player.is_on_air = false
 		return
@@ -22,7 +22,8 @@ func enter(_args:= {}):
 	if not player.is_on_air:
 		player.is_on_air = true
 	fsm_animation_state.emit("root/air/movement", "fall")
-	terrain_tracker.terrain_changed.connect(_change_terrain_state)
+	if not terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
+		terrain_tracker.terrain_changed.connect(_change_terrain_state)
 
 
 func exit():
@@ -36,11 +37,11 @@ func handle_key_input(event : InputEvent) -> void:
 			coyote_timer.stop()
 			player.jump(true)
 			terrain_tracker.disable_raycast_on_timer(0.2)
-			change_behaviour.emit("/jump")
+			change_behaviour("/jump")
 		elif player.can_actor_jump(false):
 			player.jump(false)
 			terrain_tracker.disable_raycast_on_timer(0.2)
-			change_behaviour.emit("/jump")
+			change_behaviour("/jump")
 		else:
 			jump_buffer.start()
 	elif event.is_action_pressed("gc_walk"):
@@ -64,20 +65,28 @@ func set_target_node(NewTargetNode) -> void:
 		player = NewTargetNode
 
 
-func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
-	if NewState == GameProperties.TerrainState.GROUND:
+func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
+	if new_state == GameProperties.TerrainState.GROUND:
 		player.air_jump_count = 0
 		player.is_on_air = false
-		if jump_buffer.time_left <= 0 or not player.can_actor_jump(true):
-			change_behaviour.emit("/idle")
-			return
+		if 0 < jump_buffer.time_left and player.can_actor_jump(true):
+			player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
+			change_behaviour("/jump")
+		else:
+			change_behaviour(__get_target_ground_state())
 		
-		jump_buffer.stop()
-		
-		player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
-		change_behaviour.emit("/jump")
+		if not jump_buffer.is_stopped():
+			jump_buffer.stop()
 
-	elif NewState == GameProperties.TerrainState.LIQUID:
+	elif new_state == GameProperties.TerrainState.LIQUID:
 		player.is_on_air = false
-		change_behaviour.emit("/swim-idle")
+		change_behaviour("/swim-idle")
 
+
+func __get_target_ground_state() -> String:
+	if player.axis_strength.x == 0.0:
+		return "/idle"
+	elif player.is_walking:
+		return "/walk"
+	else:
+		return "/run"

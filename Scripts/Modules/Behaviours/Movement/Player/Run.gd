@@ -18,8 +18,8 @@ func setup_behaviour() -> void:
 func enter(_args:= {}):
 	if not player:
 		return
-	
-	terrain_tracker.terrain_changed.connect(__change_terrain_state)
+	if not terrain_tracker.terrain_changed.is_connected(__change_terrain_state):
+		terrain_tracker.terrain_changed.connect(__change_terrain_state)
 	fsm_animation_state.emit("root/ground/movement", "run")
 
 
@@ -36,10 +36,10 @@ func handle_key_input(event : InputEvent) -> void:
 		if player.can_actor_jump(true):
 			player.jump(true)
 			terrain_tracker.disable_raycast_on_timer(0.1)
-			change_behaviour.emit("/jump")
+			change_behaviour("/jump")
 	elif event.is_action_pressed("gc_walk"):
 		player.is_walking = true
-		change_behaviour.emit("/walk")
+		change_behaviour("/walk")
 
 
 func handle_physics(delta : float) -> void:
@@ -49,20 +49,20 @@ func handle_physics(delta : float) -> void:
 	player.update_input_axis(true, false)
 	
 	if player.velocity.x == 0 and player.axis_strength.x == 0:
-		change_behaviour.emit("/idle")
+		change_behaviour("/idle")
 		return
 	
 	player.update_facing_right()
 	player.change_actor_speed(player.axis_strength.x, delta)
 
 
-func __change_terrain_state(NewState: GameProperties.TerrainState) -> void:
-	if NewState == GameProperties.TerrainState.AIR:
-		if 0 < player.velocity.y:
-			change_behaviour.emit("/fall")
+func __change_terrain_state(new_state: GameProperties.TerrainState) -> void:
+	if new_state == GameProperties.TerrainState.AIR:
+		if 0 <= player.velocity.y:
+			change_behaviour("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
-			change_behaviour.emit("/jump")
-	elif NewState == GameProperties.TerrainState.LIQUID:
-		change_behaviour.emit("/swim-idle")
+			change_behaviour("/jump")
+	elif new_state == GameProperties.TerrainState.LIQUID:
+		change_behaviour("/swim-idle")
 

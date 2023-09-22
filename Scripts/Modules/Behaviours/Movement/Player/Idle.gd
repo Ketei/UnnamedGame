@@ -20,18 +20,18 @@ func enter(_args:= {}):
 
 	if terrain_tracker.terrain_state == GameProperties.TerrainState.AIR:
 		if player.velocity.y < 0:
-			change_behaviour.emit("/jump")
+			change_behaviour("/jump")
 		else:
-			change_behaviour.emit("/fall")
+			change_behaviour("/fall")
 		return
 	
 	player.update_input_axis(true, false)
 	
 	if player.axis_strength.x != 0:
 		if player.is_walking:
-			change_behaviour.emit("/walk")
+			change_behaviour("/walk")
 		else:
-			change_behaviour.emit("/run")
+			change_behaviour("/run")
 	
 	if player.air_jump_count != 0:
 		player.air_jump_count = 0
@@ -55,7 +55,7 @@ func handle_key_input(event : InputEvent) -> void:
 		if player.can_actor_jump(true):
 			player.jump(true)
 			terrain_tracker.disable_raycast_on_timer(0.1)
-			change_behaviour.emit("/jump")
+			change_behaviour("/jump")
 	
 	elif event.is_action_pressed("gc_crouch"):
 		player.is_crouching = not player.is_crouching
@@ -65,9 +65,9 @@ func handle_key_input(event : InputEvent) -> void:
 		player.is_walking = false
 
 
-func set_target_node(NewTargetNode) -> void:
-	if NewTargetNode is Player:
-		player = NewTargetNode
+func set_target_node(new_target_node) -> void:
+	if new_target_node is Player:
+		player = new_target_node
 
 
 func handle_physics(delta : float) -> void:
@@ -78,21 +78,21 @@ func handle_physics(delta : float) -> void:
 	
 	if player.axis_strength.x != 0.0:
 		if player.is_walking:
-			change_behaviour.emit("/walk")
+			change_behaviour("/walk")
 		else:
-			change_behaviour.emit("/run")
+			change_behaviour("/run")
 		return
 	
 	player.change_actor_speed(0.0, delta)
 
 
-func __change_terrain_state(NewState: GameProperties.TerrainState) -> void:
-	if NewState == GameProperties.TerrainState.AIR:
-		if 0 < player.velocity.y:
-			change_behaviour.emit("/fall")
+func __change_terrain_state(new_state: GameProperties.TerrainState) -> void:
+	if new_state == GameProperties.TerrainState.AIR:
+		if 0 <= player.velocity.y:
+			change_behaviour("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
-			change_behaviour.emit("/jump")
-	elif NewState == GameProperties.TerrainState.LIQUID:
-		change_behaviour.emit("/swim-idle")
+			change_behaviour("/jump")
+	elif new_state == GameProperties.TerrainState.LIQUID:
+		change_behaviour("/swim-idle")
 

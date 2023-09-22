@@ -2,10 +2,6 @@ extends Behaviour
 
 var player: Player
 var terrain_tracker: ModuleTerrainTracker
-var current_terrain: GameProperties.TerrainState:
-	set(value):
-		current_terrain = value
-		_terrain_update()
 var jump_buffer: TimerForModule
 var _jump_timer_restore: Timer
 
@@ -17,9 +13,9 @@ func enter(_args:= {}):
 	if not player.is_on_air:
 		player.is_on_air = true
 	
-	current_terrain = terrain_tracker.terrain_state
 	fsm_animation_state.emit("root/air/movement", "jump")
-	terrain_tracker.terrain_changed.connect(_change_terrain_state)
+	if not terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
+		terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
 	_jump_timer_restore.start()
 
@@ -62,7 +58,7 @@ func handle_physics(delta : float) -> void:
 		return
 
 	if 0 <= player.velocity.y:
-		change_behaviour.emit("/fall")
+		change_behaviour("/fall")
 	
 	player.update_input_axis(true, false)
 
@@ -82,27 +78,36 @@ func setup_behaviour() -> void:
 	self.add_child(_jump_timer_restore)
 
 
-func set_target_node(NewTargetNode) -> void:
-	if NewTargetNode is Player:
-		player = NewTargetNode
+func set_target_node(new_target_node) -> void:
+	if new_target_node is Player:
+		player = new_target_node
 
 
-func _change_terrain_state(NewState: GameProperties.TerrainState) -> void:
-	current_terrain = NewState
-
-
-func _terrain_update() -> void:
-	if current_terrain == GameProperties.TerrainState.GROUND:
+func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
+	if new_state == GameProperties.TerrainState.GROUND:
 		player.air_jump_count = 0
 		if 0 < jump_buffer.time_left and player.can_actor_jump(true):
-			jump_buffer.stop()
 			player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
 			fsm_animation_replay.emit(false)
+		else:
+			change_behaviour(__get_target_ground_state())
+		
+		if not jump_buffer.is_stopped():
+			jump_buffer.stop()
 
 
-func toggle_walk(IsWalking: bool) -> void:
-	player.is_walking = IsWalking
+func toggle_walk(is_walking: bool) -> void:
+	player.is_walking = is_walking
 	if player.is_walking:
 		fsm_animation_state.emit("root/ground/movement", "walk")
 	else:
 		fsm_animation_state.emit("root/ground/movement", "run")
+
+
+func __get_target_ground_state() -> String:
+	if player.axis_strength.x == 0.0:
+		return "/idle"
+	elif player.is_walking:
+		return "/walk"
+	else:
+		return "/run"
