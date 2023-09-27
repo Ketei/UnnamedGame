@@ -10,12 +10,15 @@ signal behaviour_changed(OldPackAndBehaviour: String, NewPackAndBehaviour: Strin
 @export var default_pack: BehaviourPack
 @export var print_changes_in_debug: bool = false
 
-var loaded_packs: Dictionary = {}
-var current_pack: String = ""
+var target_node: Node = null # The node that this module will apply on
 
+var current_pack: String = ""
 var loaded_behaviour: Behaviour = null
 
-var target_node: Node = null # The node that this module will apply on
+var loaded_packs: Dictionary = {}
+
+## Array containing the last 5 behaviours.
+var behaviour_history: Array[Behaviour] = []
 
 var _original_behaviours: Dictionary = {} # Used to store replaced behaviours. One per ID
 
@@ -82,19 +85,22 @@ func change_behaviour(behaviour_path: String) -> void:
 	var _behaviour_preload: Behaviour = loaded_packs[_pack].available_behaviours[_behaviour]
 	var _old_behaviour: String = current_pack + "/" + loaded_behaviour.behaviour_id
 	
-	if current_pack != _pack:
-		current_pack = _pack
+	load_behaviour(_behaviour_preload)
 	
-	loaded_behaviour.exit()
-	disconnect_behaviour_signals()
-	loaded_behaviour = _behaviour_preload
-	connect_behaviour_signals()
 	behaviour_changed.emit(_old_behaviour, _pack + "/" + _behaviour)
-	loaded_behaviour._change_signal_sent = false
-	loaded_behaviour.enter()
 
 	if print_changes_in_debug:
 		print_debug("Changed behaviour from " + _old_behaviour + " to " + _pack + "/" + _behaviour)
+
+
+func load_behaviour(behaviour_to_load: Behaviour) -> void:
+	loaded_behaviour.exit()
+	disconnect_behaviour_signals()
+	loaded_behaviour = behaviour_to_load
+	current_pack = loaded_behaviour.pack_id
+	connect_behaviour_signals()
+	loaded_behaviour._change_signal_sent = false
+	loaded_behaviour.enter()
 
 
 func connect_behaviour_signals() -> void:
