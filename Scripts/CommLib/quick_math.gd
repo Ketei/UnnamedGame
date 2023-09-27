@@ -3,30 +3,21 @@ extends Node
 
 func get_jump_velocity(JumpInTiles: float, JumpTimeToPeak: float) -> float:
 	if JumpInTiles == 0 or JumpTimeToPeak == 0:
-		print_debug("Warning: Missing values or 0.0 provided for actor jump height and time to peak on JumpVelocity")
-		print_debug("Warning: get_jump_velocity() cannot be performed successfully. Returning 0.0 instead")
 		return 0.0
-	else:
-		# The +1 comes from the single pixel that is eaten by the floor before jump
-		return -((2.0 * JumpInTiles + 1) / JumpTimeToPeak)
+	# The +1 comes from the single pixel that is eaten by the floor before jump
+	return -((2.0 * JumpInTiles + 1) / JumpTimeToPeak)
 
 
 func get_jump_gravity(JumpInTiles:float, JumpTimeToPeak:float) -> float:
 	if JumpInTiles == 0 or JumpTimeToPeak == 0:
-		print_debug("Missing values for actor jump height and time to peak on JumpGravity")
-		print_debug("Warning: get_jump_gravity() cannot be performed successfully. Returning 0.0 instead")
 		return 0.0
-	else:
-		return -((-2.0 * JumpInTiles) / pow(JumpTimeToPeak, 2))
+	return -((-2.0 * JumpInTiles) / pow(JumpTimeToPeak, 2))
 
 
 func get_normal_gravity(JumpInTiles:float, JumpTimeToFloor:float) -> float:
 	if JumpInTiles == 0 or JumpTimeToFloor == 0:
-		print_debug("Missing values for actor jump height and time to floor on NormalGravity")
-		print_debug("Warning: get_normal_gravity() cannot be performed successfully. Returning 0.0 instead")
 		return 0.0
-	else:
-		return -((-2.0 * JumpInTiles) / pow(JumpTimeToFloor, 2))
+	return -((-2.0 * JumpInTiles) / pow(JumpTimeToFloor, 2))
 
 ## Checks if the first value is between the two values given. If it is returns true else returns false
 func is_between(Value : float, From : float, To : float) -> bool:
@@ -92,13 +83,12 @@ func array_get_lowest_numberi(ArrayToCheck: Array) -> int:
 	if ArrayToCheck.is_empty():
 		return 0
 	
-	var lowest_number: int = int(ArrayToCheck.front())
+	var _array_transform: Array[float] = []
 	
-	for number in ArrayToCheck:
-		if int(number) < lowest_number:
-			lowest_number = int(number)
+	for item in ArrayToCheck:
+		_array_transform.append(float(item))
 	
-	return lowest_number
+	return int(_array_transform.min())
 
 
 func are_numbers_same_poles(NumberA: float, NumberB: float) -> bool:
