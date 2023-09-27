@@ -1,7 +1,8 @@
-[gd_scene load_steps=27 format=3 uid="uid://df5dftulja42v"]
+[gd_scene load_steps=32 format=3 uid="uid://df5dftulja42v"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_pwxxx"]
-[ext_resource type="Texture2D" uid="uid://bj76fclypopfk" path="res://Assets/Textures/Actors/Player/Character_Idle_48x48.png" id="2_a80ui"]
+[ext_resource type="PackedScene" uid="uid://bdiyfgq02cvwy" path="res://Scenes/Actors/Components/actor_sprite.tscn" id="2_nljli"]
+[ext_resource type="Texture2D" uid="uid://b0icky3bgk5v0" path="res://Assets/Textures/Actors/Player/Character_48x48.png" id="3_a73uu"]
 [ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_ieijs"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_4kw1u"]
 [ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_sx5gr"]
@@ -11,18 +12,39 @@
 [ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Scenes/StateMachines/player_anim_fsm.tscn" id="9_q6u2g"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="10_1o7wi"]
 [ext_resource type="Script" path="res://Scripts/Modules/ModuleInteraction.gd" id="11_051nj"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/state_machine_controller.gd" id="11_een1p"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_stats.gd" id="12_utxm4"]
 [ext_resource type="Script" path="res://Scripts/BaseClasses/component_stat.gd" id="13_x20mx"]
-[ext_resource type="PackedScene" uid="uid://cjv5l3hbwnlp1" path="res://Scenes/UI/texture_progress_bar.tscn" id="14_4kikl"]
 [ext_resource type="Script" path="res://Scripts/Components/stat_progress_bar.gd" id="15_p2nnr"]
-[ext_resource type="Script" path="res://Test/TestPlayerScript.gd" id="16_b1cnf"]
+[ext_resource type="Texture2D" uid="uid://b8s5athuxem6n" path="res://Assets/Textures/UI/HUD/bar_fill.png" id="17_hjugg"]
+[ext_resource type="Texture2D" uid="uid://djk7aht017mdr" path="res://Assets/Textures/UI/HUD/bar_over.png" id="18_kli7j"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
+size = Vector2(12, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
+size = Vector2(12, 4)
+
+[sub_resource type="GDScript" id="GDScript_84agl"]
+resource_name = "player_hurt_box"
+script/source = "extends HurtBox
+
+@export var player_sprite: ActorSprite2D
+
+func _hit() -> void:
+	if 0.3 < invincibility_time:
+		player_sprite.play_effect(ActorSprite2D.EffectType.BLINK, invincibility_time)
+"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mrg70"]
+size = Vector2(12, 27)
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -32,13 +54,45 @@ tracks/0/keys = {
 "values": [0]
 }
 
+[sub_resource type="Animation" id="Animation_4ubn3"]
+resource_name = "damage"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../ActorSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [29, 30, 31, 32]
+}
+
+[sub_resource type="Animation" id="Animation_jf1pk"]
+resource_name = "death"
+length = 0.9
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../ActorSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+}
+
 [sub_resource type="Animation" id="Animation_jelgw"]
 resource_name = "fall"
 length = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -54,7 +108,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -70,7 +124,7 @@ length = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -87,7 +141,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -104,7 +158,7 @@ loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("../Sprite:frame")
+tracks/0/path = NodePath("../ActorSprite:frame")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -117,6 +171,8 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_xp0ma"]
 _data = {
 "RESET": SubResource("Animation_lkhnf"),
+"damage": SubResource("Animation_4ubn3"),
+"death": SubResource("Animation_jf1pk"),
 "fall": SubResource("Animation_jelgw"),
 "idle": SubResource("Animation_ym4cv"),
 "jump": SubResource("Animation_05th0"),
@@ -124,22 +180,15 @@ _data = {
 "walk": SubResource("Animation_t05fn")
 }
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3l8r1"]
-size = Vector2(12, 8)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_2le28"]
-size = Vector2(12, 4)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_mrg70"]
-size = Vector2(12, 27)
-
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite", "module_manager", "hurt_box")]
+position = Vector2(1, 0)
 collision_layer = 0
 collision_mask = 5
 script = ExtResource("1_pwxxx")
 actor_name = "Ketei"
 actor_type = 1
-actor_sprite = NodePath("Sprite")
+actor_sprite = NodePath("ActorSprite")
+module_manager = NodePath("ModuleManager")
 run_speed = 13.0
 walk_speed = 6.5
 acceleration = 0.3
@@ -151,15 +200,53 @@ time_to_floor = 0.38
 time_to_peak = 0.45
 air_acceleration = 0.45
 air_friction = 1.0
+hurt_box = NodePath("PlayerHurtBox")
 
-[node name="Sprite" type="Sprite2D" parent="."]
+[node name="ActorSprite" parent="." instance=ExtResource("2_nljli")]
 position = Vector2(0, -16)
-texture = ExtResource("2_a80ui")
-hframes = 6
-vframes = 5
+texture = ExtResource("3_a73uu")
+hframes = 5
+vframes = 9
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(0, 0, 5, 0, 6, -1, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -1, -5, 0)
+
+[node name="RayCastCenter" type="RayCast2D" parent="."]
+position = Vector2(0, -16)
+target_position = Vector2(0, 18)
+
+[node name="RayCastLeft" type="RayCast2D" parent="."]
+position = Vector2(-5, -16)
+target_position = Vector2(0, 18)
+
+[node name="RayCastRight" type="RayCast2D" parent="."]
+position = Vector2(5, -16)
+target_position = Vector2(0, 18)
+
+[node name="GroundTerrain" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundTerrain"]
+position = Vector2(0, -4)
+shape = SubResource("RectangleShape2D_3l8r1")
+
+[node name="MiddleTerrain" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleTerrain"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_2le28")
+
+[node name="PlayerHurtBox" type="Area2D" parent="." node_paths=PackedStringArray("player_sprite", "module_stats")]
+script = SubResource("GDScript_84agl")
+player_sprite = NodePath("../ActorSprite")
+module_stats = NodePath("../ModuleManager/ModuleStats")
+invincibility_time = 2.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerHurtBox"]
+position = Vector2(0, -13.5)
+shape = SubResource("RectangleShape2D_mrg70")
+debug_color = Color(0, 0.584314, 0.235294, 0.419608)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
 script = ExtResource("3_ieijs")
@@ -183,15 +270,40 @@ middle_collision = NodePath("../../MiddleTerrain")
 [node name="ModuleTimersManager" type="Node" parent="ModuleManager"]
 script = ExtResource("7_d17gd")
 
-[node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager" node_paths=PackedStringArray("state_machine")]
+[node name="ModuleAnimationPlayer" type="AnimationPlayer" parent="ModuleManager" node_paths=PackedStringArray("state_machine", "machine_controller")]
 autoplay = "idle"
 libraries = {
 "": SubResource("AnimationLibrary_xp0ma")
 }
 script = ExtResource("8_gt0kb")
 state_machine = NodePath("Root")
+machine_controller = NodePath("AnimSMController")
 
 [node name="Root" parent="ModuleManager/ModuleAnimationPlayer" instance=ExtResource("9_q6u2g")]
+
+[node name="AnimSMController" type="Node" parent="ModuleManager/ModuleAnimationPlayer" node_paths=PackedStringArray("state_machine")]
+script = ExtResource("11_een1p")
+state_machine = NodePath("../Root")
+state_arguments = {
+"damage": {
+"root": "damage"
+},
+"fall": {
+"root/air/movement": "fall"
+},
+"idle": {
+"root/ground/movement": "idle"
+},
+"jump": {
+"root/air/movement": "jump"
+},
+"run": {
+"root/ground/movement": "run"
+},
+"walk": {
+"root/ground/movement": "walk"
+}
+}
 
 [node name="ModuleGravity" type="Node" parent="ModuleManager" node_paths=PackedStringArray("target_actor")]
 script = ExtResource("10_1o7wi")
@@ -212,70 +324,35 @@ script = ExtResource("13_x20mx")
 stat_name = "health"
 current_value = 100.0
 _max_value = 100.0
-cancel_decimals = true
 value_rounding = 1
-
-[node name="RayCastCenter" type="RayCast2D" parent="."]
-position = Vector2(0, -16)
-target_position = Vector2(0, 18)
-
-[node name="RayCastLeft" type="RayCast2D" parent="."]
-position = Vector2(-5, -16)
-target_position = Vector2(0, 18)
-
-[node name="RayCastRight" type="RayCast2D" parent="."]
-position = Vector2(5, -16)
-target_position = Vector2(0, 18)
-
-[node name="GroundTerrain" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GroundTerrain"]
-position = Vector2(0, -4)
-shape = SubResource("RectangleShape2D_3l8r1")
-
-[node name="MiddleTerrain" type="Area2D" parent="."]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleTerrain"]
-position = Vector2(0, -18)
-shape = SubResource("RectangleShape2D_2le28")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(0, -32)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
 
-[node name="UI" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="Control" type="Control" parent="UI"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TextureProgressBar" parent="UI/Control" node_paths=PackedStringArray("measured_stat") instance=ExtResource("14_4kikl")]
-layout_mode = 2
-offset_left = 16.0
+[node name="HealthBar" type="TextureProgressBar" parent="HUD" node_paths=PackedStringArray("measured_stat")]
+offset_left = 24.0
 offset_top = 8.0
-offset_right = 96.0
+offset_right = 104.0
 offset_bottom = 16.0
+nine_patch_stretch = true
+stretch_margin_left = 3
+stretch_margin_top = 3
+stretch_margin_right = 3
+stretch_margin_bottom = 3
+texture_under = ExtResource("17_hjugg")
+texture_over = ExtResource("18_kli7j")
+texture_progress = ExtResource("17_hjugg")
+tint_under = Color(0.294118, 0.0666667, 0.0470588, 1)
+tint_over = Color(0, 0, 0, 1)
+tint_progress = Color(0.619608, 0.137255, 0.113725, 1)
 script = ExtResource("15_p2nnr")
-measured_stat = NodePath("../../../ModuleManager/ModuleStats/Health")
+measured_stat = NodePath("../../ModuleManager/ModuleStats/Health")
 show_numbers = true
 enable_tweening = true
-tween_transition = 8
+tween_time = 2.0
+tween_transition = 3
 tween_ease = 1
-
-[node name="HurtBox" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 64
-monitorable = false
-script = ExtResource("16_b1cnf")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtBox"]
-position = Vector2(0, -13.5)
-shape = SubResource("RectangleShape2D_mrg70")
-debug_color = Color(0, 0.584314, 0.235294, 0.419608)
-
-[connection signal="area_entered" from="HurtBox" to="HurtBox" method="_on_area_entered"]
