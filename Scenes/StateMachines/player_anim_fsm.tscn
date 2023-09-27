@@ -43,5 +43,9 @@ animation_list = Array[String](["jump"])
 script = ExtResource("2_ccu30")
 animation_list = Array[String](["fall"])
 
+[node name="Damage" type="Node" parent="."]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["damage"])
+
 [node name="Liquid" type="Node" parent="."]
 script = ExtResource("1_cxiaa")
