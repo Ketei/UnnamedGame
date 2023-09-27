@@ -9,17 +9,18 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 @export var actor_name: String = ""
 @export var actor_type: ActorProperties.ActorType
 @export var actor_gender: ActorProperties.Gender
-@export var actor_sprite: Sprite2D = null
+@export var actor_sprite: ActorSprite2D = null
+@export var module_manager: ModuleManager
 
 @export_category("Ground Movement")
-## Any terrain change will be checked here first, then on GameProperties.
+## Any terrain change will be checked here first, then on Game.
 @export var self_terrain_move_mod: Dictionary = {}
 @export var run_speed: float = 0.0: 
 	set(value) :
-		run_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
+		run_speed = maxf(value, 0.0) * Game.GRID_SIZE
 @export var walk_speed: float = 0.0 : 
 	set(value) :
-		walk_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
+		walk_speed = maxf(value, 0.0) * Game.GRID_SIZE
 ## How much time in seconds will it take the actor to reach max speed
 @export var acceleration: float = 0.0 : 
 	set(value) :
@@ -30,7 +31,7 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 		friction = maxf(value, 0.0)
 @export var climb_base_speed: float = 0.0 : 
 	set(value) :
-		climb_base_speed = maxf(value, 0.0) * GameProperties.GRID_SIZE
+		climb_base_speed = maxf(value, 0.0) * Game.GRID_SIZE
 @export var crouch_speed: float = 0.0 :
 	set(value):
 		crouch_speed = maxf(value, 0.0)
@@ -40,7 +41,7 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 ## If this value is updated and have a gravity module, be sure to update it too.
 @export var jump_height: float = 0.0:
 	set(value):
-		jump_height = value * GameProperties.GRID_SIZE
+		jump_height = value * Game.GRID_SIZE
 		jump_velocity = QuickMath.get_jump_velocity(jump_height, time_to_peak)
 		__update_gravity()
 ## How fast in seconds should you reach the floor after jumping. If this value
@@ -66,6 +67,9 @@ enum GravityMode {NORMAL, JUMP, ZERO}
 	set(value):
 		air_friction = maxf(value, 0.0)
 
+@export_category("Hurtbox")
+@export var hurt_box: HurtBox
+
 # Toggles
 var is_gravity_enabled: bool = true
 var can_jump: bool = true
@@ -87,9 +91,6 @@ var terrain_mod: float = 1.0:
 
 # Tracker
 var air_jump_count: int = 0
-
-# References
-var module_manager: ModuleManager
 
 @onready var jump_velocity: float = QuickMath.get_jump_velocity(jump_height,
 		time_to_peak)
@@ -140,8 +141,8 @@ func get_speed() -> float:
 func set_terrain_mult_by_name(terrain_name: String):
 	if terrain_name in self_terrain_move_mod:
 		terrain_mod = self_terrain_move_mod[terrain_name]
-	elif terrain_name in GameProperties.TerrainMoveMult:
-		terrain_mod = GameProperties.TerrainMoveMult[terrain_name]
+	elif terrain_name in Game.TerrainMoveMult:
+		terrain_mod = Game.TerrainMoveMult[terrain_name]
 
 
 func add_terrain_modifier(terrain_name: String, terrain_modifier: float) -> void:

@@ -51,8 +51,8 @@ func _update_total_speed() -> void:
 func set_terrain_mult_by_name(TerrainName: String):
 	if TerrainName in self_terrain_move_mod:
 		_terrain_mod = self_terrain_move_mod[TerrainName]
-	elif TerrainName in GameProperties.TerrainMoveMult:
-		_terrain_mod = GameProperties.TerrainMoveMult[TerrainName]
+	elif TerrainName in Game.TerrainMoveMult:
+		_terrain_mod = Game.TerrainMoveMult[TerrainName]
 
 
 func add_terrain_modifier(TerrainName: String, TerrainModifier: float) -> void:

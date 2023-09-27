@@ -20,7 +20,7 @@ func calculate_sex_damage(SkillAttacker: ActorProperties.SexSkillTypes, Vitality
 func get_lust_effect_key(LustAmount: int) -> String:
 	var _return_key: int = -1
 	
-	for lust_key in GameProperties.lust_effects.keys():
+	for lust_key in Game.lust_effects.keys():
 		if lust_key != "per-level":
 			if int(lust_key) <= LustAmount:
 				_return_key = int(lust_key)
@@ -58,11 +58,11 @@ func get_lust_stat_changef(StatType: String, CurrentLust: int, PrevLust: int) ->
 	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
 	
 	for lust_number in _lust_effect_steps.keys():
-		if StatType in GameProperties.lust_effects[lust_number]:
-			_return_value += GameProperties.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
+		if StatType in Game.lust_effects[lust_number]:
+			_return_value += Game.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
 	
-	if StatType in GameProperties.lust_effects["per-level"]:
-		_return_value += GameProperties.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
+	if StatType in Game.lust_effects["per-level"]:
+		_return_value += Game.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
 
 	return _return_value
 
@@ -73,11 +73,11 @@ func get_lust_stat_changei(StatType: String, CurrentLust: int, PrevLust: int) ->
 	var _lust_effect_steps: Dictionary = get_lust_effect_steps(CurrentLust, PrevLust)
 	
 	for lust_number in _lust_effect_steps.keys():
-		if StatType in GameProperties.lust_effects[lust_number]:
-			_return_value += GameProperties.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
+		if StatType in Game.lust_effects[lust_number]:
+			_return_value += Game.lust_effects[lust_number][StatType] * _lust_effect_steps[lust_number]
 	
-	if StatType in GameProperties.lust_effects["per-level"]:
-		_return_value += GameProperties.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
+	if StatType in Game.lust_effects["per-level"]:
+		_return_value += Game.lust_effects["per-level"][StatType] * (CurrentLust - PrevLust)
 
 	return _return_value
 

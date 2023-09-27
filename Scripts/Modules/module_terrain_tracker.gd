@@ -4,6 +4,8 @@ extends Module
 
 signal terrain_changed(new_terrain)
 
+@onready var actor: Actor = $"../.."
+
 @export_category("Terrain Raycast")
 @export var raycast_left: RayCast2D = null
 @export var raycast_center: RayCast2D = null
@@ -16,7 +18,7 @@ signal terrain_changed(new_terrain)
 @export var middle_collision: Area2D = null
 
 var effect_list: Array = []
-var terrain_state: GameProperties.TerrainState = GameProperties.TerrainState.AIR:
+var terrain_state: Game.TerrainState = Game.TerrainState.AIR:
 	set(value):
 		if value != terrain_state:
 			terrain_state = value
@@ -114,9 +116,10 @@ func __remove_terrain_effects(area) -> void:
 
 func __update_terrain_state() -> void:
 	#if is_submerged:
-		#terrain_state = GameProperties.TerrainState.LIQUID
+		#terrain_state = Game.TerrainState.LIQUID
 	if is_on_ground():
-		terrain_state = GameProperties.TerrainState.GROUND
+		terrain_state = Game.TerrainState.GROUND
+		actor.is_on_air = false
 	else:
-		terrain_state = GameProperties.TerrainState.AIR
-
+		terrain_state = Game.TerrainState.AIR
+		actor.is_on_air = true

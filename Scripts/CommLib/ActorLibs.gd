@@ -12,15 +12,15 @@ func calculate_damage_with_combat(AttackerCombat: VitalityCombat, DefenderCombat
 	var _resistance: float = 0
 	
 	for attack_type in AttackerCombat.attack_types.keys():
-		if GameProperties.AttackTypes[attack_type] == GameProperties.DamageTypes.PHYSICAL:
+		if Game.AttackTypes[attack_type] == Game.DamageTypes.PHYSICAL:
 			_damage = ActorLibs.calculate_statf(AttackerCombat.attack_types[attack_type] + AttackerCombat.skill_damage_physical, AttackerCombat.mod_damage_physical, AttackerCombat.mult_damage_physical)
 			if DefenderCombat:
 				_resistance = DefenderCombat.defense_physical
-		elif GameProperties.AttackTypes[attack_type] == GameProperties.DamageTypes.MAGICAL:
+		elif Game.AttackTypes[attack_type] == Game.DamageTypes.MAGICAL:
 			_damage = ActorLibs.calculate_statf(AttackerCombat.attack_types[attack_type] + AttackerCombat.skill_change_damage_magical, AttackerCombat.mod_damage_magical, AttackerCombat.mult_damage_magical)
 			if DefenderCombat:
 				_resistance = DefenderCombat.defense_magical
-		elif GameProperties.AttackTypes[attack_type] == GameProperties.DamageTypes.TRUE:
+		elif Game.AttackTypes[attack_type] == Game.DamageTypes.TRUE:
 			_damage = AttackerCombat.attack_types[attack_type]
 			_resistance = 0
 		

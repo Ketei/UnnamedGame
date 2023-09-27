@@ -12,11 +12,11 @@ enum GravityMode {NORMAL, ZERO}
 ## to fall by itself. Reducing this will give a low-gravity feel.
 @export var terminal_velocity: float = 0.0 : 
 	set(value) :
-		terminal_velocity = maxf(value, 0.0) * GameProperties.GRID_SIZE
+		terminal_velocity = maxf(value, 0.0) * Game.GRID_SIZE
 ## If on zero gravity, this is how much you'll slow down per second.
 @export var low_grav_slowdown: float = 0.0 :
 	set(value):
-		low_grav_slowdown = maxf(value, 0.0) * GameProperties.GRID_SIZE
+		low_grav_slowdown = maxf(value, 0.0) * Game.GRID_SIZE
 
 var jump_gravity: float = 0.0
 var normal_gravity: float = 0.0

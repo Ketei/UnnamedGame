@@ -330,9 +330,9 @@ func cum() -> void:
 		return
 	
 	if actor_sex_role == ActorProperties.SexRole.BOTTOM:
-		current_arousal += (GameProperties.Arousal_Clearing_Penalty_Bottoms * orgasm_counter_effect) - 100
+		current_arousal += (Game.Arousal_Clearing_Penalty_Bottoms * orgasm_counter_effect) - 100
 	elif actor_sex_role == ActorProperties.SexRole.TOP:
-		current_arousal += (GameProperties.Arousal_Clearing_Penalty_Tops * orgasm_counter_effect) - 100
+		current_arousal += (Game.Arousal_Clearing_Penalty_Tops * orgasm_counter_effect) - 100
 	
 	@warning_ignore("narrowing_conversion")
 	var cum_times: int = cum_meter / cum_threshold

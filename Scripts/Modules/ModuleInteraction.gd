@@ -24,5 +24,5 @@ func set_up_module() -> void:
 	is_module_enabled = true
 
 # Changes the animation terrain state depending on the terrain state of terrain module
-func __terrain_tracker_changed(NewState: GameProperties.TerrainState) -> void:
-	animation_player.set_anim_state("root", GameProperties.TerrainNames[NewState])
+func __terrain_tracker_changed(NewState: Game.TerrainState) -> void:
+	animation_player.set_anim_state("root", Game.TerrainNames[NewState])

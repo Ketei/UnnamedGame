@@ -118,9 +118,9 @@ func remove_effect(EffectID: String) -> void:
 
 
 # --- Module Terrain Tracker ---
-func get_terrain_state() -> GameProperties.TerrainState:
+func get_terrain_state() -> Game.TerrainState:
 	if not has_module("terrain-tracker"):
-		return GameProperties.TerrainState.GROUND
+		return Game.TerrainState.GROUND
 	
 	return get_module("terrain-tracker").terrain_state
 # ------------------------------

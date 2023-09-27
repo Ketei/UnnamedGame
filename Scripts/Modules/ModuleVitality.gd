@@ -180,7 +180,7 @@ func _changed_lust(CurrentValue: int, PreviousValue: int) -> void:
 
 
 func _changed_skill(SkillName: String, From: int, To: int) -> void:
-	var _skill_apply: Dictionary = GameProperties.get_skill_effects(SkillName, From, To)
+	var _skill_apply: Dictionary = Game.get_skill_effects(SkillName, From, To)
 	
 	for skill_change in _skill_apply.keys():
 		if health_module:

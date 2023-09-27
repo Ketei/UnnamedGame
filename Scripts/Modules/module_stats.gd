@@ -9,10 +9,11 @@ enum StatType {GENERIC, SKILL, LUST}
 
 # References
 ## These components will trigger a lust update when changed
-## For this to happen stat_name must exist in GameProperties.lust_effects
+## For this to happen stat_name must exist in Game.lust_effects
 @export var lust_components: Array[ComponentStat]
+
 ## These components will trigger a skill update when changed.
-## For this to happen stat_name must exist in GameProperties.skill_effects
+## For this to happen stat_name must exist in Game.skill_effects
 @export var skill_components: Array[ComponentStat]
 
 
@@ -45,7 +46,7 @@ func add_component(component_to_add: ComponentStat, stat_type := StatType.GENERI
 		component_to_add.stat_changed.connect(lust_update)
 
 
-func has_stat(stat_name: String) -> void:
+func has_stat(stat_name: String) -> bool:
 	return _available_statistics.has(stat_name)
 
 
@@ -55,11 +56,11 @@ func get_stat(stat_name: String) -> ComponentStat:
 
 ## Triggered on component signal
 func lust_update(component: ComponentStat) -> void:
-	for stat_changed in GameProperties.lust_effects.keys():
+	for stat_changed in Game.lust_effects.keys():
 		if not _available_statistics.has(stat_changed):
 			continue
 		_available_statistics[stat_changed].change_mod(
-				GameProperties.get_lust_effects(
+				Game.get_lust_effects(
 						stat_changed, 
 						component.current_value, 
 						component.previous_current_value))
@@ -67,10 +68,10 @@ func lust_update(component: ComponentStat) -> void:
 
 ## Triggered on component signal
 func skill_update(component: ComponentStat) -> void:
-	if not GameProperties.skill_effects.has(component.stat_name):
+	if not Game.skill_effects.has(component.stat_name):
 		return
 	
-	var _skill_changes: Dictionary = GameProperties.get_skill_effects(component.stat_name, component.current_value, component.previous_value)
+	var _skill_changes: Dictionary = Game.get_skill_effects(component.stat_name, component.current_value, component.previous_value)
 	
 	if _skill_changes.is_empty():
 		return
