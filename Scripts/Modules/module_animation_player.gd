@@ -7,7 +7,8 @@ extends AnimationPlayer
 ## If true custom_play will play random animations unless the argument is
 ## overriden in the function
 @export var play_random_animation: bool = false
-@export var state_machine: StateMachine
+@export var state_machine: StateMachine # Reference
+@export var machine_controller: StateMachineController # Reference
 
 # Required for the manager to track them.
 var module_type: String = "animation-player"
@@ -22,14 +23,14 @@ var animations_list: AnimationList
 func set_up_module() -> void:
 	if state_machine:
 		state_machine.ready_state_machine()
-		_register_animations()
+		_module_setup()
 		custom_play()
 		state_machine.state_changed.connect(__anim_updated)
 		state_machine.nested_machine_changed.connect(__anim_updated)
 
 
 ## Overridable function. Use it to call register_animation/s if needed.
-func _register_animations() -> void:
+func _module_setup() -> void:
 	pass
 
 
@@ -45,7 +46,10 @@ func _module_enabled_override(is_enabled: bool) -> void:
 ## Custom function for the module. Does exactly the same as play() but picks
 ## the animation from the state machine.
 func custom_play(play_random: bool = play_random_animation, custom_blend: float = -1, custom_speed: float = 1.0, from_end: bool = false) -> void:
-	var _preload_list = state_machine.get_current_state()
+	var _preload_list: AnimationList = state_machine.get_current_state()
+	#print("-------------------------------------------------")
+	#print(_preload_list)
+	#print(_preload_list.animation_list)
 	if _preload_list != animations_list:
 		animations_list = _preload_list
 		play(animations_list.get_animation(play_random), custom_blend, custom_speed, from_end)
@@ -111,6 +115,16 @@ func set_alternate_animations(animation_path: String, alternate_set: String) -> 
 		return
 	if _anim_list == animations_list and _anim_list.set_animation_override(alternate_set):
 		custom_play()
+
+
+func lock_state_machine(is_locked: bool = true) -> void:
+	state_machine.is_locked = is_locked
+
+
+func controller_set_state(call_id: String) -> void:
+	if not machine_controller:
+		return
+	machine_controller.change_state(call_id)
 
 
 func __anim_updated(_state_machine: StateMachine) -> void:
