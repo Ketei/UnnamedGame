@@ -13,7 +13,8 @@ func enter(_args:= {}):
 	if not player.is_on_air:
 		player.is_on_air = true
 	
-	fsm_animation_state.emit("root/air/movement", "jump")
+	#fsm_animation_state.emit("root/air/movement", "jump")
+	behaviour_module.module_manager.get_module("animation-player").controller_set_state("jump")
 	if not terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
 		terrain_tracker.terrain_changed.connect(_change_terrain_state)
 	
@@ -83,8 +84,8 @@ func set_target_node(new_target_node) -> void:
 		player = new_target_node
 
 
-func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
-	if new_state == GameProperties.TerrainState.GROUND:
+func _change_terrain_state(new_state: Game.TerrainState) -> void:
+	if new_state == Game.TerrainState.GROUND:
 		player.air_jump_count = 0
 		if 0 < jump_buffer.time_left and player.can_actor_jump(true):
 			player.jump(true, player.jump_velocity / (2 - int(Input.is_action_pressed("gc_jump"))))
@@ -99,9 +100,11 @@ func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
 func toggle_walk(is_walking: bool) -> void:
 	player.is_walking = is_walking
 	if player.is_walking:
-		fsm_animation_state.emit("root/ground/movement", "walk")
+		#fsm_animation_state.emit("root/ground/movement", "walk")
+		behaviour_module.module_manager.get_module("animation-player").controller_set_state("walk")
 	else:
-		fsm_animation_state.emit("root/ground/movement", "run")
+		#fsm_animation_state.emit("root/ground/movement", "run")
+		behaviour_module.module_manager.get_module("animation-player").controller_set_state("run")
 
 
 func __get_target_ground_state() -> String:

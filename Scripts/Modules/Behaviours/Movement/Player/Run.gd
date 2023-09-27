@@ -20,7 +20,8 @@ func enter(_args:= {}):
 		return
 	if not terrain_tracker.terrain_changed.is_connected(__change_terrain_state):
 		terrain_tracker.terrain_changed.connect(__change_terrain_state)
-	fsm_animation_state.emit("root/ground/movement", "run")
+	#fsm_animation_state.emit("root/ground/movement", "run")
+	behaviour_module.module_manager.get_module("animation-player").controller_set_state("run")
 
 
 func exit():
@@ -56,13 +57,13 @@ func handle_physics(delta : float) -> void:
 	player.change_actor_speed(player.axis_strength.x, delta)
 
 
-func __change_terrain_state(new_state: GameProperties.TerrainState) -> void:
-	if new_state == GameProperties.TerrainState.AIR:
+func __change_terrain_state(new_state: Game.TerrainState) -> void:
+	if new_state == Game.TerrainState.AIR:
 		if 0 <= player.velocity.y:
 			change_behaviour("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
 			change_behaviour("/jump")
-	elif new_state == GameProperties.TerrainState.LIQUID:
+	elif new_state == Game.TerrainState.LIQUID:
 		change_behaviour("/swim-idle")
 

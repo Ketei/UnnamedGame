@@ -14,11 +14,12 @@ func setup_behaviour() -> void:
 	terrain_tracker = behaviour_module.module_manager.get_module("terrain-tracker")
 
 
+# Idle is the "base" state so it can go from this to any other.
 func enter(_args:= {}):
 	if not player:
 		return
 
-	if terrain_tracker.terrain_state == GameProperties.TerrainState.AIR:
+	if terrain_tracker.terrain_state == Game.TerrainState.AIR:
 		if player.velocity.y < 0:
 			change_behaviour("/jump")
 		else:
@@ -39,6 +40,7 @@ func enter(_args:= {}):
 	if not terrain_tracker.terrain_changed.is_connected(__change_terrain_state):
 		terrain_tracker.terrain_changed.connect(__change_terrain_state)
 	
+	#behaviour_module.module_manager.get_module("animation-player").controller_set_state("idle")
 	fsm_animation_state.emit("root/ground/movement", "idle")
 
 
@@ -86,13 +88,13 @@ func handle_physics(delta : float) -> void:
 	player.change_actor_speed(0.0, delta)
 
 
-func __change_terrain_state(new_state: GameProperties.TerrainState) -> void:
-	if new_state == GameProperties.TerrainState.AIR:
+func __change_terrain_state(new_state: Game.TerrainState) -> void:
+	if new_state == Game.TerrainState.AIR:
 		if 0 <= player.velocity.y:
 			change_behaviour("/fall")
 			behaviour_module.module_manager.get_module("timers-manager").get_timer("coyote-timer").start()
 		else:
 			change_behaviour("/jump")
-	elif new_state == GameProperties.TerrainState.LIQUID:
+	elif new_state == Game.TerrainState.LIQUID:
 		change_behaviour("/swim-idle")
 

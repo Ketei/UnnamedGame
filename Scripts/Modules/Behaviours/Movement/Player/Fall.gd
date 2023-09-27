@@ -13,7 +13,7 @@ func setup_behaviour() -> void:
 
 
 func enter(_args:= {}):
-	if terrain_tracker.terrain_state == GameProperties.TerrainState.GROUND:
+	if terrain_tracker.terrain_state == Game.TerrainState.GROUND:
 		change_behaviour(__get_target_ground_state())
 		if player.is_on_air:
 			player.is_on_air = false
@@ -21,7 +21,8 @@ func enter(_args:= {}):
 	
 	if not player.is_on_air:
 		player.is_on_air = true
-	fsm_animation_state.emit("root/air/movement", "fall")
+	#fsm_animation_state.emit("root/air/movement", "fall")
+	behaviour_module.module_manager.get_module("animation-player").controller_set_state("fall")
 	if not terrain_tracker.terrain_changed.is_connected(_change_terrain_state):
 		terrain_tracker.terrain_changed.connect(_change_terrain_state)
 
@@ -65,8 +66,8 @@ func set_target_node(NewTargetNode) -> void:
 		player = NewTargetNode
 
 
-func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
-	if new_state == GameProperties.TerrainState.GROUND:
+func _change_terrain_state(new_state: Game.TerrainState) -> void:
+	if new_state == Game.TerrainState.GROUND:
 		player.air_jump_count = 0
 		player.is_on_air = false
 		if 0 < jump_buffer.time_left and player.can_actor_jump(true):
@@ -78,7 +79,7 @@ func _change_terrain_state(new_state: GameProperties.TerrainState) -> void:
 		if not jump_buffer.is_stopped():
 			jump_buffer.stop()
 
-	elif new_state == GameProperties.TerrainState.LIQUID:
+	elif new_state == Game.TerrainState.LIQUID:
 		player.is_on_air = false
 		change_behaviour("/swim-idle")
 
