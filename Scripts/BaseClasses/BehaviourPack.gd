@@ -3,6 +3,7 @@ extends Node
 
 
 var default_behaviour: Behaviour
+var behaviour_module: ModuleBehaviour # Reference
 var available_behaviours: Dictionary = {}
 
 @export var behaviour_pack_id: String = ""
@@ -10,10 +11,12 @@ var available_behaviours: Dictionary = {}
 
 func set_up_pack(target_node: Node, manager_node: ModuleBehaviour) -> void:
 	_pre_set_up(target_node, manager_node)
+	behaviour_module = manager_node
 	for child in get_children():
 		if not child is Behaviour:
 			continue
 		
+		child.pack_id = behaviour_pack_id
 		child.behaviour_module = manager_node
 		child.set_target_node(target_node)
 		child.setup_behaviour()
