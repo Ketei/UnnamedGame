@@ -18,8 +18,14 @@ signal nested_machine_changed(machine_ref)
 ## Key is the target state. Value(Dictionary) contains conditions required
 ## to transition. If all conditions are fullfilled set_state will be called.
 @export var transition_conditions: Dictionary = {}
-## If the state machine is locked, it'll prevent any transitions to new states.
+## If the state machine is locked, it'll prevent any transitions to new states 
+## or overrides.
 @export var is_locked: bool = false
+
+@export_group("Options")
+## How many changes will the state machine remember.
+@export_range(0, 50, 1) var history_size: int = 5
+
 
 ## Holds all the possible states the state machine can have
 var states_stack: Dictionary = {}
@@ -27,8 +33,12 @@ var states_stack: Dictionary = {}
 ## The value the current state machine is in.
 var current_state = null
 
+var state_history: Array[String]
+
 ## The key of the current_state in states_stack.
 var current_state_id: String = ""
+
+var state_override = null
 
 ## If this state machine is the top-level machine or is a nested one.
 var _is_top_level: bool = true
@@ -93,12 +103,14 @@ func travel_down(path: String, _path_array: Array = [], _array_index: int = 0, _
 		path.to_lower()
 		_path_array = path.split("/", false)
 		_array_size = _path_array.size()
-	
-	if _array_size == 0:
-		return null
+		if _array_size == 0:
+			return null
 	
 	if _array_index == _array_size -1 and _path_array[_array_index] == name.to_lower():
 		return self
+
+	if not _array_index < _array_size - 1:
+		return null
 	
 	if not states_stack.has(_path_array[_array_index + 1]):
 		return null
@@ -128,10 +140,17 @@ func has_state(state_name: String) -> bool:
 ## Gets the state machine current state. If the current state is a state machine
 ## it'll give that state machine's current state.
 func get_current_state():
-	if current_state is StateMachine:
+	var _target_state
+	
+	if state_override != null:
+		_target_state = state_override
+	else:
+		_target_state = current_state
+	
+	if _target_state is StateMachine:
 		return current_state.get_current_state()
 	else:
-		return current_state
+		return _target_state
 
 
 ## Returns the value of a state inside of states stack
@@ -167,6 +186,7 @@ func set_state(target_state: String) -> void:
 	if _is_top_level and current_state is StateMachine: # Used to prevent signal bubbling
 		__disconect_nested(get_current_state_machine())
 	
+	__register_state_history(current_state_id)
 	current_state_id = target_state
 	current_state = states_stack[target_state]
 	
@@ -174,6 +194,30 @@ func set_state(target_state: String) -> void:
 		__connect_nested(get_current_state_machine())
 	
 	state_changed.emit(self)
+
+
+## Locks the state machine to a specific state. The state machine can still be
+## updated while the override is set, and once the override is removed the
+## current state will return the updated one 
+func set_override(target_state: String) -> void:
+	if is_locked:
+		return
+	
+	if target_state == "":
+		state_override = null
+		state_changed.emit(self)
+	elif states_stack.has(target_state):
+		state_override = states_stack[target_state]
+		state_changed.emit(self)
+
+
+func go_to_previous_state(steps_back: int) -> void:
+	if state_history.size() == 0:
+		return
+	
+	steps_back = clampi(steps_back, 1, mini(state_history.size(), history_size - 1))
+	
+	set_state(state_history[steps_back])
 
 
 func __disconect_nested(machine_reference: StateMachine) -> void:
@@ -188,4 +232,13 @@ func __connect_nested(machine_reference: StateMachine) -> void:
 
 func __nested_changed(machine_ref: StateMachine) -> void:
 	nested_machine_changed.emit(machine_ref)
+
+
+func __register_state_history(state_to_register: String) -> void:
+	if history_size == 0:
+		return
+	
+	if state_history.size() == history_size:
+		state_history.resize(history_size - 1)
+	state_history.push_front(state_to_register)
 
