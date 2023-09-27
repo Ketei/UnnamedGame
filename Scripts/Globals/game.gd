@@ -7,10 +7,10 @@ enum TerrainState {GROUND, AIR, LIQUID}
 
 const TerrainNames: Array = ["ground", "air", "liquid"]
 
-# Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
+## Info about the tileset resolution. This is used to calculate gravity, velocity, etc.
 const GRID_SIZE: int = 16
 
-# Types of damage in game
+## Types of damage in game
 const ATTACK_TYPES: Dictionary = {
 	"blunt": DamageTypes.PHYSICAL,
 	"slashing": DamageTypes.PHYSICAL,
@@ -36,25 +36,14 @@ const TERRAIN_MOVEMENT_MOD : Dictionary = {
 const Arousal_Clearing_Penalty_Bottoms : int = 16
 const Arousal_Clearing_Penalty_Tops : int = 8
 
-# Applies effects to actor depending on it's lust value when the relevant value is updated.
-# Per-level effects are only applied when the lust value of the actor changes.
-# Effects need to be called by the relevant module in order to be applied. Methods to calculate
-# how much can be found on SexLibs
+# ------------ Skill Changes ------------
+## What changes to stats  to apply when lust changes.
 var lust_effects: Dictionary = {
 	"sex-damage-dealt": -0.75,
 	"sex-damage-received": 0.02
 }
-# ---------------------------
 
-# Used to change actor's values when it's skill changes.
-# SkillName(str): {SkillEffect(str): SkillChange(float)}
-
-# SkillName -> strength, endurance, charisma, intelligence, luck
-
-# SkillEffect -> health, stamina, mana | sex-skill-penis, sex-skill-oral, sex-skill-anal, sex-skill-vaginal
-# sex-damage-dealt, sex-damage-received, sex-endurance, sex-limit-break | damage-physical, damage-magical,
-# defense-physical, defense-magical
-
+## What changes to stats  to apply when a skill changes.
 var skill_effects: Dictionary = {
 	"strength": {
 		"damage-physical": 1
@@ -68,7 +57,18 @@ var skill_effects: Dictionary = {
 		"defense-magical": 0.5
 	}
 }
+# ----------------------------------------
 
+var game_difficulty: Difficulty = Difficulty.NORMAL
+
+
+var user_preferences: UserPreferences
+
+
+func _init():
+	user_preferences = UserPreferences.load_or_create()
+	update_physics_rate()
+	
 
 # Switch to control lib when/id it exists
 func change_keybind(event_name: String, new_keybind_key_code: int):
@@ -97,6 +97,13 @@ func remove_lust_effect(lust_amount: int, stat_change: String):
 		
 	if lust_effects[str(lust_amount)].is_empty():
 		lust_effects.erase(str(lust_amount))
+
+
+func update_physics_rate() -> void:
+	if Engine.max_fps != user_preferences.refresh_rate:
+		Engine.max_fps = user_preferences.refresh_rate
+	if Engine.physics_ticks_per_second != user_preferences.refresh_rate:
+		Engine.physics_ticks_per_second = user_preferences.refresh_rate
 
 
 func get_skill_effects(skill_name: String, current_level: float, previous_level: float) -> Dictionary:
