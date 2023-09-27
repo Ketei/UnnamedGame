@@ -1,3 +1,4 @@
-extends Area2D
-class_name TestTerrain
+extends CanvasLayer
+
+@export var bars_stats: Array[StatProgressBar]
 
