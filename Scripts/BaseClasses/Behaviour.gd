@@ -9,6 +9,10 @@ signal fsm_animation_state(state_path: String, new_state: String)
 signal fsm_animation_replay(play_random: bool)
 signal use_alternate_animation_set(state_path: String, alternate_set: String)
 
+# This is the type of behaviour this is, it's unique inside each ModuleBehaviour.
+# Some common behaviours id's are: "movement", "action", "weapon"
+@export var behaviour_id: StringName = ""
+
 # References
 var behaviour_module: ModuleBehaviour
 
@@ -16,9 +20,8 @@ var behaviour_module: ModuleBehaviour
 # are loaded as default/initial.
 var is_default: bool = false
 
-# This is the type of behaviour this is, it's unique inside each ModuleBehaviour.
-# Some common behaviours id's are: "movement", "action", "weapon"
-var behaviour_id: String = ""
+
+var pack_id: String = ""
 
 # When a behaviour is connected it can transition to other behaviours. Disconnecting the
 # behaviour means that this behaviour will ignore all transition signals. Useful if you
@@ -26,6 +29,7 @@ var behaviour_id: String = ""
 var is_connected: bool = true
 
 var _change_signal_sent: bool = false
+
 
 func enter(_args:= {}):
 	pass
