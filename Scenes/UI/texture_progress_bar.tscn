@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cjv5l3hbwnlp1"]
 
-[ext_resource type="Texture2D" uid="uid://b8s5athuxem6n" path="res://Assets/Textures/UI/bar_fill.png" id="1_dhk6w"]
-[ext_resource type="Texture2D" uid="uid://djk7aht017mdr" path="res://Assets/Textures/UI/bar_over.png" id="2_xuv72"]
+[ext_resource type="Texture2D" uid="uid://b8s5athuxem6n" path="res://Assets/Textures/UI/HUD/bar_fill.png" id="1_8ycuk"]
+[ext_resource type="Texture2D" uid="uid://djk7aht017mdr" path="res://Assets/Textures/UI/HUD/bar_over.png" id="2_kxfq6"]
 
 [node name="TextureProgressBar" type="TextureProgressBar"]
 offset_right = 80.0
@@ -12,9 +12,9 @@ stretch_margin_left = 3
 stretch_margin_top = 3
 stretch_margin_right = 3
 stretch_margin_bottom = 3
-texture_under = ExtResource("1_dhk6w")
-texture_over = ExtResource("2_xuv72")
-texture_progress = ExtResource("1_dhk6w")
+texture_under = ExtResource("1_8ycuk")
+texture_over = ExtResource("2_kxfq6")
+texture_progress = ExtResource("1_8ycuk")
 tint_under = Color(0.27451, 0.14902, 0.145098, 1)
 tint_over = Color(0.172549, 0.172549, 0.172549, 1)
 tint_progress = Color(0.905882, 0.286275, 0.313726, 1)
