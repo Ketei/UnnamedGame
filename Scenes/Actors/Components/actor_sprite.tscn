@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bdiyfgq02cvwy"]
 
-[ext_resource type="Texture2D" uid="uid://87buhp2h0ief" path="res://icon.svg" id="1_4t3j4"]
-[ext_resource type="Script" path="res://Scripts/Components/actor_sprite.gd" id="1_w1man"]
+[ext_resource type="Texture2D" uid="uid://87buhp2h0ief" path="res://icon.svg" id="1_gy4kk"]
+[ext_resource type="Script" path="res://Scripts/Components/actor_sprite.gd" id="2_kbsop"]
 
 [sub_resource type="Animation" id="Animation_1kmv2"]
 length = 0.001
@@ -43,8 +43,8 @@ _data = {
 }
 
 [node name="ActorSprite" type="Sprite2D"]
-texture = ExtResource("1_4t3j4")
-script = ExtResource("1_w1man")
+texture = ExtResource("1_gy4kk")
+script = ExtResource("2_kbsop")
 
 [node name="SpriteEffects" type="AnimationPlayer" parent="."]
 unique_name_in_owner = true
