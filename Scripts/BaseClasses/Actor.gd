@@ -154,9 +154,9 @@ func update_facing_right() -> void:
 		return
 	
 	if velocity.x < 0 and not actor_sprite.flip_h:
-		actor_sprite.flip_h = true
+		actor_sprite.flip_horizontal(true)
 	elif 0 < velocity.x and actor_sprite.flip_h:
-		actor_sprite.flip_h = false
+		actor_sprite.flip_horizontal(false)
 
 
 func jump(jump_from_ground: bool, jump_force: float = jump_velocity) -> void:
