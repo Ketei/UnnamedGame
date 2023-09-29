@@ -1,13 +1,15 @@
-[gd_scene load_steps=32 format=3 uid="uid://df5dftulja42v"]
+[gd_scene load_steps=36 format=3 uid="uid://df5dftulja42v"]
 
 [ext_resource type="Script" path="res://Scripts/Actors/Player.gd" id="1_pwxxx"]
 [ext_resource type="PackedScene" uid="uid://bdiyfgq02cvwy" path="res://Scenes/Actors/Components/actor_sprite.tscn" id="2_nljli"]
-[ext_resource type="Texture2D" uid="uid://b0icky3bgk5v0" path="res://Assets/Textures/Actors/Player/Character_48x48.png" id="3_a73uu"]
+[ext_resource type="Texture2D" uid="uid://bnq013qp5qv0v" path="res://Assets/Textures/Actors/Player/Character_48x48_2.png" id="3_3rkvg"]
 [ext_resource type="Script" path="res://Scripts/BaseClasses/ModuleManager.gd" id="3_ieijs"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_behaviour.gd" id="4_4kw1u"]
+[ext_resource type="Script" path="res://Scripts/BaseClasses/Combat/hit_box.gd" id="4_svcyd"]
 [ext_resource type="PackedScene" uid="uid://cd0fovjuf581s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour-pack_movement.tscn" id="5_sx5gr"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_terrain_tracker.gd" id="6_sbij3"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_timers_manager.gd" id="7_d17gd"]
+[ext_resource type="PackedScene" uid="uid://gu27l7pwfy2s" path="res://Scenes/Modules/Behaviour/Packs/Player/behaviour_pack_combat.tscn" id="8_178i0"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_animation_player.gd" id="8_gt0kb"]
 [ext_resource type="PackedScene" uid="uid://ergcsbjtx8h5" path="res://Scenes/StateMachines/player_anim_fsm.tscn" id="9_q6u2g"]
 [ext_resource type="Script" path="res://Scripts/Modules/module_gravity.gd" id="10_1o7wi"]
@@ -29,15 +31,18 @@ size = Vector2(12, 4)
 resource_name = "player_hurt_box"
 script/source = "extends HurtBox
 
-@export var player_sprite: ActorSprite2D
 
 func _hit() -> void:
 	if 0.3 < invincibility_time:
-		player_sprite.play_effect(ActorSprite2D.EffectType.BLINK, invincibility_time)
+		sprite.play_effect(ActorSprite2D.EffectType.BLINK, invincibility_time)
+
 "
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mrg70"]
 size = Vector2(12, 27)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reyvg"]
+size = Vector2(2, 2)
 
 [sub_resource type="Animation" id="Animation_lkhnf"]
 length = 0.001
@@ -134,6 +139,67 @@ tracks/0/keys = {
 "values": [26, 27]
 }
 
+[sub_resource type="Animation" id="Animation_d1bbf"]
+resource_name = "punch"
+length = 0.5
+step = 0.01
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../ActorSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.15, 0.25, 0.35, 0.45, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [43, 44, 45, 46, 47, 49, 50]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("../HitBox/HitCollisionShape:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.25),
+"transitions": PackedFloat32Array(0, 0, 0),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(15.5, -16.5), Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("../HitBox/HitCollisionShape:shape:size")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.25),
+"transitions": PackedFloat32Array(0, 0, 0),
+"update": 0,
+"values": [Vector2(2, 2), Vector2(14, 6), Vector2(2, 2)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("../HitBox/HitCollisionShape")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [&"disabled", true],
+"method": &"set_deferred"
+}, {
+"args": [&"disabled", false],
+"method": &"set_deferred"
+}, {
+"args": [&"disabled", true],
+"method": &"set_deferred"
+}]
+}
+
 [sub_resource type="Animation" id="Animation_3c5ef"]
 resource_name = "run"
 length = 0.8
@@ -176,12 +242,12 @@ _data = {
 "fall": SubResource("Animation_jelgw"),
 "idle": SubResource("Animation_ym4cv"),
 "jump": SubResource("Animation_05th0"),
+"punch": SubResource("Animation_d1bbf"),
 "run": SubResource("Animation_3c5ef"),
 "walk": SubResource("Animation_t05fn")
 }
 
 [node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("actor_sprite", "module_manager", "hurt_box")]
-position = Vector2(1, 0)
 collision_layer = 0
 collision_mask = 5
 script = ExtResource("1_pwxxx")
@@ -200,13 +266,13 @@ time_to_floor = 0.38
 time_to_peak = 0.45
 air_acceleration = 0.45
 air_friction = 1.0
-hurt_box = NodePath("PlayerHurtBox")
+hurt_box = NodePath("HurtBox")
 
 [node name="ActorSprite" parent="." instance=ExtResource("2_nljli")]
 position = Vector2(0, -16)
-texture = ExtResource("3_a73uu")
+texture = ExtResource("3_3rkvg")
 hframes = 5
-vframes = 9
+vframes = 11
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(0, 0, 5, 0, 6, -1, 6, -23, 4, -27, 0, -27, -4, -27, -6, -23, -6, -1, -5, 0)
@@ -237,16 +303,29 @@ visible = false
 position = Vector2(0, -18)
 shape = SubResource("RectangleShape2D_2le28")
 
-[node name="PlayerHurtBox" type="Area2D" parent="." node_paths=PackedStringArray("player_sprite", "module_stats")]
+[node name="HurtBox" type="Area2D" parent="." node_paths=PackedStringArray("module_stats", "sprite")]
 script = SubResource("GDScript_84agl")
-player_sprite = NodePath("../ActorSprite")
 module_stats = NodePath("../ModuleManager/ModuleStats")
+sprite = NodePath("../ActorSprite")
 invincibility_time = 2.5
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerHurtBox"]
+[node name="HurtCollisionShape" type="CollisionShape2D" parent="HurtBox"]
 position = Vector2(0, -13.5)
 shape = SubResource("RectangleShape2D_mrg70")
 debug_color = Color(0, 0.584314, 0.235294, 0.419608)
+
+[node name="HitBox" type="Area2D" parent="." node_paths=PackedStringArray("sprite", "collision_shape")]
+script = ExtResource("4_svcyd")
+sprite = NodePath("../ActorSprite")
+flip_with_sprite = true
+collision_shape = NodePath("HitCollisionShape")
+hit_enemies = true
+hit_objects = true
+
+[node name="HitCollisionShape" type="CollisionShape2D" parent="HitBox"]
+shape = SubResource("RectangleShape2D_reyvg")
+disabled = true
+debug_color = Color(0.870588, 0, 0.0862745, 0.419608)
 
 [node name="ModuleManager" type="Node" parent="." node_paths=PackedStringArray("parent_node")]
 script = ExtResource("3_ieijs")
@@ -258,6 +337,8 @@ script = ExtResource("4_4kw1u")
 default_pack = NodePath("BehaviourPack-Movement")
 
 [node name="BehaviourPack-Movement" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("5_sx5gr")]
+
+[node name="BehaviourPack-Combat" parent="ModuleManager/ModuleBehaviour" instance=ExtResource("8_178i0")]
 
 [node name="ModuleTerrainTracker" type="Node" parent="ModuleManager" node_paths=PackedStringArray("raycast_left", "raycast_center", "raycast_right", "ground_collision", "middle_collision")]
 script = ExtResource("6_sbij3")
