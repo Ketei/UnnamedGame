@@ -65,7 +65,8 @@ func handle_key_input(event : InputEvent) -> void:
 		player.is_walking = not player.is_walking
 	elif event.is_action_released("gc_walk") and player.walk_hold:
 		player.is_walking = false
-
+	elif event.is_action_pressed("gc_attack"):
+		change_behaviour("combat/attack")
 
 func set_target_node(new_target_node) -> void:
 	if new_target_node is Player:
