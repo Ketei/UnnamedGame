@@ -27,6 +27,10 @@ animation_list = Array[String](["walk"])
 script = ExtResource("2_ccu30")
 animation_list = Array[String](["run"])
 
+[node name="Attack" type="Node" parent="Ground/Movement"]
+script = ExtResource("2_ccu30")
+animation_list = Array[String](["punch"])
+
 [node name="Air" type="Node" parent="."]
 script = ExtResource("1_cxiaa")
 initial_state_key = "movement"
