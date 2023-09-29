@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://gu27l7pwfy2s"]
+
+[ext_resource type="Script" path="res://Scripts/BaseClasses/BehaviourPack.gd" id="1_jgr2s"]
+[ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Hurt.gd" id="2_qrew8"]
+[ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Attack.gd" id="3_fmp7n"]
+
+[node name="BehaviourPack-Combat" type="Node"]
+script = ExtResource("1_jgr2s")
+behaviour_pack_id = "combat"
+
+[node name="Hurt" type="Node" parent="."]
+script = ExtResource("2_qrew8")
+
+[node name="Attack" type="Node" parent="."]
+script = ExtResource("3_fmp7n")
