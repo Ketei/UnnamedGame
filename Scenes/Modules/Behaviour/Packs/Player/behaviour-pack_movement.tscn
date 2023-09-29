@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Walk.gd" id="3_2ydbe"]
 [ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Run.gd" id="4_8johf"]
 [ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Jump.gd" id="5_oe8tj"]
-[ext_resource type="Script" path="res://Scenes/Modules/Behaviour/Packs/Player/Hurt.gd" id="6_fp1e5"]
+[ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Hurt.gd" id="6_er1yq"]
 [ext_resource type="Script" path="res://Scripts/Modules/Behaviours/Movement/Player/Fall.gd" id="6_ouc77"]
 
 [sub_resource type="GDScript" id="GDScript_ky5mv"]
@@ -17,8 +17,7 @@ func _pre_set_up(_TargetNode: Node, BehaviourModule: ModuleBehaviour) -> void:
 
 
 func _post_set_up(_node, _module_behaviour)-> void:
-	$\"../../../PlayerHurtBox\".hit_taken.connect(_hit_taken)
-
+	$\"../../../HurtBox\".hit_taken.connect(_hit_taken)
 
 func _hit_taken() -> void:
 	behaviour_module.change_behaviour(\"/hurt\")
@@ -44,4 +43,4 @@ script = ExtResource("5_oe8tj")
 script = ExtResource("6_ouc77")
 
 [node name="Hurt" type="Node" parent="."]
-script = ExtResource("6_fp1e5")
+script = ExtResource("6_er1yq")
