@@ -17,8 +17,17 @@ enum HurtboxType {
 ## What type of entity is this hurtbox attatched to.
 @export var hurtbox_type: HurtboxType
 
+## Set the sprite to play effects on or to monitor for flips
+@export var sprite: ActorSprite2D
+
 @export_group("Invincibility")
 @export var invincibility_time: float = 1.0
+
+@export_group("Options")
+## The collisions will be flipped if the sprite is flipped too
+@export var flip_with_sprite: bool
+## This is only nessesary if Flip With Sprite is true
+@export var collision_shape: CollisionShape2D
 
 var invis_timer: Timer
 
@@ -39,6 +48,9 @@ func _ready():
 	invis_timer.one_shot = true
 	invis_timer.timeout.connect(__invincibility_timeout)
 	self.add_child(invis_timer)
+	
+	if flip_with_sprite and sprite and collision_shape:
+		sprite.sprite_flipped.connect(flip_collision_with_axis)
 
 ## Overridable function called when a hitbox enters the hurtbox.
 ## Can be used to apply visual effects.
@@ -64,6 +76,16 @@ func hit_triggered(area: HitBox) -> void:
 	is_invincible = true
 	invis_timer.start()
 	
+
+func flip_collision_with_axis(axis_char: String, flip_state: bool) -> void:
+	if not flip_with_sprite or not sprite or not collision_shape:
+		return
+	
+	if axis_char == "h":
+		self.scale.x = 1 - (2 * int(flip_state))
+	elif axis_char == "v":
+		self.scale.y = 1 - (2 * int(flip_state))
+
 
 func set_invincibility_frames(new_time: float) -> void:
 	invincibility_time = maxf(new_time, 0.1)
